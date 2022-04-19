@@ -7,6 +7,7 @@ plugins {
 	kotlin("jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.4.31"
 	kotlin("plugin.jpa") version "1.4.31"
+	jacoco
 }
 
 group = "ar.edu.unq"
@@ -42,4 +43,27 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport)
+}
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+}
+
+tasks.jacocoTestReport {
+	reports {
+		xml.required.set(true)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml").get().asFile)
+	}
+
+	classDirectories.setFrom(
+		sourceSets.main.get().output.asFileTree.matching {
+			include("ar/edu/unq/postinscripciones/model/**")
+			include("ar/edu/unq/postinscripciones/persistence/**")
+			include("ar/edu/unq/postinscripciones/service/**")
+		}
+	)
 }

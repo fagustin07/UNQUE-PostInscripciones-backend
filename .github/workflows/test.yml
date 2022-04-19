@@ -21,15 +21,18 @@ jobs:
       - name: Install jq
         run: sudo apt-get install jq
 
+      - name: Install Codacy
+        run: wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)
+
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
       - name: Run tests
         run: ./gradlew test -i koverVerify koverReport
 
-      - name: Upload coverage reports
+
+      - name: Update coverage report in Codacy
         if: success()
-        uses: codecov/codecov-action@v2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: build/reports/kover/report.xml
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Kotlin --force-language -r build/reports/jacoco/test/jacocoTestReport.xml
