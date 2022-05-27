@@ -1,4 +1,4 @@
-package ar.edu.unq.postinscripciones.resources
+package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.persistence.*
 import org.springframework.beans.factory.annotation.Autowired

@@ -31,4 +31,10 @@ class CuatrimestreService {
             )
         }
     }
+
+    @Transactional
+    fun obtener(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): Cuatrimestre {
+        return cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+            .orElseThrow { ExcepcionUNQUE("No se ha encontrado el cuatrimestre") }
+    }
 }

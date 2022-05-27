@@ -17,5 +17,9 @@ data class HorarioDTO(
         fun aModelo(horarioDTO: HorarioDTO): Horario {
             return Horario(horarioDTO.dia, LocalTime.parse(horarioDTO.inicio), LocalTime.parse(horarioDTO.fin))
         }
+
+        fun desdeModelo(horario: Horario): HorarioDTO {
+            return HorarioDTO(horario.dia, horario.inicio.toString(), horario.fin.toString())
+        }
     }
 }

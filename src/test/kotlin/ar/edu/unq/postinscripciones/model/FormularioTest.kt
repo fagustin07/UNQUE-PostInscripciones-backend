@@ -26,4 +26,50 @@ internal class FormularioTest {
     fun `un formulario conoce su cuatrimestre`() {
         assertThat(formulario.cuatrimestre).isEqualTo(cuatrimestre)
     }
+
+    @Test
+    fun `un formulario inicialmente se encuentra abierto`() {
+        assertThat(formulario.estado).isEqualTo(EstadoFormulario.ABIERTO)
+    }
+
+    @Test
+    fun `se puede cerrar un formulario`() {
+        formulario.cambiarEstado()
+        assertThat(formulario.estado).isEqualTo(EstadoFormulario.CERRADO)
+    }
+
+    @Test
+    fun `se puede abrir un formulario ya cerrado`() {
+        formulario.cambiarEstado()
+        val estadoDelFormularioDespuesDeCambiarEstado = formulario.estado
+        formulario.cambiarEstado()
+
+        assertThat(estadoDelFormularioDespuesDeCambiarEstado).isEqualTo(EstadoFormulario.CERRADO)
+        assertThat(formulario.estado).isEqualTo(EstadoFormulario.ABIERTO)
+    }
+
+    @Test
+    fun `cuando se cierra un formulario todas las solicitudes pendientes se rechazan`() {
+        val solicitudes = listOf(SolicitudSobrecupo(), SolicitudSobrecupo())
+        val formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = solicitudes)
+
+        formulario.cambiarEstado()
+
+        assertThat(formulario.solicitudes.map { it.estado })
+                .usingRecursiveComparison()
+                .isEqualTo(listOf(EstadoSolicitud.RECHAZADO, EstadoSolicitud.RECHAZADO))
+    }
+
+    @Test
+    fun `cuando se cierra un formulario todas las solicitudes aprobadas no se rechazan`() {
+        val solicitudes = listOf(SolicitudSobrecupo(), SolicitudSobrecupo())
+        solicitudes.first().cambiarEstado(EstadoSolicitud.APROBADO)
+        val formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = solicitudes)
+
+        formulario.cambiarEstado()
+
+        assertThat(formulario.solicitudes.map { it.estado })
+                .usingRecursiveComparison()
+                .isEqualTo(listOf(EstadoSolicitud.APROBADO, EstadoSolicitud.RECHAZADO))
+    }
 }

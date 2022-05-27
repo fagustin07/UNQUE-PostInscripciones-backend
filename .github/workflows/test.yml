@@ -28,7 +28,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests
-        run: ./gradlew test -i koverVerify koverReport
+        run: ./gradlew test -i
 
 
       - name: Update coverage report in Codacy

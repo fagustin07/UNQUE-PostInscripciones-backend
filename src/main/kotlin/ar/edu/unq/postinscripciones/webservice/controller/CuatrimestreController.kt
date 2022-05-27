@@ -1,8 +1,11 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.ComisionService
 import ar.edu.unq.postinscripciones.service.CuatrimestreService
+import ar.edu.unq.postinscripciones.service.dto.ComisionDTO
+import ar.edu.unq.postinscripciones.service.dto.CuatrimestreDTO
 import ar.edu.unq.postinscripciones.service.dto.FormularioCuatrimestre
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -28,10 +31,10 @@ class CuatrimestreController {
 
 
     @ApiOperation("Endpoint que se usa para registrar un nuevo cuatrimestre en el sistema")
-    @RequestMapping(value = ["/crear"], method = [RequestMethod.POST])
+    @RequestMapping(value = [""], method = [RequestMethod.POST])
     @ApiResponses(
         value = [
-            ApiResponse(code = 201, message = "Cuatrimestre creado"),
+            ApiResponse(code = 201, message = "Cuatrimestre creado", response = CuatrimestreDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
@@ -42,20 +45,41 @@ class CuatrimestreController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para obtener al oferta academica de un cuatrimestre")
+    @ApiOperation("Endpoint que se usa para obtener la oferta academica de un cuatrimestre")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "OK", response = ComisionDTO::class, responseContainer = "List"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
     @RequestMapping(value = ["/oferta"], method = [RequestMethod.GET])
     fun ofertaAcademica(
         @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
         @RequestParam
         anio: Int,
-        @ApiParam(value = "Semestre deseado", example = "S1", required = true)
+        @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
         @RequestParam
         semestre: Semestre
     ): ResponseEntity<*> {
         return ResponseEntity(
-            comisionService.ofertaDelCuatrimestre(anio, semestre),
+            comisionService.ofertaDelCuatrimestre(Cuatrimestre(anio, semestre)),
             HttpStatus.OK
         )
     }
 
+    @ApiOperation("Endpoint que se usa para obtener informacion basica de un cuatrimestre")
+    @RequestMapping(value = [""], method = [RequestMethod.GET])
+    fun cuatrimestre(
+        @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
+        @RequestParam
+        anio: Int,
+        @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
+        @RequestParam
+        semestre: Semestre
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            cuatrimestreService.obtener(Cuatrimestre(anio, semestre)),
+            HttpStatus.OK
+        )
+    }
 }

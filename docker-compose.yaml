@@ -7,23 +7,32 @@ services:
     restart: always
     env_file: .env
     ports:
-      - ${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}
+      - ${SPRING_LOCAL_PORT-8080}:${SPRING_DOCKER_PORT-8080}
     depends_on:
       - mysql
     environment:
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url": "jdbc:mysql://mysql:${MYSQLDB_DOCKER_PORT}/${MYSQLDB_DATABASE}",
-        "spring.datasource.username": "${MYSQLDB_USER}",
-        "spring.datasource.password": "${MYSQLDB_ROOT_PASSWORD}",
-        "spring.datasource.driver-class-name": "com.mysql.cj.jdbc.Driver",
+        "spring.datasource.url": "${SPRING_DATABASE_URL-jdbc:h2:mem:testdb}",
+        "spring.datasource.username": "${MYSQLDB_USER-root}",
+        "spring.datasource.password": "${MYSQLDB_ROOT_PASSWORD-root}",
+        "spring.datasource.driver-class-name": "${SPRING_DATABASE_DRIVER-org.h2.Driver}",
         "spring.jpa.hibernate.ddl-auto": "update",
-        "spring.jpa.database-platform": "org.hibernate.dialect.MySQL8Dialect",
+        "spring.jpa.database-platform": "${SPRING_DATABASE_PLATFORM-org.hibernate.dialect.H2Dialect}",
         "spring.jpa.properties.hibernate.show_sql": true,
         "spring.jpa.generate-ddl": true,
-        "server.port": ${SPRING_DOCKER_PORT},
-        "spring.security.user.password": "${SPRING_SECURITY_PASSWORD}",
-        "spring.security.user.name":"${SPRING_SECURITY_USER}",
-        "spring.security.user.roles": "admin" }'
+        "server.port": "${SPRING_DOCKER_PORT-8080}",
+        "spring.security.user.password": "${SPRING_SECURITY_PASSWORD-root}",
+        "spring.security.user.name":"${SPRING_SECURITY_USER-root}",
+        "spring.security.user.roles": "admin", 
+        "spring.liquibase.enabled":false,
+        "spring.flyway.enabled":true,
+        "spring.flyway.baselineOnMigrate":true,
+        "spring.flyway.url":"${SPRING_DATABASE_URL-jdbc:h2:mem:testdb}",
+        "spring.flyway.user":"${MYSQLDB_USER-root}",
+        "spring.flyway.password":"${MYSQLDB_ROOT_PASSWORD-root}",
+        "spring.flyway.schemas[0]":"${MYSQLDB_DATABASE-unque}",
+        "spring.flyway.create-schemas":true,
+        "spring.flyway.locations":"classpath:/db/migrations" }'
   mysql:
     image: "mysql:8.0"
     restart: always

@@ -1,5 +1,6 @@
 package ar.edu.unq.postinscripciones.service.dto
 
+import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import io.swagger.annotations.ApiModelProperty
 
@@ -16,5 +17,7 @@ data class FormularioComision(
     val cuposTotales: Int,
     @ApiModelProperty(example = "8", required = true)
     val sobreCuposTotales: Int,
-    val horarios: List<HorarioDTO>
+    val horarios: List<HorarioDTO>,
+    @ApiModelProperty(example = "PRESENCIAL", required = true)
+    val modalidad: Modalidad
 )

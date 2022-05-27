@@ -1,5 +1,6 @@
 package ar.edu.unq.postinscripciones.model
 
+import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import javax.persistence.*
@@ -15,4 +16,26 @@ class Formulario(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
+    @Enumerated(EnumType.STRING)
+    var estado = EstadoFormulario.ABIERTO
+
+    fun cambiarEstado() {
+        estado.cambiarEstado(this)
+    }
+
+    fun cerrarFormulario() {
+        solicitudes.forEach {
+            if (it.estado == EstadoSolicitud.PENDIENTE){
+                it.cambiarEstado(EstadoSolicitud.RECHAZADO)
+            }
+        }
+        estado = EstadoFormulario.CERRADO
+    }
+
+    fun abrirFormulario() {
+        estado = EstadoFormulario.ABIERTO
+    }
+
+    fun tieneLaComision(comision: Comision) = solicitudes.any { it.solicitaLaComision(comision) }
 }
+

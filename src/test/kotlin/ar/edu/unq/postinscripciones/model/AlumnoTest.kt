@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
 
 internal class AlumnoTest {
     lateinit var alumno: Alumno
@@ -16,7 +17,7 @@ internal class AlumnoTest {
     fun `set up`() {
         comisionBdd = Comision()
         otraComision = Comision(numero = 5)
-        alumno = Alumno()
+        alumno = Alumno(carrera = Carrera.TPI)
     }
 
     @Test
@@ -96,5 +97,47 @@ internal class AlumnoTest {
         alumno = Alumno(legajo = 123)
 
         assertThat(alumno.legajo).isEqualTo(123)
+    }
+
+    @Test
+    fun `Un alumno conoce la carrera en la que se encuentra inscripto`() {
+        alumno = Alumno(carrera = Carrera.TPI)
+
+        assertThat(alumno.carrera).isEqualTo(Carrera.TPI)
+    }
+
+    @Test
+    fun `Un alumno conoce su historia academica`() {
+        val intro = Materia("int-102", "Intro", mutableListOf())
+        val materiaCursada1 = MateriaCursada(intro)
+
+        alumno.cargarHistoriaAcademica(materiaCursada1)
+
+        assertThat(alumno.historiaAcademica).usingRecursiveComparison().isEqualTo(listOf(materiaCursada1))
+
+
+    }
+
+    @Test
+    fun `La historia academica se encuentra ordenada por fecha de carga descendente`() {
+        val intro = Materia("int-102", "Intro", mutableListOf())
+        val materiaCursada1 = MateriaCursada(intro, EstadoMateria.PA,LocalDate.of(2021, 7, 20))
+        val materiaCursada2 = MateriaCursada(intro, EstadoMateria.PA,LocalDate.of(2021, 12, 20))
+
+        alumno.cargarHistoriaAcademica(materiaCursada1)
+        alumno.cargarHistoriaAcademica(materiaCursada2)
+
+
+        assertThat(alumno.historiaAcademica).usingRecursiveComparison().isEqualTo(listOf(materiaCursada2, materiaCursada1))
+    }
+
+    @Test
+    fun `Un alumno conoce sus materias aprobadas`() {
+        val intro = Materia("int-102", "Intro", mutableListOf())
+        val materiaCursada1 = MateriaCursada(intro)
+        materiaCursada1.cambiarEstado(EstadoMateria.APROBADO)
+        alumno.cargarHistoriaAcademica(materiaCursada1)
+
+        assertThat(alumno.materiasAprobadas()).usingRecursiveComparison().isEqualTo(listOf(materiaCursada1.materia))
     }
 }

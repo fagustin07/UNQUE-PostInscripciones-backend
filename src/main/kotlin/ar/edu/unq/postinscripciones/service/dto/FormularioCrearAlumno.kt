@@ -1,5 +1,6 @@
 package ar.edu.unq.postinscripciones.service.dto
 
+import ar.edu.unq.postinscripciones.model.Carrera
 import io.swagger.annotations.ApiModelProperty
 
 data class FormularioCrearAlumno(
@@ -14,5 +15,8 @@ data class FormularioCrearAlumno(
     @ApiModelProperty(example = "999", required = true)
     val legajo: Int,
     @ApiModelProperty(example = "contrasenia", required = true)
-    val contrasenia: String
+    val contrasenia: String,
+    @ApiModelProperty(example = "TPI", required = true)
+    val carrera: Carrera,
+    val historiaAcademica: List<MateriaCursadaDTO>
 )

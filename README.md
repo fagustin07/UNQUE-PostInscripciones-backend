@@ -40,6 +40,5 @@ Aplicación para facilitar la asignación de sobre cupos de las materias de una 
     ```
     La aplicación se encontrara ejecutandose en el puerto indicado en ```SPRING_LOCAL_PORT:```
     
-## Diagrama de relaciones
- 
+## Diagrama de relaciones 
 ![Relaciones](imagenes/relaciones_1.4.jpg)

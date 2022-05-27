@@ -18,6 +18,8 @@ class SolicitudSobrecupo(
     fun cambiarEstado(estado: EstadoSolicitud){
         this.estado = estado
     }
+
+    fun solicitaLaComision(comision: Comision) = this.comision.esLaComision(comision)
 }
 
 enum class EstadoSolicitud {
