@@ -22,13 +22,13 @@ class MateriaController {
     private lateinit var materiaService: MateriaService
 
     @ApiOperation("Endpoint que se usa para registra una nueva materia en el sistema")
-    @RequestMapping(value = [""], method = [RequestMethod.POST])
     @ApiResponses(
         value = [
             ApiResponse(code = 201, message = "Materia creada", response = MateriaDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
+    @RequestMapping(value = [""], method = [RequestMethod.POST])
     fun registrarMateria(@RequestBody formularioMateria: FormularioMateria): ResponseEntity<*> {
         return ResponseEntity(
             materiaService.crear(

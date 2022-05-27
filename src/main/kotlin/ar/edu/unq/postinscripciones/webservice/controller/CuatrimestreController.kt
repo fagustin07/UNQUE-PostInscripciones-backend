@@ -31,13 +31,13 @@ class CuatrimestreController {
 
 
     @ApiOperation("Endpoint que se usa para registrar un nuevo cuatrimestre en el sistema")
-    @RequestMapping(value = [""], method = [RequestMethod.POST])
     @ApiResponses(
         value = [
             ApiResponse(code = 201, message = "Cuatrimestre creado", response = CuatrimestreDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
+    @RequestMapping(value = [""], method = [RequestMethod.POST])
     fun registrarCuatrimestre(@RequestBody formularioCuatrimestre: FormularioCuatrimestre): ResponseEntity<*> {
         return ResponseEntity(
             cuatrimestreService.crear(formularioCuatrimestre),

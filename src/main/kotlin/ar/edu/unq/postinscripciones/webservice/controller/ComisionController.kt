@@ -63,7 +63,6 @@ class ComisionController {
     }
 
     @ApiOperation(value = "##### Endpoint usado para listar todas las comisiones de un cuatrimestre ordenadas por cantidad de solicitudes #####")
-    @RequestMapping(value = [""], method = [RequestMethod.GET])
     @ApiResponses(
         value = [
             ApiResponse(
@@ -75,6 +74,7 @@ class ComisionController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
+    @RequestMapping(value = [""], method = [RequestMethod.GET])
     fun comisionSolicitudes(
         @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
         @RequestParam
@@ -90,7 +90,6 @@ class ComisionController {
     }
 
     @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una comision, junto con el id del formulario y la solicitud #####")
-    @RequestMapping(value = ["/solicitantes"], method = [RequestMethod.GET])
     @ApiResponses(
         value = [
             ApiResponse(
@@ -102,6 +101,7 @@ class ComisionController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
+    @RequestMapping(value = ["/solicitantes"], method = [RequestMethod.GET])
     fun alumnosQueSolicitaron(
         @ApiParam(value = "Id de la comision", example = "1", required = true)
         @RequestParam
@@ -116,7 +116,6 @@ class ComisionController {
 
 
     @ApiOperation("Endpoint que se usa para modificar los horarios de una comision ya creada")
-    @RequestMapping(value = ["/horarios/{comisionId}"], method = [RequestMethod.PUT])
     @ApiResponses(
             value = [
                 ApiResponse(
@@ -128,6 +127,7 @@ class ComisionController {
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )
+    @RequestMapping(value = ["/horarios/{comisionId}"], method = [RequestMethod.PUT])
     fun modificarHorarios(
             @ApiParam(value = "Id de la comision", example = "1", required = true)
             @PathVariable
