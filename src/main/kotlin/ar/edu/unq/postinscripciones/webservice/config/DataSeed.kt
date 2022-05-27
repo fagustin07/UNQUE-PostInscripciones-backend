@@ -228,7 +228,7 @@ class DataSeed(
             alumnoService.guardarSolicitudPara(bartolo.dni, listOf(bddc1.id!!, bddc2.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(jorge.dni, listOf(estrc1.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
-            alumnoService.guardarSolicitudPara(maria.dni, listOf(orgac1.id!!), cuatrimestre)
+            alumnoService.guardarSolicitudPara(maria.dni, listOf(bddc1.id!!), cuatrimestre)
 
             val cantMaterias = materiaRepository.count()
             val cantComisiones = comisionRespository.count()
