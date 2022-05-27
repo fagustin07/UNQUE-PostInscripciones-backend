@@ -77,7 +77,7 @@ class AlumnoService {
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         this.checkFecha(cuatrimestreObtenido.inicioInscripciones, cuatrimestreObtenido.finInscripciones, fechaCarga)
-        val alumno = alumnoRepository.findById(dni).get()
+        val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
         val solicitudesPorMateria = solicitudes.map { idComision ->
             val comision = comisionRepository.findById(idComision)
             SolicitudSobrecupo(comision.get())

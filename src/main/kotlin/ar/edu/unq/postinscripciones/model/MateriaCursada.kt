@@ -7,14 +7,15 @@ import javax.persistence.*
 class MateriaCursada(
         @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
         val materia: Materia,
+        @Enumerated(EnumType.STRING)
+        var estado: EstadoMateria = EstadoMateria.PA,
         var fechaDeCarga: LocalDate = LocalDate.now()
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
-    @Enumerated(EnumType.STRING)
-    var estado: EstadoMateria = EstadoMateria.PA
+
 
     fun cambiarEstado(nuevoEstado: EstadoMateria) {
         estado = nuevoEstado

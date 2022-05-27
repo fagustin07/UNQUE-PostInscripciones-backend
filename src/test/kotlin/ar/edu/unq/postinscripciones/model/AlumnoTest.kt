@@ -121,8 +121,8 @@ internal class AlumnoTest {
     @Test
     fun `La historia academica se encuentra ordenada por fecha de carga descendente`() {
         val intro = Materia("int-102", "Intro", mutableListOf())
-        val materiaCursada1 = MateriaCursada(intro, LocalDate.of(2021, 7, 20))
-        val materiaCursada2 = MateriaCursada(intro, LocalDate.of(2021, 12, 20))
+        val materiaCursada1 = MateriaCursada(intro, EstadoMateria.PA,LocalDate.of(2021, 7, 20))
+        val materiaCursada2 = MateriaCursada(intro, EstadoMateria.PA,LocalDate.of(2021, 12, 20))
 
         alumno.cargarHistoriaAcademica(materiaCursada1)
         alumno.cargarHistoriaAcademica(materiaCursada2)

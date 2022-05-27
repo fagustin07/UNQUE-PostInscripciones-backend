@@ -1,8 +1,6 @@
 package ar.edu.unq.postinscripciones.webservice.config
 
-import ar.edu.unq.postinscripciones.model.Alumno
-import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.Materia
+import ar.edu.unq.postinscripciones.model.*
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.comision.Horario
@@ -133,13 +131,28 @@ class DataSeed(
                 Horario(Dia.VIERNES, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0))
             )
 
+            val introhorariosc1 = listOf(
+                    Horario(Dia.MARTES, LocalTime.of(18, 0, 0), LocalTime.of(20, 0, 0)),
+                    Horario(Dia.JUEVES, LocalTime.of(18, 0, 0), LocalTime.of(22, 0, 0))
+            )
 
+            val introhorariosc2 = listOf(
+                    Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(11, 0, 0)),
+                    Horario(Dia.JUEVES, LocalTime.of(18, 0, 0), LocalTime.of(22, 0, 0))
+            )
+            val orgahorariosc1 = listOf(
+                    Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(11, 0, 0)),
+                    Horario(Dia.MIERCOLES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
+            )
             val cuatrimestre = Cuatrimestre.actual()
 
             val bddc1 = Comision(bdd, 1, cuatrimestre, bddhorariosc1)
             val bddc2 = Comision(bdd, 2, cuatrimestre, bddhorariosc2)
             val matec1 = Comision(mate1, 1, cuatrimestre, matehorarios)
             val estrc1 = Comision(estructura, 1, cuatrimestre, estrhorarios)
+            val introc1 = Comision(intro, 1, cuatrimestre, introhorariosc1)
+            val introc2 = Comision(intro, 2, cuatrimestre, introhorariosc2)
+            val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
 
             val jorge = Alumno(
                 12345678,
@@ -150,7 +163,6 @@ class DataSeed(
                 "contrasenia",
                 Carrera.SIMULTANEIDAD
             )
-
             val bartolo = Alumno(
                 12345677,
                 "Bartolo",
@@ -160,7 +172,44 @@ class DataSeed(
                 "contrasenia",
                 Carrera.SIMULTANEIDAD
             )
+            val maria = Alumno(
+                    12345680,
+                    "Maria",
+                    "Jimenez",
+                    "mjimenez@alu.edu.ar",
+                    45557,
+                    "contrasenia",
+                    Carrera.SIMULTANEIDAD
+            )
+            val roberto = Alumno(
+                    12345679,
+                    "Roberto",
+                    "Sanchez",
+                    "rsanchez@alu.edu.ar",
+                    45556,
+                    "contrasenia",
+                    Carrera.TPI
+            )
 
+            val firulais = Alumno(
+                    12345681,
+                    "Firulais",
+                    "Tercero",
+                    "ftercero@alu.edu.ar",
+                    45559,
+                    "contrasenia",
+                    Carrera.TPI
+            )
+
+            val sofia = Alumno(
+                    12345682,
+                    "sofia",
+                    "Sofia",
+                    "ssofia@alu.edu.ar",
+                    45560,
+                    "contrasenia",
+                    Carrera.TPI
+            )
             cuatrimestreRepository.save(cuatrimestre)
             materiaRepository.saveAll(listOf(epyl, lea, ttu, tti, matematica, ingles1, ingles2, bdd, intro, orga,mate1, estructura, objetos1, objetos2, redes
                                             , sistemasoperativos, concurrente, mate2, elementosdeingeneria, interfaces, persistencia, funcional, desarrollo, labo, bdd2
@@ -168,10 +217,18 @@ class DataSeed(
                                             , tecnicas, tip, analisis, mate3, proba, logica, seguridad, requerimientos, gestion, practicaDeDesarrollo, lfa, algoritmos
                                             , teoria, arquitectura1, distribuidos, caracteristicas, arquitectura2, arquitecturaDeComputadoras, parseo, aspectosLegales, seminarioFinal, seminarioCapacitacion
                                             , seguridadTec, tv, streaming, cloud, bajo, semantica, seminarios, calidad, funcionalAvanzada, progCuantica, ciudadana, ludificacion, cdDatos))
-            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1))
-            alumnoRepository.saveAll(listOf(jorge,bartolo))
-
+            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1))
+            jorge.actualizarHistoriaAcademica(listOf(MateriaCursada(intro, EstadoMateria.APROBADO), MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            roberto.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            bartolo.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            maria.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO)))
+            firulais.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            sofia.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            alumnoRepository.saveAll(listOf(jorge,bartolo, roberto, maria, firulais, sofia))
             alumnoService.guardarSolicitudPara(bartolo.dni, listOf(bddc1.id!!, bddc2.id!!), cuatrimestre)
+            alumnoService.guardarSolicitudPara(jorge.dni, listOf(estrc1.id!!), cuatrimestre)
+            alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
+            alumnoService.guardarSolicitudPara(maria.dni, listOf(orgac1.id!!), cuatrimestre)
 
             val cantMaterias = materiaRepository.count()
             val cantComisiones = comisionRespository.count()
