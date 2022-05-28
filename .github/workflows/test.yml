@@ -1,4 +1,4 @@
-name: UNQUE-PostInscripciones
+name: UNQUE-PostInscripciones Test
 
 on:
   push:
