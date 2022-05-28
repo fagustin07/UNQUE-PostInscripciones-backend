@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @ServiceREST
-@RequestMapping("/api/alumnos")
+@RequestMapping("/api/alumno")
 class AlumnoController {
 
     @Autowired
