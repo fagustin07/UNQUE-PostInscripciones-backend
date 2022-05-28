@@ -43,25 +43,6 @@ class ComisionController {
         )
     }
 
-    @ApiOperation(value = "Endpoint usado para listar todas las comisiones del cuatrimestre actual de una materia especifica")
-    @ApiResponses(
-        value = [
-            ApiResponse(code = 200, message = "OK", response = ComisionDTO::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
-        ]
-    )
-    @RequestMapping(value = ["/materia/{codigoMateria}"], method = [RequestMethod.GET])
-    fun materiasComision(
-        @PathVariable
-        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
-        codigoMateria: String
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-            comisionService.obtenerComisionesMateria(codigoMateria),
-            HttpStatus.OK
-        )
-    }
-
     @ApiOperation(value = "##### Endpoint usado para listar todas las comisiones de un cuatrimestre ordenadas por cantidad de solicitudes #####")
     @ApiResponses(
         value = [
@@ -101,14 +82,14 @@ class ComisionController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/solicitantes"], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/{id}/solicitantes"], method = [RequestMethod.GET])
     fun alumnosQueSolicitaron(
         @ApiParam(value = "Id de la comision", example = "1", required = true)
-        @RequestParam
-        comisionId: Long,
+        @PathVariable
+        id: Long,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(comisionId),
+            alumnoService.alumnosQueSolicitaron(id),
             HttpStatus.OK
         )
     }
@@ -127,16 +108,16 @@ class ComisionController {
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )
-    @RequestMapping(value = ["/horarios/{comisionId}"], method = [RequestMethod.PUT])
+    @RequestMapping(value = ["/{id}/horarios"], method = [RequestMethod.PUT])
     fun modificarHorarios(
             @ApiParam(value = "Id de la comision", example = "1", required = true)
             @PathVariable
-            comisionId: Long,
+            id: Long,
             @RequestBody
             nuevosHorarios: List<HorarioDTO>
     ): ResponseEntity<*> {
         return ResponseEntity(
-                comisionService.modificarHorarios(comisionId, nuevosHorarios),
+                comisionService.modificarHorarios(id, nuevosHorarios),
                 HttpStatus.OK
         )
     }

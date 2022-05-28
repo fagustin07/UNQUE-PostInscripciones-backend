@@ -1,6 +1,8 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
+import ar.edu.unq.postinscripciones.service.ComisionService
 import ar.edu.unq.postinscripciones.service.MateriaService
+import ar.edu.unq.postinscripciones.service.dto.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.MateriaDTO
 import io.swagger.annotations.ApiOperation
@@ -20,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 class MateriaController {
     @Autowired
     private lateinit var materiaService: MateriaService
+
+    @Autowired
+    private lateinit var comisionService: ComisionService
 
     @ApiOperation("Endpoint que se usa para registra una nueva materia en el sistema")
     @ApiResponses(
@@ -75,6 +80,25 @@ class MateriaController {
         return ResponseEntity(
                 materiaService.actualizarCorrelativas(codigo, correlativas),
                 HttpStatus.OK
+        )
+    }
+
+    @ApiOperation(value = "Endpoint usado para listar todas las comisiones del cuatrimestre actual de una materia especifica")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "OK", response = ComisionDTO::class, responseContainer = "List"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
+    @RequestMapping(value = ["/{codigo}/comision"], method = [RequestMethod.GET])
+    fun materiasComision(
+        @PathVariable
+        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+        codigo: String
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            comisionService.obtenerComisionesMateria(codigo),
+            HttpStatus.OK
         )
     }
 }
