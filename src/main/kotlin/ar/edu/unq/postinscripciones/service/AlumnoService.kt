@@ -55,11 +55,12 @@ class AlumnoService {
 
         val historiaAcademica: List<MateriaCursada> = historiaDada.map {
             val materia = materiaRepository
-                    .findMateriaByCodigo(it.codigoMateria).orElseThrow { ExcepcionUNQUE("No existe la materia") }
+                .findMateriaByCodigo(it.codigoMateria).orElseThrow { ExcepcionUNQUE("No existe la materia") }
             val materiaCursada = MateriaCursada(materia)
             materiaCursada.estado = it.estado
             materiaCursada.fechaDeCarga = it.fechaDeCarga
-            materiaCursada}
+            materiaCursada
+        }
 
         alumno.actualizarHistoriaAcademica(historiaAcademica)
 
@@ -69,7 +70,7 @@ class AlumnoService {
     @Transactional
     fun guardarSolicitudPara(
         dni: Int,
-        solicitudes: List<Long>,
+        idComisiones: List<Long>,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
         fechaCarga: LocalDateTime = LocalDateTime.now()
     ): FormularioDTO {
@@ -78,18 +79,34 @@ class AlumnoService {
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         this.checkFecha(cuatrimestreObtenido.inicioInscripciones, cuatrimestreObtenido.finInscripciones, fechaCarga)
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
-        val solicitudesPorMateria = solicitudes.map { idComision ->
-            val comision = comisionRepository.findById(idComision)
-            SolicitudSobrecupo(comision.get())
-        }
-        val materiasDisponibles = this.materiasDisponibles(alumno.dni, cuatrimestreObtenido)
-        this.checkPuedeCursar(alumno, solicitudesPorMateria, materiasDisponibles)
+        val solicitudesPorMateria = this.chequearSiPuedeCursarYObtenerSolicitudes(alumno,cuatrimestre,idComisiones)
         val formulario = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudesPorMateria))
 
         alumno.guardarFormulario(formulario)
         alumnoRepository.save(alumno)
 
         return FormularioDTO.desdeModelo(formulario, alumno.dni)
+    }
+
+    @Transactional
+    fun actualizarFormulario(
+        dniAlumno: Int,
+        idComisiones: List<Long>,
+        cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+        fechaCarga: LocalDateTime = LocalDateTime.now()
+    ): FormularioDTO {
+        val cuatrimestreObtenido =
+            cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        this.checkFecha(cuatrimestre.inicioInscripciones, cuatrimestre.finInscripciones, fechaCarga)
+        val alumno = alumnoRepository.findById(dniAlumno).get()
+        val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
+        val formularioNuevo = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes))
+
+        alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formularioNuevo)
+        alumnoRepository.save(alumno)
+
+        return FormularioDTO.desdeModelo(formularioNuevo, alumno.dni)
     }
 
     @Transactional
@@ -156,15 +173,15 @@ class AlumnoService {
         val cuatrimestreObtenido = Cuatrimestre.actual()
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("El Alumno no existe") }
         val materiasCursadas = alumnoRepository.findResumenHistoriaAcademica(dni)
-                .map {
-                    val materia = materiaRepository.findMateriaByCodigo(it.get(0) as String)
-                            .orElseThrow{ ExcepcionUNQUE("Materia no encontrada") }
-                    val fecha = (it.get(2) as java.sql.Date).toLocalDate()
-                    val estado = EstadoMateria.desdeString(it.get(1) as String)
-                    val intentos = (it.get(3) as BigInteger).toInt()
+            .map {
+                val materia = materiaRepository.findMateriaByCodigo(it.get(0) as String)
+                    .orElseThrow { ExcepcionUNQUE("Materia no encontrada") }
+                val fecha = (it.get(2) as java.sql.Date).toLocalDate()
+                val estado = EstadoMateria.desdeString(it.get(1) as String)
+                val intentos = (it.get(3) as BigInteger).toInt()
 
-                    MateriaCursadaResumenDTO(materia.nombre, materia.codigo, estado, fecha, intentos)
-                }
+                MateriaCursadaResumenDTO(materia.nombre, materia.codigo, estado, fecha, intentos)
+            }
 
         return ResumenAlumno(
             alumno.nombre,
@@ -225,6 +242,21 @@ class AlumnoService {
                 )
         }
         return materias
+    }
+
+    private fun chequearSiPuedeCursarYObtenerSolicitudes(
+        alumno: Alumno,
+        cuatrimestre: Cuatrimestre,
+        idComisiones: List<Long>
+    ): List<SolicitudSobrecupo> {
+        val solicitudes = idComisiones.map { idComision ->
+            val comision = comisionRepository.findById(idComision)
+            SolicitudSobrecupo(comision.get())
+        }
+        val materiasDisponibles = this.materiasDisponibles(alumno.dni, cuatrimestre)
+        this.checkPuedeCursar(alumno, solicitudes, materiasDisponibles)
+
+        return solicitudes
     }
 
     private fun checkFecha(

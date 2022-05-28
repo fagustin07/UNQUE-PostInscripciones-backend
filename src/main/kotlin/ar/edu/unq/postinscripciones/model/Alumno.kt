@@ -19,10 +19,10 @@ class Alumno(
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD,
 ) {
-    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     private val formularios: MutableList<Formulario> = mutableListOf()
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
 
     fun guardarFormulario(formulario: Formulario) {
@@ -35,6 +35,11 @@ class Alumno(
         historiaAcademica.sortByDescending { it.fechaDeCarga }
     }
 
+    fun cambiarFormulario(anio: Int, semestre: Semestre, formulario: Formulario) {
+        formularios.removeIf { it.cuatrimestre.esElCuatrimestre(anio,semestre) }
+        formularios.add(formulario)
+    }
+
     fun actualizarHistoriaAcademica(historia: List<MateriaCursada>) {
         historiaAcademica = historia.toMutableList()
     }
@@ -42,13 +47,6 @@ class Alumno(
     fun obtenerFormulario(anio: Int, semestre: Semestre): Formulario {
         val formulario = formularios.find { it.cuatrimestre.esElCuatrimestre(anio, semestre) }
         return formulario ?: throw ExcepcionUNQUE("No se encontró ningun formulario para el cuatrimestre dado")
-    }
-
-    fun obtenerFormularioYSolicitud(comision: Comision): Pair<Formulario, SolicitudSobrecupo> {
-        val formulario = formularios.firstOrNull { it.tieneLaComision(comision) } ?: throw ExcepcionUNQUE("No se encontró ningun formulario que tenga la comision dada")
-        val solicitud = formulario.solicitudes.first { it.solicitaLaComision(comision) }
-
-        return Pair(formulario, solicitud)
     }
 
     fun haSolicitado(unaComision: Comision): Boolean {
@@ -68,10 +66,6 @@ class Alumno(
     }
 
     fun cantidadAprobadas() = historiaAcademica.count { it.estado == EstadoMateria.APROBADO }
-
-    fun cantidadDeVecesQueCurso(materia: Materia): Int {
-        return historiaAcademica.count { it.materia.esLaMateria(materia) }
-    }
 
     fun puedeCursar(solicitudes : List<Materia>, materiasDisponibles: List<String>) : Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }

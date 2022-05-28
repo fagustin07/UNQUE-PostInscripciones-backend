@@ -41,14 +41,14 @@ class AlumnoController {
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )
-    @RequestMapping(value = ["/historia-academica/{alumnoDni}"], method = [RequestMethod.PUT])
+    @RequestMapping(value = ["/{dni}/historia-academica"], method = [RequestMethod.PUT])
     fun actualizarHistoriaAcademica(
             @ApiParam(value = "Dni del alumno para cargar historia academica", example = "12345677", required = true)
-            @PathVariable alumnoDni: Int,
+            @PathVariable dni: Int,
             @RequestBody historiaAcademica: List<MateriaCursadaDTO>
     ): ResponseEntity<*> {
         return ResponseEntity(
-                alumnoService.actualizarHistoriaAcademica(alumnoDni, historiaAcademica),
+                alumnoService.actualizarHistoriaAcademica(dni, historiaAcademica),
                 HttpStatus.CREATED
         )
     }
@@ -60,7 +60,7 @@ class AlumnoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/solicitudes/{dni}"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/{dni}/solicitudes"], method = [RequestMethod.POST])
     fun cargarSolicitudes(
         @ApiParam(value = "Dni del alumno para cargar solicitudes", example = "12345678", required = true)
         @PathVariable dni: Int,
@@ -69,6 +69,26 @@ class AlumnoController {
     ): ResponseEntity<*> {
         return ResponseEntity(
             alumnoService.guardarSolicitudPara(dni, comisiones),
+            HttpStatus.OK
+        )
+    }
+
+    @ApiOperation("Endpoint que se usa para actualizar las solicitudes de un alumno.")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
+    @RequestMapping(value = ["/{dni}/solicitudes"], method = [RequestMethod.PUT])
+    fun actualizarFormulario(
+        @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
+        @PathVariable dni: Int,
+        @ApiParam(value = "Lista de id de comisiones pedidas. Ejemplo: [2]", required = true)
+        @RequestBody comisiones: List<Long>
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            alumnoService.actualizarFormulario(dni, comisiones),
             HttpStatus.OK
         )
     }
@@ -102,7 +122,7 @@ class AlumnoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/materias/{dni}"], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/{dni}/materias"], method = [RequestMethod.GET])
     fun materiasDisponibles(
         @ApiParam(value = "Dni del alumno", example = "12345678", required = true)
         @PathVariable

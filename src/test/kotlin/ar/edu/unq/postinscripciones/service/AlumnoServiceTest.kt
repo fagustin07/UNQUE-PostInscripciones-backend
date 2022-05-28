@@ -7,6 +7,8 @@ import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.persistence.FormularioRepository
+import ar.edu.unq.postinscripciones.persistence.SolicitudSobrecupoRepository
 import ar.edu.unq.postinscripciones.service.dto.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -448,6 +450,78 @@ internal class AlumnoServiceTest {
         val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
         assertThat(alumnos.first().cantidadDeAprobadas).isEqualTo(alumnos.maxOf { it.cantidadDeAprobadas })
         assertThat(alumnos.last().cantidadDeAprobadas).isEqualTo(alumnos.minOf { it.cantidadDeAprobadas })
+    }
+
+    @Test
+    fun `un alumno puede editar su formulario dentro del periodo de inscripcion`() {
+        alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioComision = FormularioComision(
+            2,
+            algo.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            listOf(),
+            Modalidad.PRESENCIAL
+        )
+        val comisionDosAlgoritmos = comisionService.crear(formularioComision)
+
+        val formularioActualizado = alumnoService.actualizarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!))
+
+        val formularioLuegoDeActualizar = alumnoService.obtenerFormulario(alumno.dni)
+        assertThat(formularioLuegoDeActualizar.solicitudes).containsExactly(formularioActualizado.solicitudes.first())
+    }
+
+    @Test
+    fun `un alumno no puede editar su formulario fuera del periodo de inscripcion`() {
+        val formularioAntesDeActualizar = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioComision = FormularioComision(
+            2,
+            algo.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            listOf(),
+            Modalidad.PRESENCIAL
+        )
+        val comisionDosAlgoritmos = comisionService.crear(formularioComision)
+
+        val excepcion = assertThrows<ExcepcionUNQUE> { alumnoService.actualizarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!), fechaCarga = cuatrimestre.finInscripciones.plusDays(1)) }
+
+        val formularioLuegoDeIntentarActualizar = alumnoService.obtenerFormulario(alumno.dni)
+        assertThat(formularioLuegoDeIntentarActualizar).usingRecursiveComparison().isEqualTo(formularioAntesDeActualizar)
+        assertThat(excepcion.message).isEqualTo("El periodo para enviar solicitudes de sobrecupos ya ha pasado.")
+    }
+
+    @Autowired
+    lateinit var formularioRepository: FormularioRepository
+
+    @Autowired
+    lateinit var solicitudRepository: SolicitudSobrecupoRepository
+
+    @Test
+    fun `al desvincular un alumno de un formulario se borra el formulario y las solicitudes pero no la comision de las solicitudes`() {
+        val formularioAntesDeActualizar = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioComision = FormularioComision(
+            2,
+            algo.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            listOf(),
+            Modalidad.PRESENCIAL
+        )
+        val comisionDosAlgoritmos = comisionService.crear(formularioComision)
+
+        alumnoService.actualizarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!))
+
+        assertThat(formularioRepository.findById(formularioAntesDeActualizar.id).isPresent).isFalse
+        assertThat(solicitudRepository.findById(formularioAntesDeActualizar.solicitudes.first().id).isPresent).isFalse
+        assertThat(comisionService.obtener(comision1Algoritmos.id!!)).usingRecursiveComparison().isEqualTo(ComisionDTO.desdeModelo(comision1Algoritmos))
+        assertThat(cuatrimestreService.obtener(cuatrimestre)).usingRecursiveComparison().isEqualTo(cuatrimestre)
     }
 
     @AfterEach

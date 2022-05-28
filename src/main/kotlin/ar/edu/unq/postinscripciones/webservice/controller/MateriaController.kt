@@ -63,7 +63,7 @@ class MateriaController {
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )
-    @RequestMapping(value = ["/correlativas/{codigo}"], method = [RequestMethod.PUT])
+    @RequestMapping(value = ["/{codigo}/correlativas"], method = [RequestMethod.PUT])
     fun actualizarCorrelativas(
             @PathVariable
             @ApiParam(value = "Codigo de materia", example = "80000", required = true)

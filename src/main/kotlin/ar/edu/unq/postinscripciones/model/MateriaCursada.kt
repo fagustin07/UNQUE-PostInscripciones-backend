@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 class MateriaCursada(
-        @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+        @ManyToOne(fetch = FetchType.EAGER)
         val materia: Materia,
         @Enumerated(EnumType.STRING)
         var estado: EstadoMateria = EstadoMateria.PA,
