@@ -2,6 +2,7 @@ package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.MateriaDTO
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -76,6 +77,44 @@ internal class MateriaServiceTest {
                 mutableListOf("EPYL-103"),
                 Carrera.SIMULTANEIDAD
             )
+        }
+
+        assertThat(excepcion.message).isEqualTo("No existe la materia con codigo: EPYL-103")
+    }
+
+    @Test
+    fun `Se puede crear una lista de materias`() {
+        val intro = FormularioMateria("00487", "Introducción a la Programación",mutableListOf(), Carrera.SIMULTANEIDAD)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras",mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materiasCreadas = materiaService.crear(listOf(intro, orga))
+
+        assertThat(materiasCreadas.map{it.codigo}).containsAll(listOf(intro.codigo, orga.codigo))
+    }
+
+    @Test
+    fun `no se puede crear una lista de materias que ya existen`() {
+        val excepcion = assertThrows<ExcepcionUNQUE> {
+            materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096", mutableListOf(), Carrera.SIMULTANEIDAD)))
+        }
+        assertThat(excepcion.message).isEqualTo(
+            "La materia que desea crear con nombre Base de datos " +
+                    "y codigo BD-096, " +
+                    "genera conflicto con la materia: ${bdd.nombre}, codigo: ${bdd.codigo}"
+        )
+    }
+
+    @Test
+    fun `se puede crear una lista de materias con una correlativa`() {
+        val orga = FormularioMateria("01032", "Organización de las Computadoras",mutableListOf(bdd.codigo), Carrera.SIMULTANEIDAD)
+        val materiasCreadas = materiaService.crear(listOf(orga))
+        assertThat(materiasCreadas.first().correlativas.first()).isEqualTo(bdd.nombre)
+    }
+
+    @Test
+    fun `no se puede crear una lista de materias con una correlativa inexistente`() {
+        val orga = FormularioMateria("01032", "Organización de las Computadoras",mutableListOf("EPYL-103"), Carrera.SIMULTANEIDAD)
+        val excepcion = assertThrows<ExcepcionUNQUE> {
+            materiaService.crear(listOf(orga))
         }
 
         assertThat(excepcion.message).isEqualTo("No existe la materia con codigo: EPYL-103")

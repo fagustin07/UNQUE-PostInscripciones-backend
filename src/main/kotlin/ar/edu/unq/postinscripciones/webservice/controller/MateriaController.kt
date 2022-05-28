@@ -29,19 +29,14 @@ class MateriaController {
     @ApiOperation("Endpoint que se usa para registra una nueva materia en el sistema")
     @ApiResponses(
         value = [
-            ApiResponse(code = 201, message = "Materia creada", response = MateriaDTO::class),
+            ApiResponse(code = 201, message = "Materia creada", response = MateriaDTO::class, responseContainer = "List"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
     @RequestMapping(value = [""], method = [RequestMethod.POST])
-    fun registrarMateria(@RequestBody formularioMateria: FormularioMateria): ResponseEntity<*> {
+    fun registrarMateria(@RequestBody formulariosMaterias: List<FormularioMateria>): ResponseEntity<*> {
         return ResponseEntity(
-            materiaService.crear(
-                formularioMateria.nombre,
-                formularioMateria.codigo,
-                formularioMateria.correlativas,
-                formularioMateria.carrera
-            ),
+            materiaService.crear(formulariosMaterias),
             HttpStatus.CREATED
         )
     }
