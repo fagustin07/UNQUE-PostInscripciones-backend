@@ -45,7 +45,8 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
             "WHERE alumno_dni = ?1 " +
             "GROUP BY alumno_dni, materia_codigo) AS info " +
         "ON info.materia_codigo = cursada.materia_codigo " +
-        "WHERE info.fecha = cursada.fecha_de_carga",
+        "WHERE info.fecha = cursada.fecha_de_carga " +
+        "GROUP BY cursada.materia_codigo",
         nativeQuery = true
     )
     fun findResumenHistoriaAcademica(dni: Int): List<Tuple>

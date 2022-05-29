@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 import java.time.LocalTime
 
 @Profile("!test")
@@ -218,7 +219,14 @@ class DataSeed(
                                             , teoria, arquitectura1, distribuidos, caracteristicas, arquitectura2, arquitecturaDeComputadoras, parseo, aspectosLegales, seminarioFinal, seminarioCapacitacion
                                             , seguridadTec, tv, streaming, cloud, bajo, semantica, seminarios, calidad, funcionalAvanzada, progCuantica, ciudadana, ludificacion, cdDatos))
             comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1))
-            jorge.actualizarHistoriaAcademica(listOf(MateriaCursada(intro, EstadoMateria.APROBADO), MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            jorge.actualizarHistoriaAcademica(listOf(
+                    MateriaCursada(intro, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(matematica, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(epyl, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(lea, EstadoMateria.DESAPROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(bdd, EstadoMateria.DESAPROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(bdd, EstadoMateria.APROBADO)
+            ))
             roberto.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             bartolo.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             maria.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO)))
