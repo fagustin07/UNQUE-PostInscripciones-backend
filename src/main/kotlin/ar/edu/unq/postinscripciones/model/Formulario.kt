@@ -10,7 +10,7 @@ class Formulario(
     @ManyToOne(fetch = FetchType.EAGER)
     val cuatrimestre: Cuatrimestre = Cuatrimestre(2009, Semestre.S1),
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-    val solicitudes: List<SolicitudSobrecupo> = listOf()
+    val solicitudes: MutableList<SolicitudSobrecupo> = mutableListOf()
 ) {
 
     @Id
@@ -21,6 +21,10 @@ class Formulario(
 
     fun cambiarEstado() {
         estado.cambiarEstado(this)
+    }
+
+    fun agregarSolicitud(solicitud: SolicitudSobrecupo) {
+        solicitudes.add(solicitud)
     }
 
     fun cerrarFormulario() {

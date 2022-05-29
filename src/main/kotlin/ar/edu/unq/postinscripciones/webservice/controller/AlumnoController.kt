@@ -93,28 +93,6 @@ class AlumnoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para aprobar o rechazar una solicitud de un alumno")
-    @ApiResponses(
-        value = [
-            ApiResponse(code = 200, message = "Solicitud modificada", response = SolicitudSobrecupoDTO::class),
-            ApiResponse(code = 400, message = "Algo salio mal")
-        ]
-    )
-    @RequestMapping(value = ["/solicitudes/{id}"], method = [RequestMethod.PUT])
-    fun cambiarEstadoSolicitud(
-        @ApiParam(value = "Id de la Solicitud", example = "1", required = true)
-        @PathVariable
-        id: Long,
-        @ApiParam(value = "Estado a cambiar en la solicitud", example = "APROBADO", required = true)
-        @RequestParam
-        estado: EstadoSolicitud
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-            alumnoService.cambiarEstado(id, estado),
-            HttpStatus.OK
-        )
-    }
-
     @ApiOperation("Endpoint que se usa para obtener las materias que puede cursar un alumno")
     @ApiResponses(
         value = [

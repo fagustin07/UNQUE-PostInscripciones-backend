@@ -204,6 +204,32 @@ class AlumnoService {
         return alumnos.map { AlumnoSolicitaComision.desdeTupla(it) }
     }
 
+    @Transactional
+    fun agregarSolicitud(
+      dni: Int,
+      idComision: Long,
+      cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+      fechaCarga: LocalDateTime = LocalDateTime.now()
+    ): FormularioDTO {
+        val cuatrimestreObtenido =
+                cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+                        .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
+
+        val comision = comisionRepository.findById(idComision)
+        val solicitud = SolicitudSobrecupo(comision.get())
+
+        val formulario = alumno.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
+        formulario.agregarSolicitud(solicitud)
+
+        formularioRepository.save(formulario)
+
+        alumnoRepository.save(alumno)
+
+        return FormularioDTO.desdeModelo(formulario, alumno.dni)
+
+    }
+
     private fun guardarAlumno(formulario: FormularioCrearAlumno): Alumno {
         val historiaAcademica = formulario.historiaAcademica.map {
             val materia = materiaRepository
@@ -248,11 +274,11 @@ class AlumnoService {
         alumno: Alumno,
         cuatrimestre: Cuatrimestre,
         idComisiones: List<Long>
-    ): List<SolicitudSobrecupo> {
+    ): MutableList<SolicitudSobrecupo> {
         val solicitudes = idComisiones.map { idComision ->
             val comision = comisionRepository.findById(idComision)
             SolicitudSobrecupo(comision.get())
-        }
+        }.toMutableList()
         val materiasDisponibles = this.materiasDisponibles(alumno.dni, cuatrimestre)
         this.checkPuedeCursar(alumno, solicitudes, materiasDisponibles)
 

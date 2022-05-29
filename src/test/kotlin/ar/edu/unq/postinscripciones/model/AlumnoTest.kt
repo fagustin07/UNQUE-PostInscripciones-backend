@@ -23,7 +23,7 @@ internal class AlumnoTest {
     @Test
     fun `un alumno puede completar un formulario de solicitud de cupo por cuatrimestre`() {
         val otraComision = Comision()
-        val formulario = Formulario(comisionBdd.cuatrimestre, listOf())
+        val formulario = Formulario(comisionBdd.cuatrimestre, mutableListOf())
 
         alumno.guardarFormulario(formulario)
 
@@ -45,7 +45,7 @@ internal class AlumnoTest {
     fun `un alumno puede solicitar cupo para mas de una comision`() {
         val formulario = Formulario(
             comisionBdd.cuatrimestre,
-            listOf(
+            mutableListOf(
                 SolicitudSobrecupo(comisionBdd),
                 SolicitudSobrecupo(otraComision)
             )
