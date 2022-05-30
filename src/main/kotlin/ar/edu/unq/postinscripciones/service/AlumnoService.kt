@@ -220,6 +220,11 @@ class AlumnoService {
 
     }
 
+    @Transactional
+    fun buscarAlumno(dni: Int): Alumno {
+        return alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
+    }
+
     fun crearFormulario(
             cuatrimestre: Cuatrimestre,
             alumno: Alumno,
@@ -255,7 +260,7 @@ class AlumnoService {
             formulario.apellido,
             formulario.correo,
             formulario.legajo,
-            formulario.contrasenia,
+            "",
             formulario.carrera,
         )
 

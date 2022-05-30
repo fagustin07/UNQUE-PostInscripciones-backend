@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -15,10 +16,15 @@ class Alumno(
     val correo: String = "",
     @Column(unique = true)
     val legajo: Int = 4,
-    val contrasenia: String = "",
+    var contrasenia: String = "",
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD,
 ) {
+    var codigo: Int? = null
+    var cargaDeCodigo: LocalDateTime? = null
+    @Enumerated(EnumType.STRING)
+    var estadoCuenta: EstadoCuenta = EstadoCuenta.SIN_CONFIRMAR
+
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     private val formularios: MutableList<Formulario> = mutableListOf()
 
@@ -57,6 +63,27 @@ class Alumno(
         return formularios.any { formulario -> formulario.cuatrimestre.esElCuatrimestre(cuatrimestre) }
     }
 
+    fun actualizarCodigoYContrasenia(codigo: Int, contrasenia: String, confirmarContrasenia: String, horaDeCarga: LocalDateTime) {
+        checkEstadoCuenta()
+        checkTiempoDeCodigo(horaDeCarga)
+        if (contrasenia != confirmarContrasenia) throw ExcepcionUNQUE("La contrasenia no coincide.")
+
+        this.cargaDeCodigo = horaDeCarga
+        this.codigo = codigo
+        this.contrasenia = contrasenia
+    }
+
+    fun confirmarCuenta(codigo: Int, carga: LocalDateTime) {
+        this.checkEstadoCuenta()
+        this.checkTiempoConfirmacionCodigo(carga)
+
+        if (codigo == this.codigo) {
+            this.estadoCuenta = EstadoCuenta.CONFIRMADA
+        } else {
+            throw ExcepcionUNQUE("Codigo incorrecto. Intente nuevamente")
+        }
+    }
+
     fun materiasCursadasPorEstadoDeMateria(estadoMateria: EstadoMateria): List<MateriaCursada> {
         return historiaAcademica.filter { it.estado == estadoMateria }
     }
@@ -76,4 +103,25 @@ class Alumno(
             throw ExcepcionUNQUE("Ya has guardado un formulario para este cuatrimestre")
         }
     }
+
+    private fun checkEstadoCuenta() {
+        if (this.estadoCuenta == EstadoCuenta.CONFIRMADA) throw ExcepcionUNQUE("Ya posees una cuenta")
+    }
+
+    private fun checkTiempoDeCodigo(horaDeCarga: LocalDateTime) {
+        if (this.cargaDeCodigo!= null && horaDeCarga.isBefore(this.cargaDeCodigo!!.plusMinutes(30))) {
+            throw ExcepcionUNQUE("Usted posee un codigo que no expiró. " +
+                    "Revise su correo y confirme su cuenta con el codigo dado")
+        }
+    }
+
+    private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
+        if (this.cargaDeCodigo!= null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(30))) {
+            throw ExcepcionUNQUE("Su codigo ha expirado. Cree su cuenta nuevamente")
+        }
+    }
+}
+
+enum class EstadoCuenta {
+    CONFIRMADA, SIN_CONFIRMAR
 }

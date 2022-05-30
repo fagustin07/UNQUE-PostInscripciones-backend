@@ -5,10 +5,7 @@ import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.ComisionACrear
-import ar.edu.unq.postinscripciones.service.dto.FormularioCrearAlumno
-import ar.edu.unq.postinscripciones.service.dto.FormularioCuatrimestre
-import ar.edu.unq.postinscripciones.service.dto.HorarioDTO
+import ar.edu.unq.postinscripciones.service.dto.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -43,11 +40,11 @@ internal class ServiceDataTest {
 
         alumnoService.registrarAlumnos(planillaAlumnos)
 
-        val alumnosRegistrados = alumnoService.todos()
+        val alumnosRegistrados = alumnoService.todos().map {AlumnoDTO.desdeModelo(it)}
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
         assertThat(alumnosRegistrados)
             .usingRecursiveComparison()
-            .ignoringFields("formularios")
+            .ignoringFields("formularios", "contrasenia")
             .isEqualTo(planillaAlumnos)
 
     }
@@ -190,7 +187,7 @@ internal class ServiceDataTest {
             planilla.add(
                 FormularioCrearAlumno(
                     prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
-                    prefijo + planilla.size, "asdas", Carrera.TPI, listOf()
+                    prefijo + planilla.size, Carrera.TPI, listOf()
                 )
             )
         }

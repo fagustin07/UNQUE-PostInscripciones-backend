@@ -52,7 +52,6 @@ internal class AlumnoServiceTest {
             "Martinez",
             "nicolas.martinez@unq.edu.ar",
             42256394,
-            "42256395",
             Carrera.TPI,
             listOf()
         )
@@ -63,7 +62,6 @@ internal class AlumnoServiceTest {
             "Sandoval",
             "fede.sando@unq.edu.ar",
             11223344,
-            "1234",
             Carrera.TPI,
             listOf()
         )
@@ -235,7 +233,6 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            "1234",
             Carrera.TPI,
             listOf(materiaCursada)
         )
@@ -280,7 +277,6 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            "1234",
             Carrera.TPI,
             listOf(materiaCursada)
         )
@@ -319,7 +315,6 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            "1234",
             Carrera.TPI,
             listOf(materiaCursada)
         )
@@ -382,7 +377,6 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            "1234",
             Carrera.SIMULTANEIDAD,
             listOf(materiaCursada, materiaCursada2, materiaCursada3)
         )
@@ -438,7 +432,6 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            "1234",
             Carrera.TPI,
             listOf(materiaCursada)
         )

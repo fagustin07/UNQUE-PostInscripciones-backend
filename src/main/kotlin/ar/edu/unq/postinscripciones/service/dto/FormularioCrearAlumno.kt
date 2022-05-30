@@ -14,8 +14,6 @@ data class FormularioCrearAlumno(
     val correo: String,
     @ApiModelProperty(example = "999", required = true)
     val legajo: Int,
-    @ApiModelProperty(example = "contrasenia", required = true)
-    val contrasenia: String,
     @ApiModelProperty(example = "TPI", required = true)
     val carrera: Carrera,
     val historiaAcademica: List<MateriaCursadaDTO>
