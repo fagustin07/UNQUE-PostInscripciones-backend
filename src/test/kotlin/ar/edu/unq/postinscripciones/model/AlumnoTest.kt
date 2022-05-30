@@ -32,16 +32,6 @@ internal class AlumnoTest {
     }
 
     @Test
-    fun `un alumno no puede tener dos formularios de sobrecupos del mismo cuatrimestre`() {
-        val formulario = Formulario(comisionBdd.cuatrimestre)
-        alumno.guardarFormulario(formulario)
-
-        val excepcion = assertThrows<ExcepcionUNQUE> { alumno.guardarFormulario(formulario) }
-
-        assertThat(excepcion.message).isEqualTo("Ya has solicitado materias para este cuatrimestre")
-    }
-
-    @Test
     fun `un alumno puede solicitar cupo para mas de una comision`() {
         val formulario = Formulario(
             comisionBdd.cuatrimestre,

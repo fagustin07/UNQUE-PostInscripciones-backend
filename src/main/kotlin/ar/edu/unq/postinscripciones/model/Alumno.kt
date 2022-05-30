@@ -25,19 +25,31 @@ class Alumno(
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     var historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
 
-    fun guardarFormulario(formulario: Formulario) {
-        chequearSiExiste(formulario)
+    fun guardarFormulario(formulario: Formulario, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()) {
+        if(existeFormulario(cuatrimestre)) {
+            chequearSiSePuedeModificar(cuatrimestre.anio, cuatrimestre.semestre)
+            formularios.removeIf { it.cuatrimestre.esElCuatrimestre(cuatrimestre.anio,cuatrimestre.semestre) }
+        }
         formularios.add(formulario)
+    }
+
+    fun chequearSiSePuedeModificar(anio: Int, semestre: Semestre) {
+        if(estaCerradoElFormularioActual(anio,semestre)) {
+            throw ExcepcionUNQUE("El formulario se encuentra cerrado a modificaciones")
+        }
+    }
+    fun existeFormulario(cuatrimestre: Cuatrimestre): Boolean {
+        return formularios.any { formulario -> formulario.cuatrimestre.esElCuatrimestre(cuatrimestre) }
+    }
+
+    fun estaCerradoElFormularioActual(anio: Int, semestre: Semestre): Boolean {
+        val formularioActual = obtenerFormulario(anio,semestre)
+        return formularioActual.estado === EstadoFormulario.CERRADO
     }
 
     fun cargarHistoriaAcademica(materiaCursada: MateriaCursada) {
         historiaAcademica.add(materiaCursada)
         historiaAcademica.sortByDescending { it.fechaDeCarga }
-    }
-
-    fun cambiarFormulario(anio: Int, semestre: Semestre, formulario: Formulario) {
-        formularios.removeIf { it.cuatrimestre.esElCuatrimestre(anio,semestre) }
-        formularios.add(formulario)
     }
 
     fun actualizarHistoriaAcademica(historia: List<MateriaCursada>) {
@@ -69,11 +81,5 @@ class Alumno(
 
     fun puedeCursar(solicitudes : List<Materia>, materiasDisponibles: List<String>) : Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
-    }
-
-    private fun chequearSiExiste(formulario: Formulario) {
-        if (llenoElFormularioDelCuatrimestre(formulario.cuatrimestre)) {
-            throw ExcepcionUNQUE("Ya has solicitado materias para este cuatrimestre")
-        }
     }
 }

@@ -94,8 +94,8 @@ internal class ComisionServiceTest {
         )
         comision2 = comisionService.crear(formulario2)
         comision3 = comisionService.crear(formulario3)
-        alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
-        alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision2.id!!), cuatrimestre)
+        alumnoService.guardarFormulario(alumno.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
+        alumnoService.guardarFormulario(alumno2.dni, listOf(comision2.id!!), cuatrimestre)
 
     }
 

@@ -100,7 +100,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `Un alumno registra un formulario de solicitud de cupo`() {
         val formulario =
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
@@ -108,23 +108,6 @@ internal class AlumnoServiceTest {
         val comisionesDeSolicitudes = formulario.solicitudes.map { it.comision.id }
 
         assertThat(comisionesDeSolicitudes).contains(ComisionDTO.desdeModelo(comision1Algoritmos).id)
-    }
-
-    @Test
-    fun `Un alumno no puede registrar dos formularios para el mismo cuatrimestre`() {
-        alumnoService.guardarSolicitudPara(
-            alumno.dni,
-            listOf(comision1Algoritmos.id!!),
-            cuatrimestre
-        )
-        val exception = assertThrows<ExcepcionUNQUE> {
-            alumnoService.guardarSolicitudPara(
-                alumno.dni,
-                listOf(),
-                cuatrimestre
-            )
-        }
-        assertThat(exception.message).isEqualTo("Ya has solicitado materias para este cuatrimestre")
     }
 
     @Test
@@ -145,7 +128,7 @@ internal class AlumnoServiceTest {
         )
         val comisionLogica = comisionService.crear(formularioComision)
         val exception = assertThrows<ExcepcionUNQUE> {
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                     alumno.dni,
                     listOf(comisionLogica.id!!),
                     cuatrimestre
@@ -157,7 +140,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `Se puede obtener el formulario`() {
         val formularioDTO =
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
@@ -170,7 +153,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `Se puede aprobar una solicitud de sobrecupo`() {
         val formulario =
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
@@ -185,7 +168,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `Se puede rechazar una solicitud de sobrecupo`() {
         val formulario =
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
@@ -199,13 +182,13 @@ internal class AlumnoServiceTest {
     @Test
     fun `Se pueden cerrar todos los formularios del cuatrimestre corriente`() {
         val formularioAntesDeCerrar =
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
         val formulario2AntesDeCerrar =
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 fede.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
@@ -333,7 +316,7 @@ internal class AlumnoServiceTest {
         comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
 
         val excepcion = assertThrows<ExcepcionUNQUE> {
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre,
@@ -348,7 +331,7 @@ internal class AlumnoServiceTest {
         comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
 
         val excepcion = assertThrows<ExcepcionUNQUE> {
-            alumnoService.guardarSolicitudPara(
+            alumnoService.guardarFormulario(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre,
@@ -388,7 +371,7 @@ internal class AlumnoServiceTest {
         )
         val nacho = alumnoService.crear(formularioAlumno)
 
-        val formulario = alumnoService.guardarSolicitudPara(
+        val formulario = alumnoService.guardarFormulario(
             nacho.dni,
             listOf(comisionIntro.id!!)
         )
@@ -404,8 +387,8 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se pueden obtener los alumnos que pidieron una comision`() {
-        val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
-        val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
+        val formularioAlumno = alumnoService.guardarFormulario(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioFede = alumnoService.guardarFormulario(fede.dni, listOf(comision1Algoritmos.id!!))
 
         val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
 
@@ -420,8 +403,8 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se pueden obtener los alumnos que pidieron una comision con el id del formulario`() {
-        val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
-        val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
+        val formularioAlumno = alumnoService.guardarFormulario(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioFede = alumnoService.guardarFormulario(fede.dni, listOf(comision1Algoritmos.id!!))
 
         val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
 
@@ -444,8 +427,8 @@ internal class AlumnoServiceTest {
         )
         val nacho = alumnoService.crear(formularioAlumno)
 
-        alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
-        alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!))
+        alumnoService.guardarFormulario(alumno.dni, listOf(comision1Algoritmos.id!!))
+        alumnoService.guardarFormulario(nacho.dni, listOf(comision1Algoritmos.id!!))
 
         val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
         assertThat(alumnos.first().cantidadDeAprobadas).isEqualTo(alumnos.maxOf { it.cantidadDeAprobadas })
@@ -454,7 +437,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno puede editar su formulario dentro del periodo de inscripcion`() {
-        alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
+        alumnoService.guardarFormulario(alumno.dni, listOf(comision1Algoritmos.id!!))
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
@@ -467,7 +450,7 @@ internal class AlumnoServiceTest {
         )
         val comisionDosAlgoritmos = comisionService.crear(formularioComision)
 
-        val formularioActualizado = alumnoService.actualizarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!))
+        val formularioActualizado = alumnoService.guardarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!))
 
         val formularioLuegoDeActualizar = alumnoService.obtenerFormulario(alumno.dni)
         assertThat(formularioLuegoDeActualizar.solicitudes).containsExactly(formularioActualizado.solicitudes.first())
@@ -475,7 +458,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno no puede editar su formulario fuera del periodo de inscripcion`() {
-        val formularioAntesDeActualizar = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioAntesDeActualizar = alumnoService.guardarFormulario(alumno.dni, listOf(comision1Algoritmos.id!!))
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
@@ -488,7 +471,7 @@ internal class AlumnoServiceTest {
         )
         val comisionDosAlgoritmos = comisionService.crear(formularioComision)
 
-        val excepcion = assertThrows<ExcepcionUNQUE> { alumnoService.actualizarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!), fechaCarga = cuatrimestre.finInscripciones.plusDays(1)) }
+        val excepcion = assertThrows<ExcepcionUNQUE> { alumnoService.guardarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!), fechaCarga = cuatrimestre.finInscripciones.plusDays(1)) }
 
         val formularioLuegoDeIntentarActualizar = alumnoService.obtenerFormulario(alumno.dni)
         assertThat(formularioLuegoDeIntentarActualizar).usingRecursiveComparison().isEqualTo(formularioAntesDeActualizar)
@@ -503,7 +486,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `al desvincular un alumno de un formulario se borra el formulario y las solicitudes pero no la comision de las solicitudes`() {
-        val formularioAntesDeActualizar = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
+        val formularioAntesDeActualizar = alumnoService.guardarFormulario(alumno.dni, listOf(comision1Algoritmos.id!!))
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
@@ -516,7 +499,7 @@ internal class AlumnoServiceTest {
         )
         val comisionDosAlgoritmos = comisionService.crear(formularioComision)
 
-        alumnoService.actualizarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!))
+        alumnoService.guardarFormulario(alumno.dni, listOf(comisionDosAlgoritmos.id!!))
 
         assertThat(formularioRepository.findById(formularioAntesDeActualizar.id).isPresent).isFalse
         assertThat(solicitudRepository.findById(formularioAntesDeActualizar.solicitudes.first().id).isPresent).isFalse

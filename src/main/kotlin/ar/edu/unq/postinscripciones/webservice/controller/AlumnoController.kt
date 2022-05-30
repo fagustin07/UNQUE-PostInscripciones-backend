@@ -1,6 +1,5 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
-import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.dto.*
 import io.swagger.annotations.*
@@ -65,7 +64,7 @@ class AlumnoController {
         @RequestBody formulario: FormularioCrearOActualizarFormulario,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.guardarSolicitudPara(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
+            alumnoService.guardarFormulario(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
             HttpStatus.OK
         )
     }
@@ -85,7 +84,7 @@ class AlumnoController {
         @RequestBody formulario: FormularioCrearOActualizarFormulario,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.actualizarFormulario(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
+            alumnoService.guardarFormulario(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
             HttpStatus.OK
         )
     }

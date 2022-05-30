@@ -68,7 +68,7 @@ class AlumnoService {
     }
 
     @Transactional
-    fun guardarSolicitudPara(
+    fun guardarFormulario(
             dni: Int,
             idComisiones: List<Long>,
             cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
@@ -92,32 +92,6 @@ class AlumnoService {
         alumnoRepository.save(alumno)
 
         return FormularioDTO.desdeModelo(formulario, alumno.dni)
-    }
-
-    @Transactional
-    fun actualizarFormulario(
-        dniAlumno: Int,
-        idComisiones: List<Long>,
-        cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
-        fechaCarga: LocalDateTime = LocalDateTime.now(),
-        comisionesInscriptoIds: List<Long> = listOf()
-    ): FormularioDTO {
-        val cuatrimestreObtenido =
-            cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
-                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
-        this.checkFecha(cuatrimestre.inicioInscripciones, cuatrimestre.finInscripciones, fechaCarga)
-        val alumno = alumnoRepository.findById(dniAlumno).get()
-        val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
-        val comisionesInscripto = comisionesInscriptoIds.map {
-            comisionRepository.findById(it).orElseThrow { ExcepcionUNQUE("La comision no existe")
-            }
-        }
-        val formularioNuevo = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
-
-        alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formularioNuevo)
-        alumnoRepository.save(alumno)
-
-        return FormularioDTO.desdeModelo(formularioNuevo, alumno.dni)
     }
 
     @Transactional
