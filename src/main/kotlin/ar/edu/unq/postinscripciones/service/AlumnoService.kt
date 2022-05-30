@@ -75,19 +75,8 @@ class AlumnoService {
             fechaCarga: LocalDateTime = LocalDateTime.now(),
             comisionesInscriptoIds: List<Long> = listOf()
     ): FormularioDTO {
-        val cuatrimestreObtenido =
-            cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
-                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
-        this.checkFecha(cuatrimestreObtenido.inicioInscripciones, cuatrimestreObtenido.finInscripciones, fechaCarga)
-        val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
-        val solicitudesPorMateria = this.chequearSiPuedeCursarYObtenerSolicitudes(alumno,cuatrimestre,idComisiones)
-        val comisionesInscripto = comisionesInscriptoIds.map {
-                comisionRepository.findById(it).orElseThrow { ExcepcionUNQUE("La comision no existe")
-            }
-        }
-
-        val formulario = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudesPorMateria, comisionesInscripto))
-
+        val alumno = alumnoRepository.findById(dni).get()
+        val formulario = crearFormulario(cuatrimestre, alumno, idComisiones, comisionesInscriptoIds, fechaCarga)
         alumno.guardarFormulario(formulario)
         alumnoRepository.save(alumno)
 
@@ -96,28 +85,18 @@ class AlumnoService {
 
     @Transactional
     fun actualizarFormulario(
-        dniAlumno: Int,
-        idComisiones: List<Long>,
-        cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
-        fechaCarga: LocalDateTime = LocalDateTime.now(),
-        comisionesInscriptoIds: List<Long> = listOf()
+            dni: Int,
+            idComisiones: List<Long>,
+            cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+            fechaCarga: LocalDateTime = LocalDateTime.now(),
+            comisionesInscriptoIds: List<Long> = listOf()
     ): FormularioDTO {
-        val cuatrimestreObtenido =
-            cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
-                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
-        this.checkFecha(cuatrimestre.inicioInscripciones, cuatrimestre.finInscripciones, fechaCarga)
-        val alumno = alumnoRepository.findById(dniAlumno).get()
-        val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
-        val comisionesInscripto = comisionesInscriptoIds.map {
-            comisionRepository.findById(it).orElseThrow { ExcepcionUNQUE("La comision no existe")
-            }
-        }
-        val formularioNuevo = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
-
-        alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formularioNuevo)
+        val alumno = alumnoRepository.findById(dni).get()
+        val formulario = crearFormulario(cuatrimestre, alumno, idComisiones, comisionesInscriptoIds, fechaCarga)
+        alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formulario)
         alumnoRepository.save(alumno)
 
-        return FormularioDTO.desdeModelo(formularioNuevo, alumno.dni)
+        return FormularioDTO.desdeModelo(formulario, alumno.dni)
     }
 
     @Transactional
@@ -239,6 +218,26 @@ class AlumnoService {
 
         return FormularioDTO.desdeModelo(formulario, alumno.dni)
 
+    }
+
+    fun crearFormulario(
+            cuatrimestre: Cuatrimestre,
+            alumno: Alumno,
+            idComisiones: List<Long>,
+            comisionesInscriptoIds: List<Long>,
+            fechaCarga: LocalDateTime
+    ): Formulario {
+        val cuatrimestreObtenido =
+                cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+                        .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        this.checkFecha(cuatrimestreObtenido.inicioInscripciones, cuatrimestreObtenido.finInscripciones, fechaCarga)
+
+        val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
+        val comisionesInscripto = comisionesInscriptoIds.map {
+            comisionRepository.findById(it).orElseThrow { ExcepcionUNQUE("La comision no existe")
+            }
+        }
+        return formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
     }
 
     private fun guardarAlumno(formulario: FormularioCrearAlumno): Alumno {

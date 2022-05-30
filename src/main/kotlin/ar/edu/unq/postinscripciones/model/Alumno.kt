@@ -53,7 +53,7 @@ class Alumno(
         return formularios.any { formulario -> formulario.tieneLaComision(unaComision) }
     }
 
-    fun llenoElFormularioDelCuatrimestre(cuatrimestre: Cuatrimestre): Boolean {
+    fun yaGuardoUnFormulario(cuatrimestre: Cuatrimestre): Boolean {
         return formularios.any { formulario -> formulario.cuatrimestre.esElCuatrimestre(cuatrimestre) }
     }
 
@@ -72,8 +72,8 @@ class Alumno(
     }
 
     private fun chequearSiExiste(formulario: Formulario) {
-        if (llenoElFormularioDelCuatrimestre(formulario.cuatrimestre)) {
-            throw ExcepcionUNQUE("Ya has solicitado materias para este cuatrimestre")
+        if (yaGuardoUnFormulario(formulario.cuatrimestre)) {
+            throw ExcepcionUNQUE("Ya has guardado un formulario para este cuatrimestre")
         }
     }
 }

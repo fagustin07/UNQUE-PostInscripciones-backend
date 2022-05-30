@@ -27,7 +27,7 @@ internal class AlumnoTest {
 
         alumno.guardarFormulario(formulario)
 
-        assertThat(alumno.llenoElFormularioDelCuatrimestre(comisionBdd.cuatrimestre)).isTrue
+        assertThat(alumno.yaGuardoUnFormulario(comisionBdd.cuatrimestre)).isTrue
         assertThat(alumno.haSolicitado(otraComision)).isFalse
     }
 
@@ -38,7 +38,7 @@ internal class AlumnoTest {
 
         val excepcion = assertThrows<ExcepcionUNQUE> { alumno.guardarFormulario(formulario) }
 
-        assertThat(excepcion.message).isEqualTo("Ya has solicitado materias para este cuatrimestre")
+        assertThat(excepcion.message).isEqualTo("Ya has guardado un formulario para este cuatrimestre")
     }
 
     @Test

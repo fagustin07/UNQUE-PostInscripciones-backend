@@ -124,7 +124,7 @@ internal class AlumnoServiceTest {
                 cuatrimestre
             )
         }
-        assertThat(exception.message).isEqualTo("Ya has solicitado materias para este cuatrimestre")
+        assertThat(exception.message).isEqualTo("Ya has guardado un formulario para este cuatrimestre")
     }
 
     @Test
