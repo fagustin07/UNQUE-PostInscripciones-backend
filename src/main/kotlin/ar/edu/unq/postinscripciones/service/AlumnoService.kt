@@ -69,10 +69,11 @@ class AlumnoService {
 
     @Transactional
     fun guardarSolicitudPara(
-        dni: Int,
-        idComisiones: List<Long>,
-        cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
-        fechaCarga: LocalDateTime = LocalDateTime.now()
+            dni: Int,
+            idComisiones: List<Long>,
+            cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+            fechaCarga: LocalDateTime = LocalDateTime.now(),
+            comisionesInscriptoIds: List<Long> = listOf()
     ): FormularioDTO {
         val cuatrimestreObtenido =
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
@@ -80,7 +81,12 @@ class AlumnoService {
         this.checkFecha(cuatrimestreObtenido.inicioInscripciones, cuatrimestreObtenido.finInscripciones, fechaCarga)
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
         val solicitudesPorMateria = this.chequearSiPuedeCursarYObtenerSolicitudes(alumno,cuatrimestre,idComisiones)
-        val formulario = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudesPorMateria))
+        val comisionesInscripto = comisionesInscriptoIds.map {
+                comisionRepository.findById(it).orElseThrow { ExcepcionUNQUE("La comision no existe")
+            }
+        }
+
+        val formulario = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudesPorMateria, comisionesInscripto))
 
         alumno.guardarFormulario(formulario)
         alumnoRepository.save(alumno)
@@ -93,7 +99,8 @@ class AlumnoService {
         dniAlumno: Int,
         idComisiones: List<Long>,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
-        fechaCarga: LocalDateTime = LocalDateTime.now()
+        fechaCarga: LocalDateTime = LocalDateTime.now(),
+        comisionesInscriptoIds: List<Long> = listOf()
     ): FormularioDTO {
         val cuatrimestreObtenido =
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
@@ -101,7 +108,11 @@ class AlumnoService {
         this.checkFecha(cuatrimestre.inicioInscripciones, cuatrimestre.finInscripciones, fechaCarga)
         val alumno = alumnoRepository.findById(dniAlumno).get()
         val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
-        val formularioNuevo = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes))
+        val comisionesInscripto = comisionesInscriptoIds.map {
+            comisionRepository.findById(it).orElseThrow { ExcepcionUNQUE("La comision no existe")
+            }
+        }
+        val formularioNuevo = formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
 
         alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formularioNuevo)
         alumnoRepository.save(alumno)

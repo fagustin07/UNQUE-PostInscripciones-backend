@@ -9,8 +9,10 @@ import javax.persistence.*
 class Formulario(
     @ManyToOne(fetch = FetchType.EAGER)
     val cuatrimestre: Cuatrimestre = Cuatrimestre(2009, Semestre.S1),
-    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-    val solicitudes: MutableList<SolicitudSobrecupo> = mutableListOf()
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    val solicitudes: MutableList<SolicitudSobrecupo> = mutableListOf(),
+    @ManyToMany(fetch = FetchType.LAZY)
+    val comisionesInscripto: List<Comision> = listOf()
 ) {
 
     @Id
@@ -42,4 +44,3 @@ class Formulario(
 
     fun tieneLaComision(comision: Comision) = solicitudes.any { it.solicitaLaComision(comision) }
 }
-

@@ -3,10 +3,7 @@ package ar.edu.unq.postinscripciones.webservice.controller
 import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.dto.*
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -64,11 +61,11 @@ class AlumnoController {
     fun cargarSolicitudes(
         @ApiParam(value = "Dni del alumno para cargar solicitudes", example = "12345678", required = true)
         @PathVariable dni: Int,
-        @ApiParam(value = "Lista de id de comisiones solicitadas. Ejemplo: [1,2]", required = true)
-        @RequestBody comisiones: List<Long>
+        @ApiParam(value = "Lista de id de comisiones solicitadas y de comisiones en las que el alumno se encuentra inscripto.", required = true)
+        @RequestBody formulario: FormularioCrearOActualizarFormulario,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.guardarSolicitudPara(dni, comisiones),
+            alumnoService.guardarSolicitudPara(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
             HttpStatus.OK
         )
     }
@@ -84,11 +81,11 @@ class AlumnoController {
     fun actualizarFormulario(
         @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
         @PathVariable dni: Int,
-        @ApiParam(value = "Lista de id de comisiones pedidas. Ejemplo: [2]", required = true)
-        @RequestBody comisiones: List<Long>
+        @ApiParam(value = "Lista de id de comisiones solicitadas y de comisiones en las que el alumno se encuentra inscripto.", required = true)
+        @RequestBody formulario: FormularioCrearOActualizarFormulario,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.actualizarFormulario(dni, comisiones),
+            alumnoService.actualizarFormulario(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
             HttpStatus.OK
         )
     }
@@ -131,3 +128,5 @@ class AlumnoController {
         )
     }
 }
+
+

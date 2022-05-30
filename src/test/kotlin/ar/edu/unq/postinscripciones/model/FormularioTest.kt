@@ -1,5 +1,6 @@
 package ar.edu.unq.postinscripciones.model
 
+import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import org.assertj.core.api.Assertions.assertThat
@@ -27,6 +28,15 @@ internal class FormularioTest {
         val solicitud2 = SolicitudSobrecupo()
         formulario.agregarSolicitud(solicitud2)
         assertThat(formulario.solicitudes).containsExactly(solicitud, solicitud2)
+    }
+
+    @Test
+    fun `se puede agregar las materias en las que se encuentra inscripto un alumno`() {
+        val materia = Materia("BDD-102", "Base de datos")
+        val comision = Comision(materia)
+        formulario = Formulario(comisionesInscripto = listOf(comision))
+
+        assertThat(formulario.comisionesInscripto).containsExactly(comision)
     }
 
     @Test
