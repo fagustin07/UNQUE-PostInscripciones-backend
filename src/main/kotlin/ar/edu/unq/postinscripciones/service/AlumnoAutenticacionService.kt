@@ -38,13 +38,8 @@ class AlumnoAutenticacionService {
 
     @Transactional
     fun loguearse(dni: Int, contrasenia: String): AlumnoDTO {
-        //TODO: testear estoy y crear endpoints
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("Cree o confirme su cuenta") }
-        if (alumno.cargaDeCodigo == null ||
-            alumno.estadoCuenta == EstadoCuenta.SIN_CONFIRMAR
-        ) {
-            throw ExcepcionUNQUE("Cree o confirme su cuenta")
-        }
+        if (alumno.estadoCuenta == EstadoCuenta.SIN_CONFIRMAR) throw ExcepcionUNQUE("Cree o confirme su cuenta")
 
         return if (contrasenia == alumno.contrasenia) {
             AlumnoDTO.desdeModelo(alumno)

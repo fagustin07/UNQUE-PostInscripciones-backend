@@ -74,6 +74,7 @@ class Alumno(
     }
 
     fun confirmarCuenta(codigo: Int, carga: LocalDateTime) {
+        if (cargaDeCodigo == null) throw ExcepcionUNQUE("Cree su cuenta. Si el problema persiste, comuniquese con el equipo directivo")
         this.checkEstadoCuenta()
         this.checkTiempoConfirmacionCodigo(carga)
 

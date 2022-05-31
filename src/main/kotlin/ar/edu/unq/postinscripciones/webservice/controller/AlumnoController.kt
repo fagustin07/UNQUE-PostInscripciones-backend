@@ -1,6 +1,5 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
-import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.dto.*
 import io.swagger.annotations.*
