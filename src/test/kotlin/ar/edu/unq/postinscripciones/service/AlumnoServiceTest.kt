@@ -244,6 +244,30 @@ internal class AlumnoServiceTest {
     }
 
     @Test
+    fun `Se puede actualizar la historia academica de un alumno`() {
+        val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val formularioAlumno = FormularioCrearAlumno(
+                1234567,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                44556,
+                Carrera.TPI,
+                listOf(materiaCursada)
+        )
+        val alumno = alumnoService.crear(formularioAlumno)
+
+        val materiaCursada2 = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val dto = alumnoService.actualizarHistoriaAcademica(alumno.dni, listOf(materiaCursada, materiaCursada2))
+        val alumnoDespuesDeActualizar = alumnoService.buscarAlumno(dto.dni)
+
+        assertThat(alumnoDespuesDeActualizar.historiaAcademica).isNotEmpty
+        assertThat(alumnoDespuesDeActualizar.historiaAcademica.map { it.materia.codigo })
+                .usingRecursiveComparison()
+                .isEqualTo(listOf(materiaCursada.codigoMateria, materiaCursada2.codigoMateria))
+    }
+
+    @Test
     fun `Se puede obtener las materias disponibles de un alumno`() {
         val materiasdisponibles =
             alumnoService.materiasDisponibles(alumno.dni, cuatrimestre)

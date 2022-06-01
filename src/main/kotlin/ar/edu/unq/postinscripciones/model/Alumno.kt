@@ -47,7 +47,9 @@ class Alumno(
     }
 
     fun actualizarHistoriaAcademica(historia: List<MateriaCursada>) {
-        historiaAcademica = historia.toMutableList()
+        historiaAcademica.clear()
+        historiaAcademica.addAll(historia)
+        historiaAcademica.sortByDescending { it.fechaDeCarga }
     }
 
     fun obtenerFormulario(anio: Int, semestre: Semestre): Formulario {
