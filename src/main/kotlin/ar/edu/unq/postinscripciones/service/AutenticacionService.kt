@@ -5,7 +5,7 @@ import ar.edu.unq.postinscripciones.model.EstadoCuenta
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.AlumnoRepository
 import ar.edu.unq.postinscripciones.persistence.DirectivoRepository
-import ar.edu.unq.postinscripciones.webservice.config.JWTTokenUtil
+import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

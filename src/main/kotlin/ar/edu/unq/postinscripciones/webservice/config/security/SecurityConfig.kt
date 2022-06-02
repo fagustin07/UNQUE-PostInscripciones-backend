@@ -1,5 +1,6 @@
-package ar.edu.unq.postinscripciones.webservice.security
+package ar.edu.unq.postinscripciones.webservice.config.security
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -20,9 +22,14 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Value("\${unque.frontend.urls}")
     private lateinit var allowedFrontends: List<String>
 
+    @Autowired
+    private lateinit var jwtRequestFilter: JWTAuthFilter
+
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/**").permitAll()
+            .antMatchers("/api/auth/**").permitAll()
+            .antMatchers("/api/**").authenticated()
+            .anyRequest().permitAll()
             .and()
             .cors().configurationSource(corsConfigurationSource())
             .and()
@@ -31,6 +38,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .headers().frameOptions().sameOrigin()
             .and()
             .csrf().disable()
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
     }
 
     @Bean

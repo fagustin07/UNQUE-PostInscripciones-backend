@@ -1,4 +1,4 @@
-package ar.edu.unq.postinscripciones.webservice.config
+package ar.edu.unq.postinscripciones.webservice.config.security
 
 import ar.edu.unq.postinscripciones.model.Alumno
 import ar.edu.unq.postinscripciones.model.Directivo
@@ -26,7 +26,7 @@ class JWTTokenUtil {
             .setExpiration(Date(System.currentTimeMillis().plus(1000 * 60 * 60 * 24 * 3)))
             .signWith(
                 SignatureAlgorithm.HS512,
-                Base64.getEncoder().encode(this.secret.toByteArray())
+                this.secret.toByteArray()
             ).compact()
 
         return "Bearer $token"
@@ -43,37 +43,41 @@ class JWTTokenUtil {
             .setExpiration(Date(System.currentTimeMillis().plus(1000 * 60 * 60 * 24)))
             .signWith(
                 SignatureAlgorithm.HS512,
-                Base64.getEncoder().encode(this.secret.toByteArray())
+                this.secret.toByteArray()
             ).compact()
 
         return "Bearer $token"
     }
 
-    fun obtainClaims(bearerToken: String): Claims {
+    fun getClaims(bearerToken: String): Claims {
         val token = bearerToken.replace("Bearer ", "")
 
         return Jwts
             .parser()
-            .setSigningKey(this.secret)
+            .setSigningKey(this.secret.toByteArray())
             .parseClaimsJws(token).body
     }
 
     fun obtenerDni(bearerToken: String): Int {
-        return obtainClaims(bearerToken)["alumno"].toString().toInt()
+        return getClaims(bearerToken)["alumno"].toString().toInt()
     }
 
-    fun esAlumno(token: String) = getRole(token) == Role.ROLE_ALUMNO
+    fun obtenerCorreo(bearerToken: String): String {
+        return getClaims(bearerToken)["directivo"].toString()
+    }
+
+    fun esDirectivo(token: String) = getRole(token) == Role.ROLE_DIRECTIVO
 
     fun getRole(bearerToken: String): Role {
-        val authority = obtainClaims(bearerToken)["authorities"] as List<String>
+        val authority = getClaims(bearerToken)["authorities"] as List<String>
 
         return Role.fromString(authority[0])
     }
 
     fun esTokenValido(bearerToken: String): Boolean {
-        val claims = obtainClaims(bearerToken)
+        val claims = getClaims(bearerToken)
         return bearerToken.startsWith("Bearer ") &&
                 claims["authorities"] != null &&
-                claims["username"] != null
+                (claims["alumno"] != null || claims["directivo"] != null)
     }
 }

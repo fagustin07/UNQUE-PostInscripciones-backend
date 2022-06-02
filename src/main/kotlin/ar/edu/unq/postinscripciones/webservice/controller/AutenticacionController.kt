@@ -5,11 +5,11 @@ import ar.edu.unq.postinscripciones.service.dto.ConfirmacionCuenta
 import ar.edu.unq.postinscripciones.service.dto.FormularioRegistro
 import ar.edu.unq.postinscripciones.service.dto.LoguearAlumno
 import ar.edu.unq.postinscripciones.service.dto.LoguearDirectivo
-import io.swagger.annotations.ApiModelProperty
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
@@ -29,7 +29,7 @@ class AutenticacionController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/registrar"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/alumno/registrar"], method = [RequestMethod.POST])
     fun registrarse(@RequestBody formularioRegistro: FormularioRegistro): ResponseEntity<*> {
         val respuesta = autenticacionService.crearCuenta(
             formularioRegistro.dni,
@@ -46,7 +46,7 @@ class AutenticacionController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/confirmar"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/alumno/confirmar"], method = [RequestMethod.POST])
     fun confirmarCuenta(@RequestBody confirmarCuenta: ConfirmacionCuenta): ResponseEntity<Void> {
         autenticacionService.confirmarCuenta(confirmarCuenta.dni, confirmarCuenta.codigo)
         return ResponseEntity(HttpStatus.NO_CONTENT)
@@ -55,39 +55,30 @@ class AutenticacionController {
     @ApiOperation("Endpoint para que un alumno ingrese a la aplicacion")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = JWTToken::class),
+            ApiResponse(code = 204, message = "OK"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/login"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/alumno/login"], method = [RequestMethod.POST])
     fun loguearAlumno(@RequestBody loguearAlumno: LoguearAlumno): ResponseEntity<*> {
         val token = autenticacionService.loguearse(loguearAlumno.dni, loguearAlumno.contrasenia)
-        return ResponseEntity(
-            JWTToken(token),
-            HttpStatus.OK
-        )
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Authorization", token)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(responseHeaders).body(null)
     }
 
     @ApiOperation("Endpoint para que un director ingrese a la aplicacion")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = JWTToken::class),
+            ApiResponse(code = 204, message = "OK"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/directora/login"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/directivo/login"], method = [RequestMethod.POST])
     fun loguearDirectora(@RequestBody loguearDirectivo: LoguearDirectivo): ResponseEntity<*> {
         val token = autenticacionService.loguearDirectivo(loguearDirectivo.correo, loguearDirectivo.contrasenia)
-        return ResponseEntity(
-            JWTToken(token),
-            HttpStatus.OK
-        )
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Authorization", token)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(responseHeaders).body(null)
     }
-
-
 }
-
-data class JWTToken(
-    @ApiModelProperty("Bearer .........")
-    val token: String
-)
