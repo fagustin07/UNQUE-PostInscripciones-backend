@@ -3,7 +3,6 @@ package ar.edu.unq.postinscripciones.service
 import ar.edu.unq.postinscripciones.model.Carrera
 import ar.edu.unq.postinscripciones.model.EstadoCuenta
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.AlumnoDTO
 import ar.edu.unq.postinscripciones.service.dto.FormularioCrearAlumno
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -13,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
 @IntegrationTest
-internal class AlumnoAutenticacionServiceTest {
+internal class AutenticacionServiceTest {
 
     @Autowired
     private lateinit var dataService: DataService
@@ -22,14 +21,14 @@ internal class AlumnoAutenticacionServiceTest {
     private lateinit var alumnoService: AlumnoService
 
     @Autowired
-    private lateinit var alumnoAutenticacionService: AlumnoAutenticacionService
+    private lateinit var autenticacionService: AutenticacionService
 
     @Test
     fun `un alumno puede registrarse si fue cargado previamente por algun director y se genera un codigo de confirmacion`() {
         val dni = 12345678
         this.crearAlumno(dni)
 
-        val codigo = alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
+        val codigo = autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
 
         assertThat(alumnoService.buscarAlumno(dni).codigo).isEqualTo(codigo)
     }
@@ -38,7 +37,7 @@ internal class AlumnoAutenticacionServiceTest {
     fun `un alumno no puede registrarse si no fue cargado previamente por algun director`() {
         val exception =
             assertThrows<ExcepcionUNQUE> {
-                alumnoAutenticacionService.crearCuenta(
+                autenticacionService.crearCuenta(
                     32165487,
                     "contrasenia",
                     "contrasenia"
@@ -52,10 +51,10 @@ internal class AlumnoAutenticacionServiceTest {
     fun `se levanta una excepcion si se quiere crear una cuenta con un codigo sin expirar`() {
         val dni = 32165487
         this.crearAlumno(dni)
-        alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
+        autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
 
         val exception =
-            assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia") }
+            assertThrows<ExcepcionUNQUE> { autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia") }
 
         assertThat(exception.message).isEqualTo("Usted posee un codigo que no expiró. Revise su correo y confirme su cuenta con el codigo dado")
     }
@@ -64,10 +63,10 @@ internal class AlumnoAutenticacionServiceTest {
     fun `se puede crear nuevamente una cuenta si el codigo ha expirado`() {
         val dni = 32165487
         this.crearAlumno(dni)
-        val primerCodigo = alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
+        val primerCodigo = autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
 
         val segundoCodigo =
-            alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia", LocalDateTime.now().plusDays(1))
+            autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia", LocalDateTime.now().plusDays(1))
 
         assertThat(segundoCodigo).isNotEqualTo(primerCodigo)
         assertThat(alumnoService.buscarAlumno(dni).codigo).isEqualTo(segundoCodigo)
@@ -77,9 +76,9 @@ internal class AlumnoAutenticacionServiceTest {
     fun `un alumno puede confirmar su cuenta con el codigo dado`() {
         val dni = 32165487
         this.crearAlumno(dni)
-        val codigo = alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
+        val codigo = autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
 
-        alumnoAutenticacionService.confirmarCuenta(dni, codigo)
+        autenticacionService.confirmarCuenta(dni, codigo)
 
         assertThat(alumnoService.buscarAlumno(dni).estadoCuenta).isEqualTo(EstadoCuenta.CONFIRMADA)
     }
@@ -89,9 +88,9 @@ internal class AlumnoAutenticacionServiceTest {
         val dni = 32165487
         this.crearAlumno(dni)
         val codigo =
-            alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia", LocalDateTime.now().minusDays(1))
+            autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia", LocalDateTime.now().minusDays(1))
 
-        val exception = assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.confirmarCuenta(dni, codigo) }
+        val exception = assertThrows<ExcepcionUNQUE> { autenticacionService.confirmarCuenta(dni, codigo) }
 
         assertThat(exception.message).isEqualTo("Su codigo ha expirado. Cree su cuenta nuevamente")
     }
@@ -100,9 +99,9 @@ internal class AlumnoAutenticacionServiceTest {
     fun `se levanta una excepcion si se quiere confirmar una cuenta con un codigo incorrecto`() {
         val dni = 32165487
         this.crearAlumno(dni)
-        val codigo = alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
+        val codigo = autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
 
-        val exception = assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.confirmarCuenta(dni, codigo - 1) }
+        val exception = assertThrows<ExcepcionUNQUE> { autenticacionService.confirmarCuenta(dni, codigo - 1) }
 
         assertThat(exception.message).isEqualTo("Codigo incorrecto. Intente nuevamente")
     }
@@ -111,12 +110,12 @@ internal class AlumnoAutenticacionServiceTest {
     fun `se levanta una excepcion si se quiere crear una cuenta con una cuenta ya confirmada`() {
         val dni = 32165487
         this.crearAlumno(dni)
-        val codigo = alumnoAutenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
+        val codigo = autenticacionService.crearCuenta(dni, "contrasenia", "contrasenia")
 
-        alumnoAutenticacionService.confirmarCuenta(dni, codigo)
+        autenticacionService.confirmarCuenta(dni, codigo)
 
         val exception = assertThrows<ExcepcionUNQUE> {
-            alumnoAutenticacionService.crearCuenta(
+            autenticacionService.crearCuenta(
                 dni,
                 "contrasenia",
                 "contrasenia",
@@ -132,7 +131,7 @@ internal class AlumnoAutenticacionServiceTest {
         val dni = 32165487
         this.crearAlumno(dni)
 
-        val exception = assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.confirmarCuenta(dni, 1234567) }
+        val exception = assertThrows<ExcepcionUNQUE> { autenticacionService.confirmarCuenta(dni, 1234567) }
 
         assertThat(exception.message).isEqualTo("Cree su cuenta. Si el problema persiste, comuniquese con el equipo directivo")
     }
@@ -142,11 +141,10 @@ internal class AlumnoAutenticacionServiceTest {
         val dni = 32165487
         this.crearAlumno(dni)
         val password = "contrasenia"
-        val codigo = alumnoAutenticacionService.crearCuenta(dni, password, password)
-        alumnoAutenticacionService.confirmarCuenta(dni, codigo)
+        val codigo = autenticacionService.crearCuenta(dni, password, password)
+        autenticacionService.confirmarCuenta(dni, codigo)
 
-        assertThat(alumnoAutenticacionService.loguearse(dni, password))
-            .isEqualTo(AlumnoDTO.desdeModelo(alumnoService.buscarAlumno(dni)))
+        assertThat(autenticacionService.loguearse(dni, password)).isNotNull
     }
 
     @Test
@@ -154,10 +152,10 @@ internal class AlumnoAutenticacionServiceTest {
         val dni = 32165487
         this.crearAlumno(dni)
         val password = "contrasenia"
-        val codigo = alumnoAutenticacionService.crearCuenta(dni, password, password)
-        alumnoAutenticacionService.confirmarCuenta(dni, codigo)
+        val codigo = autenticacionService.crearCuenta(dni, password, password)
+        autenticacionService.confirmarCuenta(dni, codigo)
 
-        val excepcion = assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.loguearse(dni, "otropass") }
+        val excepcion = assertThrows<ExcepcionUNQUE> { autenticacionService.loguearse(dni, "otropass") }
 
         assertThat(excepcion.message).isEqualTo("Credenciales invalidas")
     }
@@ -167,7 +165,7 @@ internal class AlumnoAutenticacionServiceTest {
         val dni = 32165487
         val password = "contrasenia"
 
-        val excepcion = assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.loguearse(dni, password) }
+        val excepcion = assertThrows<ExcepcionUNQUE> { autenticacionService.loguearse(dni, password) }
 
         assertThat(excepcion.message).isEqualTo("Cree o confirme su cuenta")
     }
@@ -177,11 +175,29 @@ internal class AlumnoAutenticacionServiceTest {
         val dni = 32165487
         this.crearAlumno(dni)
         val password = "contrasenia"
-        alumnoAutenticacionService.crearCuenta(dni, password, password)
+        autenticacionService.crearCuenta(dni, password, password)
 
-        val excepcion = assertThrows<ExcepcionUNQUE> { alumnoAutenticacionService.loguearse(dni, password) }
+        val excepcion = assertThrows<ExcepcionUNQUE> { autenticacionService.loguearse(dni, password) }
 
         assertThat(excepcion.message).isEqualTo("Cree o confirme su cuenta")
+    }
+
+    @Test
+    fun `un directivo puede loguearse`() {
+        autenticacionService.crearDirectivo(CreacionDirectivo("correo@correo", "nombre", "contrasenia"))
+
+        assertThat(autenticacionService.loguearDirectivo("correo@correo", "contrasenia")).isNotNull
+    }
+
+    @Test
+    fun `se levanta una excepcion al no loguearse correctamente como directivo`() {
+        autenticacionService.crearDirectivo(CreacionDirectivo("correo@correo", "nombre", "contrasenia"))
+
+        val excepcion = assertThrows<ExcepcionUNQUE> {
+            autenticacionService.loguearDirectivo("correo@correo", "incorrecta")
+        }
+
+        assertThat(excepcion.message).isEqualTo("Credenciales invalidas")
     }
 
     private fun crearAlumno(dni: Int) {

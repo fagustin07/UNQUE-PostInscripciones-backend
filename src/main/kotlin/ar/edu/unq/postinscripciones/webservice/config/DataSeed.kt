@@ -10,6 +10,8 @@ import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
 import ar.edu.unq.postinscripciones.service.AlumnoService
+import ar.edu.unq.postinscripciones.service.AutenticacionService
+import ar.edu.unq.postinscripciones.service.CreacionDirectivo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
@@ -24,7 +26,8 @@ class DataSeed(
     @Autowired private val cuatrimestreRepository: CuatrimestreRepository,
     @Autowired private val comisionRespository: ComisionRespository,
     @Autowired private val alumnoRepository: AlumnoRepository,
-    @Autowired private val alumnoService: AlumnoService
+    @Autowired private val alumnoService: AlumnoService,
+    @Autowired private val autenticacionService: AutenticacionService
 ) : CommandLineRunner {
 
     @Throws(Exception::class)
@@ -238,6 +241,7 @@ class DataSeed(
             alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(maria.dni, listOf(bddc1.id!!), cuatrimestre)
 
+            autenticacionService.crearDirectivo(CreacionDirectivo("gabi@unque.edu.ar", "Gabi A", "1234"))
             val cantMaterias = materiaRepository.count()
             val cantComisiones = comisionRespository.count()
             val cantAlumnos = alumnoRepository.count()

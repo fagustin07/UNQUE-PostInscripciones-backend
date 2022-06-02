@@ -4,13 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class DirectorTest {
+internal class DirectivoTest {
     private lateinit var solicitudSobrecupo: SolicitudSobrecupo
-    private lateinit var falvia: Director
+    private lateinit var falvia: Directivo
 
     @BeforeEach
     fun `set up`() {
-        falvia = Director()
+        falvia = Directivo()
         solicitudSobrecupo = SolicitudSobrecupo()
     }
 
@@ -29,23 +29,15 @@ internal class DirectorTest {
     }
 
     @Test
-    fun `un director conoce su dni`() {
-        falvia = Director(dni = 4)
-
-        assertThat(falvia.dni).isEqualTo(4)
-    }
-
-    @Test
     fun `un director conoce su nombre y apellido`() {
-        falvia = Director(nombre = "falvia", apellido = "sangalia")
+        falvia = Directivo(nombre = "falvia")
 
         assertThat(falvia.nombre).isEqualTo("falvia")
-        assertThat(falvia.apellido).isEqualTo("sangalia")
     }
 
     @Test
     fun `un director conoce su correo y contrasenia`() {
-        falvia = Director(correo = "falvia@ejemplo.com", contrasenia = "contra")
+        falvia = Directivo(correo = "falvia@ejemplo.com", contrasenia = "contra")
 
         assertThat(falvia.correo).isEqualTo("falvia@ejemplo.com")
         assertThat(falvia.contrasenia).isEqualTo("contra")

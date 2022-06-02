@@ -31,6 +31,7 @@ dependencies {
 	implementation("io.springfox:springfox-swagger-ui:2.9.2")
 	implementation("org.flywaydb:flyway-core:8.5.10")
 	implementation("org.flywaydb:flyway-mysql:8.5.10")
+	implementation("io.jsonwebtoken:jjwt:0.9.1")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

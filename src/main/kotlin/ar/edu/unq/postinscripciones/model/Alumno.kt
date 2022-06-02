@@ -24,6 +24,7 @@ class Alumno(
     var cargaDeCodigo: LocalDateTime? = null
     @Enumerated(EnumType.STRING)
     var estadoCuenta: EstadoCuenta = EstadoCuenta.SIN_CONFIRMAR
+    val rol = Role.ROLE_ALUMNO
 
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     private val formularios: MutableList<Formulario> = mutableListOf()
