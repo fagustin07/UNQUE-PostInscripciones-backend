@@ -9,45 +9,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @ServiceREST
-@RequestMapping("/api/alumno")
+@RequestMapping("/api/alumnos")
 class AlumnoController {
 
     @Autowired
     private lateinit var alumnoService: AlumnoService
-
-    @ApiOperation("Endpoint que se usa para registrar una lista de alumnos en el sistema")
-    @ApiResponses(
-        value = [
-            ApiResponse(code = 201, message = "OK", response = ConflictoAlumnoDTO::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
-        ]
-    )
-    @RequestMapping(value = [""], method = [RequestMethod.POST])
-    fun registrarAlumnos(@RequestBody planillaAlumnos: List<FormularioCrearAlumno>): ResponseEntity<*> {
-        return ResponseEntity(
-            alumnoService.registrarAlumnos(planillaAlumnos),
-            HttpStatus.CREATED
-        )
-    }
-
-    @ApiOperation("Endpoint que se usa para actualizar la historia academica de un alumno registrado en el sistema")
-    @ApiResponses(
-            value = [
-                ApiResponse(code = 200, message = "OK", response = AlumnoDTO::class, responseContainer = "List"),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
-    )
-    @RequestMapping(value = ["/{dni}/historia-academica"], method = [RequestMethod.PUT])
-    fun actualizarHistoriaAcademica(
-            @ApiParam(value = "Dni del alumno para cargar historia academica", example = "12345677", required = true)
-            @PathVariable dni: Int,
-            @RequestBody historiaAcademica: List<MateriaCursadaDTO>
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-                alumnoService.actualizarHistoriaAcademica(dni, historiaAcademica),
-                HttpStatus.CREATED
-        )
-    }
 
     @ApiOperation("Endpoint que se usa para cargar una solicitud de comisiones a un alumno.")
     @ApiResponses(
@@ -76,7 +42,7 @@ class AlumnoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/{dni}/solicitudes"], method = [RequestMethod.PUT])
+    @RequestMapping(value = ["/{dni}/solicitudes"], method = [RequestMethod.PATCH])
     fun actualizarFormulario(
         @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
         @PathVariable dni: Int,
@@ -89,7 +55,7 @@ class AlumnoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para obtener las materias que puede cursar un alumno")
+    @ApiOperation("Endpoint que se usa para obtener las materias que puede cursar un alumno y comisiones")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = MateriaComision::class, responseContainer = "List"),
@@ -104,25 +70,6 @@ class AlumnoController {
     ): ResponseEntity<*> {
         return ResponseEntity(
             alumnoService.materiasDisponibles(dni),
-            HttpStatus.OK
-        )
-    }
-
-    @ApiOperation("#### Endpoint que se usa para obtener el formulario y un resumen de la historia academica del alumno dado ####")
-    @ApiResponses(
-        value = [
-            ApiResponse(code = 200, message = "OK", response = ResumenAlumno::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
-        ]
-    )
-    @RequestMapping(value = ["/{dni}"], method = [RequestMethod.GET])
-    fun resumenAlumno(
-        @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
-        @PathVariable
-        dni: Int,
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-            alumnoService.obtenerResumenAlumno(dni),
             HttpStatus.OK
         )
     }

@@ -56,7 +56,6 @@ class MateriaService {
     @Transactional
     fun todas(): List<MateriaDTO> {
         val materias = materiaRepository.findAll().toList()
-        materias.forEach { it.correlativas.size }
         return materias.map { MateriaDTO.desdeModelo(it) }
     }
 
