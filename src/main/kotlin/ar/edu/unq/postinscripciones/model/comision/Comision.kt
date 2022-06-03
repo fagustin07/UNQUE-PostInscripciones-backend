@@ -3,6 +3,7 @@ package ar.edu.unq.postinscripciones.model.comision
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
+import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import javax.persistence.*
 
 @Entity
@@ -28,6 +29,24 @@ class Comision(
 
     fun modificarHorarios(nuevosHorarios: List<Horario>) {
         horarios = nuevosHorarios
+    }
+
+    fun asignarSobrecupo() {
+        if(sobrecuposDisponibles() > 0) {
+            sobrecuposOcupados ++
+        } else {
+            throw ExcepcionUNQUE("No hay sobrecupos disponibles")
+        }
+
+    }
+
+    fun quitarSobrecupo() {
+        if(sobrecuposOcupados > 0) {
+            sobrecuposOcupados --
+        } else {
+            throw ExcepcionUNQUE("No hay sobrecupos ocupados")
+        }
+
     }
 
     fun esLaComision(comision: Comision): Boolean {

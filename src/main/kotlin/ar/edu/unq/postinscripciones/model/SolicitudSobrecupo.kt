@@ -16,12 +16,31 @@ class SolicitudSobrecupo(
     var estado: EstadoSolicitud = EstadoSolicitud.PENDIENTE
 
     fun cambiarEstado(estado: EstadoSolicitud){
+        val estadoAnterior = this.estado
         this.estado = estado
+        estado.asignarODesasignarCupo(comision, estadoAnterior)
     }
 
     fun solicitaLaComision(comision: Comision) = this.comision.esLaComision(comision)
 }
 
 enum class EstadoSolicitud {
-    PENDIENTE, APROBADO, RECHAZADO
+    PENDIENTE {
+        override fun asignarODesasignarCupo(comision: Comision, estadoAnterior: EstadoSolicitud) {
+            if(estadoAnterior === APROBADO) {
+                comision.quitarSobrecupo()
+            }
+        }
+    }, APROBADO {
+        override fun asignarODesasignarCupo(comision: Comision, estadoAnterior: EstadoSolicitud) {
+            comision.asignarSobrecupo()
+        }
+    }, RECHAZADO {
+        override fun asignarODesasignarCupo(comision: Comision, estadoAnterior: EstadoSolicitud) {
+            if(estadoAnterior === APROBADO) {
+                comision.quitarSobrecupo()
+            }
+        }
+    };
+    abstract fun asignarODesasignarCupo(comision: Comision, estadoAnterior: EstadoSolicitud)
 }

@@ -3,9 +3,11 @@ package ar.edu.unq.postinscripciones.model.comision
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
+import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalTime
 
 internal class ComisionTest {
@@ -72,6 +74,39 @@ internal class ComisionTest {
         val horarios: List<Horario> = horariosBdd()
         val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios, cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL)
         assertThat(comisionDosBdd.modalidad).isEqualTo(Modalidad.VIRTUAL)
+    }
+
+    @Test
+    fun `Cuando una comision asigna un sobrecupo ahora tiene un sobrecupo disponible menos`() {
+        val sobrecuposDisponiblesAntes = comisionUnoBdd.sobrecuposDisponibles()
+        comisionUnoBdd.asignarSobrecupo()
+        assertThat(comisionUnoBdd.sobrecuposDisponibles()).isEqualTo(sobrecuposDisponiblesAntes - 1)
+    }
+
+    @Test
+    fun `Cuando una comision quita un sobrecupo ahora tiene un sobrecupo disponible mas`() {
+        comisionUnoBdd.asignarSobrecupo()
+        val sobrecuposDisponiblesAntes = comisionUnoBdd.sobrecuposDisponibles()
+
+        comisionUnoBdd.quitarSobrecupo()
+
+        assertThat(comisionUnoBdd.sobrecuposDisponibles()).isEqualTo(sobrecuposDisponiblesAntes + 1)
+    }
+
+    @Test
+    fun `No se puede asignar un sobrecupo a una comision que no tiene sobrecupos disponibles`() {
+        val comision = Comision(bdd, 2, sobrecuposTotales = 0)
+        val exception = assertThrows<ExcepcionUNQUE> { comision.asignarSobrecupo() }
+
+        assertThat(exception.message).isEqualTo("No hay sobrecupos disponibles")
+    }
+
+    @Test
+    fun `No se puede quitar un sobrecupo a una comision que no tiene sobrecupos ocupados`() {
+        val comision = Comision(bdd, 2)
+        val exception = assertThrows<ExcepcionUNQUE> { comision.quitarSobrecupo() }
+
+        assertThat(exception.message).isEqualTo("No hay sobrecupos ocupados")
     }
 
 
