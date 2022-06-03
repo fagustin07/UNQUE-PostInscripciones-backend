@@ -84,8 +84,8 @@ internal class MateriaServiceTest {
 
     @Test
     fun `Se puede crear una lista de materias`() {
-        val intro = FormularioMateria("00487", "Introducción a la Programación",mutableListOf(), Carrera.SIMULTANEIDAD)
-        val orga = FormularioMateria("01032", "Organización de las Computadoras",mutableListOf(), Carrera.SIMULTANEIDAD)
+        val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.SIMULTANEIDAD)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
         val materiasCreadas = materiaService.crear(listOf(intro, orga))
 
         assertThat(materiasCreadas.map{it.codigo}).containsAll(listOf(intro.codigo, orga.codigo))
@@ -94,7 +94,7 @@ internal class MateriaServiceTest {
     @Test
     fun `no se puede crear una lista de materias que ya existen`() {
         val excepcion = assertThrows<ExcepcionUNQUE> {
-            materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096", mutableListOf(), Carrera.SIMULTANEIDAD)))
+            materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
         }
         assertThat(excepcion.message).isEqualTo(
             "La materia que desea crear con nombre Base de datos " +
@@ -105,16 +105,18 @@ internal class MateriaServiceTest {
 
     @Test
     fun `se puede crear una lista de materias con una correlativa`() {
-        val orga = FormularioMateria("01032", "Organización de las Computadoras",mutableListOf(bdd.codigo), Carrera.SIMULTANEIDAD)
-        val materiasCreadas = materiaService.crear(listOf(orga))
-        assertThat(materiasCreadas.first().correlativas.first()).isEqualTo(bdd.nombre)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        materiaService.crear(listOf(orga))
+        val materiaDTO = materiaService.actualizarCorrelativas(orga.codigo, mutableListOf(bdd.codigo))
+        assertThat(materiaDTO.correlativas.first()).isEqualTo(bdd.nombre)
     }
 
     @Test
-    fun `no se puede crear una lista de materias con una correlativa inexistente`() {
-        val orga = FormularioMateria("01032", "Organización de las Computadoras",mutableListOf("EPYL-103"), Carrera.SIMULTANEIDAD)
+    fun `no se puede las correlativas de una materia con un codigo inexistente`() {
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        materiaService.crear(listOf(orga))
         val excepcion = assertThrows<ExcepcionUNQUE> {
-            materiaService.crear(listOf(orga))
+            materiaService.actualizarCorrelativas(orga.codigo, mutableListOf("EPYL-103"))
         }
 
         assertThat(excepcion.message).isEqualTo("No existe la materia con codigo: EPYL-103")

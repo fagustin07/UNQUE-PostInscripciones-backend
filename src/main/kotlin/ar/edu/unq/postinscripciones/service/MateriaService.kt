@@ -43,10 +43,8 @@ class MateriaService {
                             "y codigo ${form.codigo}, genera conflicto con la materia: ${existeConNombreOCodigo.get().nombre}, codigo: ${existeConNombreOCodigo.get().codigo}"
                 )
             }
-            val materiasCorrelativas = materiaRepository.findAllByCodigoIn(form.correlativas)
-            val materiaInexistente = form.correlativas.find { !materiasCorrelativas.map { c -> c.codigo }.contains(it) }
-            if (materiaInexistente != null) throw ExcepcionUNQUE("No existe la materia con codigo: $materiaInexistente")
-            Materia(form.codigo, form.nombre, materiasCorrelativas.toMutableList(), form.carrera)
+
+            Materia(form.codigo, form.nombre, mutableListOf(), form.carrera)
         }
 
         val materiasCreadas = materiaRepository.saveAll(materias)
@@ -64,7 +62,9 @@ class MateriaService {
         val materia = materiaRepository.findMateriaByCodigo(codigo).orElseThrow{ MateriaNoEncontradaExcepcion() }
 
         val materiasCorrelativas = correlativas.map { codigoCorrelativa ->
-            materiaRepository.findMateriaByCodigo(codigoCorrelativa).orElseThrow{ MateriaNoEncontradaExcepcion() }
+            materiaRepository
+                .findMateriaByCodigo(codigoCorrelativa)
+                .orElseThrow{ ExcepcionUNQUE("No existe la materia con codigo: $codigoCorrelativa") }
         }
 
         materia.actualizarCorrelativas(materiasCorrelativas.toMutableList())

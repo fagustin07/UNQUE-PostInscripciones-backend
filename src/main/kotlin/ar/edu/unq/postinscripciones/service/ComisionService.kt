@@ -148,7 +148,7 @@ class ComisionService {
                 materia,
                 comisionACrear.numeroComision,
                 cuatrimestre,
-                comisionACrear.horarios.map { HorarioDTO.aModelo(it) },
+                listOf(),
                 comisionACrear.cuposTotales,
                 comisionACrear.sobrecuposTotales
             )

@@ -1,7 +1,6 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
@@ -97,14 +96,12 @@ internal class ServiceDataTest {
                 ComisionACrear(
                     1,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.LUNES, "18:00", "21:00")),
                     30,
                     8
                 ),
                 ComisionACrear(
                     2,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.MIERCOLES, "15:00", "18:00")),
                     30,
                     8
                 )
@@ -126,7 +123,6 @@ internal class ServiceDataTest {
         val crearBdd = ComisionACrear(
             1,
             bdd.codigo,
-            listOf(),
             30,
             8
         )
@@ -136,7 +132,6 @@ internal class ServiceDataTest {
                 ComisionACrear(
                     2,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.MIERCOLES, "15:00", "18:00")),
                     30,
                     8
                 )
@@ -160,7 +155,6 @@ internal class ServiceDataTest {
                 ComisionACrear(
                     1,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.LUNES, "18:00", "21:00")),
                     30,
                     8
                 ),

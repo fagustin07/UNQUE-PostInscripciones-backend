@@ -152,7 +152,6 @@ internal class ComisionServiceTest {
                 ComisionACrear(
                     1,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.LUNES, "18:00", "21:00")),
                     30,
                     8
                 ),
