@@ -1,9 +1,13 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
+import ar.edu.unq.postinscripciones.model.comision.Comision
+import ar.edu.unq.postinscripciones.model.comision.Dia
+import ar.edu.unq.postinscripciones.model.comision.Modalidad
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.FormularioMateria
-import ar.edu.unq.postinscripciones.service.dto.MateriaDTO
+import ar.edu.unq.postinscripciones.service.dto.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -19,14 +23,58 @@ internal class MateriaServiceTest {
 
     @Autowired
     private lateinit var dataService: DataService
+    @Autowired
+    private lateinit var comisionService: ComisionService
 
+    @Autowired
+    private lateinit var cuatrimestreService: CuatrimestreService
+
+    @Autowired
+    private lateinit var alumnoService: AlumnoService
     private lateinit var bdd: MateriaDTO
     private lateinit var algo: MateriaDTO
+    private lateinit var comision: Comision
+    private lateinit var comision2: Comision
+    private lateinit var cuatrimestre: Cuatrimestre
 
     @BeforeEach
     fun setUp() {
         bdd = materiaService.crear("Base de datos", "BD-096", mutableListOf(), Carrera.SIMULTANEIDAD)
         algo = materiaService.crear("Algoritmos", "AA-208", mutableListOf(), Carrera.SIMULTANEIDAD)
+
+        val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
+        cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
+
+        var horarios = listOf(
+            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
+            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+        )
+        val formulario = FormularioComision(
+            1,
+            bdd.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            horarios,
+            Modalidad.PRESENCIAL
+        )
+        comision = comisionService.crear(formulario)
+        horarios = listOf(
+            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
+            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+        )
+        val formulario2 = FormularioComision(
+            2,
+            algo.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            horarios,
+            Modalidad.PRESENCIAL
+        )
+        comision2 = comisionService.crear(formulario2)
     }
 
     @Test
@@ -154,6 +202,25 @@ internal class MateriaServiceTest {
         assertThat(correlativasAntes).isNotEqualTo(materiaDespuesDeActualizarCorrelativas.correlativas)
         assertThat(materiaDespuesDeActualizarCorrelativas.correlativas.first()).isEqualTo(algo.nombre)
 
+    }
+
+    @Test
+    fun `Obtener comisiones ordenadas por cantidad de solicitudes`() {
+        val alumno1 =
+            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LICENCIATURA))
+        val alumno2 =
+            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LICENCIATURA))
+
+        alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
+        alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
+
+        val materiasObtenidas = materiaService.materiasPorSolicitudes(cuatrimestre)
+
+        assertThat(materiasObtenidas.maxOf { it.cantidadSolicitudes }).isEqualTo(materiasObtenidas.first().cantidadSolicitudes)
+        assertThat(materiasObtenidas.minOf { it.cantidadSolicitudes }).isEqualTo(materiasObtenidas.last().cantidadSolicitudes)
+        assertThat(materiasObtenidas.first().cantidadSolicitudes).isEqualTo(2)
+        assertThat(materiasObtenidas.first().codigo).isEqualTo(bdd.codigo)
+        assertThat(materiasObtenidas.last().cantidadSolicitudes).isEqualTo(1)
     }
 
     @AfterEach

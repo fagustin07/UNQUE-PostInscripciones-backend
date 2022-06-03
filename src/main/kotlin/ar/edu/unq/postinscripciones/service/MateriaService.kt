@@ -2,9 +2,11 @@ package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
 import ar.edu.unq.postinscripciones.model.Materia
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
+import ar.edu.unq.postinscripciones.service.dto.MateriaPorSolicitudes
 import ar.edu.unq.postinscripciones.service.dto.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.MateriaDTO
 import org.springframework.beans.factory.annotation.Autowired
@@ -77,6 +79,16 @@ class MateriaService {
         val materia = materiaRepository.findMateriaByCodigo(codigo).orElseThrow{ MateriaNoEncontradaExcepcion() }
         materia.correlativas.size
         return materia
+    }
+
+    @Transactional
+    fun materiasPorSolicitudes(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<MateriaPorSolicitudes> {
+        return materiaRepository
+            .findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudes(
+                cuatrimestre.anio,
+                cuatrimestre.semestre
+            )
+            .map { MateriaPorSolicitudes.desdeTupla(it) }
     }
 
 }

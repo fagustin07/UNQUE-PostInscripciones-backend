@@ -159,19 +159,19 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "##### Endpoint usado para listar todas las comisiones de un cuatrimestre ordenadas por cantidad de solicitudes #####")
+    @ApiOperation(value = "##### Endpoint usado para listar todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
     @ApiResponses(
         value = [
             ApiResponse(
                 code = 200,
                 message = "OK",
-                response = ComisionPorSolicitudes::class,
+                response = MateriaPorSolicitudes::class,
                 responseContainer = "List"
             ),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/comisiones"], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/materias/solicitudes"], method = [RequestMethod.GET])
     fun comisionSolicitudes(
         @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
         @RequestParam
@@ -181,7 +181,7 @@ class DirectivoController {
         semestre: Semestre
     ): ResponseEntity<*> {
         return ResponseEntity(
-            comisionService.comisionesPorSolicitudes(),
+            materiaService.materiasPorSolicitudes(),
             HttpStatus.OK
         )
     }

@@ -132,15 +132,6 @@ internal class ComisionServiceTest {
     }
 
     @Test
-    fun `Obtener comisiones ordenadas por cantidad de solicitudes`() {
-        val comisionesObtenidas = comisionService.comisionesPorSolicitudes(cuatrimestre)
-        assertThat(comisionesObtenidas.maxOf { it.cantidadSolicitudes }).isEqualTo(comisionesObtenidas.first().cantidadSolicitudes)
-        assertThat(comisionesObtenidas.minOf { it.cantidadSolicitudes }).isEqualTo(comisionesObtenidas.last().cantidadSolicitudes)
-        assertThat(comisionesObtenidas.first().cantidadSolicitudes).isEqualTo(2)
-        assertThat(comisionesObtenidas.last().cantidadSolicitudes).isEqualTo(0)
-    }
-
-    @Test
     fun `se puede guardar una oferta academica con un inicio y un fin para registrar formularios`() {
         val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
         val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
