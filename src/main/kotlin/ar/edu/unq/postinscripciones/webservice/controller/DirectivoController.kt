@@ -68,7 +68,7 @@ class DirectivoController {
     ): ResponseEntity<*> {
         return ResponseEntity(
             alumnoService.actualizarHistoriaAcademica(dni, historiaAcademica),
-            HttpStatus.CREATED
+            HttpStatus.OK
         )
     }
 

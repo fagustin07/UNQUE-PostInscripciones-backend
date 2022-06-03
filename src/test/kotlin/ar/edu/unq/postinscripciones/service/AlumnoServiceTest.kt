@@ -53,7 +53,6 @@ internal class AlumnoServiceTest {
             "nicolas.martinez@unq.edu.ar",
             42256394,
             Carrera.TPI,
-            listOf()
         )
 
         val fedeFormularioCrear = FormularioCrearAlumno(
@@ -63,7 +62,6 @@ internal class AlumnoServiceTest {
             "fede.sando@unq.edu.ar",
             11223344,
             Carrera.TPI,
-            listOf()
         )
 
         alumno = alumnoService.crear(nicoFormularioCrear)
@@ -233,14 +231,15 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.TPI,
-            listOf(materiaCursada)
+            Carrera.TPI
         )
+        val otroAlumno = alumnoService.crear(formularioAlumno)
 
-        val alumno = alumnoService.crear(formularioAlumno)
+        alumnoService.actualizarHistoriaAcademica(otroAlumno.dni,listOf(materiaCursada))
 
-        assertThat(alumno.historiaAcademica).isNotEmpty
-        assertThat(alumno.historiaAcademica.first().materia.codigo).isEqualTo(materiaCursada.codigoMateria)
+        val alumnoLuegoDeActualizar = alumnoService.buscarAlumno(otroAlumno.dni)
+        assertThat(alumnoLuegoDeActualizar.historiaAcademica).isNotEmpty
+        assertThat(alumnoLuegoDeActualizar.historiaAcademica.first().materia.codigo).isEqualTo(materiaCursada.codigoMateria)
     }
 
     @Test
@@ -252,13 +251,12 @@ internal class AlumnoServiceTest {
                 "Sanchez",
                 "pepe.sanchez@unq.edu.ar",
                 44556,
-                Carrera.TPI,
-                listOf(materiaCursada)
+                Carrera.TPI
         )
-        val alumno = alumnoService.crear(formularioAlumno)
-
+        val otroAlumno = alumnoService.crear(formularioAlumno)
+        alumnoService.actualizarHistoriaAcademica(otroAlumno.dni,listOf(materiaCursada))
         val materiaCursada2 = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
-        val dto = alumnoService.actualizarHistoriaAcademica(alumno.dni, listOf(materiaCursada, materiaCursada2))
+        val dto = alumnoService.actualizarHistoriaAcademica(otroAlumno.dni, listOf(materiaCursada, materiaCursada2))
         val alumnoDespuesDeActualizar = alumnoService.buscarAlumno(dto.dni)
 
         assertThat(alumnoDespuesDeActualizar.historiaAcademica).isNotEmpty
@@ -302,9 +300,9 @@ internal class AlumnoServiceTest {
             "pepe.sanchez@unq.edu.ar",
             4455611,
             Carrera.TPI,
-            listOf(materiaCursada)
         )
         val nacho = alumnoService.crear(formularioAlumno)
+        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
         val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
         val formularioComision = FormularioComision(
             1,
@@ -339,11 +337,13 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
-            listOf(materiaCursada)
+            Carrera.TPI
         )
         val nacho = alumnoService.crear(formularioAlumno)
+        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
+
         val materiasdisponibles = alumnoService.materiasDisponibles(nacho.dni, cuatrimestre)
+
         assertThat(materiasdisponibles.map { it.codigo }).doesNotContain(algo.codigo)
     }
 
@@ -401,10 +401,10 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.SIMULTANEIDAD,
-            listOf(materiaCursada, materiaCursada2, materiaCursada3)
+            Carrera.SIMULTANEIDAD
         )
         val nacho = alumnoService.crear(formularioAlumno)
+        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada, materiaCursada2, materiaCursada3))
 
         val formulario = alumnoService.guardarSolicitudPara(
             nacho.dni,
@@ -456,10 +456,10 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
-            listOf(materiaCursada)
+            Carrera.TPI
         )
         val nacho = alumnoService.crear(formularioAlumno)
+        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
 
         alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!))

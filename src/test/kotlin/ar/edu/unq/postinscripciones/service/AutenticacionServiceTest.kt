@@ -204,7 +204,7 @@ internal class AutenticacionServiceTest {
         alumnoService.registrarAlumnos(
             listOf(
                 FormularioCrearAlumno(
-                    dni, "F", "S", "f@correo.com", 12345, Carrera.TPI, listOf()
+                    dni, "F", "S", "f@correo.com", 12345, Carrera.TPI
                 )
             )
         )

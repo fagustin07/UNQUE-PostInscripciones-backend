@@ -187,7 +187,7 @@ internal class ServiceDataTest {
             planilla.add(
                 FormularioCrearAlumno(
                     prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
-                    prefijo + planilla.size, Carrera.TPI, listOf()
+                    prefijo + planilla.size, Carrera.TPI
                 )
             )
         }

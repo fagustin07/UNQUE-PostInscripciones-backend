@@ -246,14 +246,6 @@ class AlumnoService {
     }
 
     private fun guardarAlumno(formulario: FormularioCrearAlumno): Alumno {
-        val historiaAcademica = formulario.historiaAcademica.map {
-            val materia = materiaRepository
-                .findMateriaByCodigo(it.codigoMateria).orElseThrow { ExcepcionUNQUE("No existe la materia") }
-            val materiaCursada = MateriaCursada(materia)
-            materiaCursada.estado = it.estado
-            materiaCursada.fechaDeCarga = it.fechaDeCarga
-            materiaCursada
-        }
         val alumno = Alumno(
             formulario.dni,
             formulario.nombre,
@@ -261,10 +253,8 @@ class AlumnoService {
             formulario.correo,
             formulario.legajo,
             "",
-            formulario.carrera,
+            formulario.carrera
         )
-
-        historiaAcademica.forEach { alumno.cargarHistoriaAcademica(it) }
 
         return alumnoRepository.save(alumno)
     }

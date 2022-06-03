@@ -16,5 +16,4 @@ data class FormularioCrearAlumno(
     val legajo: Int,
     @ApiModelProperty(example = "TPI", required = true)
     val carrera: Carrera,
-    val historiaAcademica: List<MateriaCursadaDTO>
 )
