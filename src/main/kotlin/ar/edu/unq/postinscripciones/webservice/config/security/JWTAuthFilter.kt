@@ -56,7 +56,7 @@ class JWTAuthFilter : OncePerRequestFilter() {
 
     private fun validateToken(request: HttpServletRequest) {
         var bearerToken: String? = null
-        if (existJWTToken(request)) bearerToken = request.getHeader("Authorization")
+        if (existJWTToken(request)) bearerToken = request.getHeader("authorization")
 
         if (bearerToken != null && jwtUtil.esTokenValido(bearerToken)) {
             setUpSpringAuthentication(bearerToken)

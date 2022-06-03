@@ -63,7 +63,8 @@ class AutenticacionController {
     fun loguearAlumno(@RequestBody loguearAlumno: LoguearAlumno): ResponseEntity<*> {
         val token = autenticacionService.loguearse(loguearAlumno.dni, loguearAlumno.contrasenia)
         val responseHeaders = HttpHeaders()
-        responseHeaders.set("Authorization", token)
+        responseHeaders.set("authorization", token)
+        responseHeaders.set("rol", "Alumno")
         return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(responseHeaders).body(null)
     }
 
@@ -78,7 +79,8 @@ class AutenticacionController {
     fun loguearDirectora(@RequestBody loguearDirectivo: LoguearDirectivo): ResponseEntity<*> {
         val token = autenticacionService.loguearDirectivo(loguearDirectivo.correo, loguearDirectivo.contrasenia)
         val responseHeaders = HttpHeaders()
-        responseHeaders.set("Authorization", token)
+        responseHeaders.set("authorization", token)
+        responseHeaders.set("rol", "Directivo")
         return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(responseHeaders).body(null)
     }
 }
