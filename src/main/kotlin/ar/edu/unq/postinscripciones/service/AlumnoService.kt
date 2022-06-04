@@ -124,11 +124,29 @@ class AlumnoService {
     }
 
     @Transactional
-    fun cambiarEstado(solicitudId: Long, estado: EstadoSolicitud): SolicitudSobrecupoDTO {
+    fun cambiarEstadoSolicitud(solicitudId: Long, estado: EstadoSolicitud, formularioId: Long): SolicitudSobrecupoDTO {
         val solicitud =
             solicitudSobrecupoRepository.findById(solicitudId).orElseThrow { ExcepcionUNQUE("No existe la solicitud") }
+        val formulario = formularioRepository.findById(formularioId).get()
+
+        chequearEstado(formulario)
+
         solicitud.cambiarEstado(estado)
         return SolicitudSobrecupoDTO.desdeModelo(solicitudSobrecupoRepository.save(solicitud))
+    }
+
+    @Transactional
+    fun cerrarFormulario(formularioId: Long, alumnoDni: Int): FormularioDTO {
+        val formulario = formularioRepository.findById(formularioId).orElseThrow { ExcepcionUNQUE("No existe el formulario") }
+        formulario.cerrarFormulario()
+        return FormularioDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
+    }
+
+    @Transactional
+    fun abrirFormulario(formularioId: Long, alumnoDni: Int): FormularioDTO {
+        val formulario = formularioRepository.findById(formularioId).orElseThrow { ExcepcionUNQUE("No existe el formulario") }
+        formulario.abrirFormulario()
+        return FormularioDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
     }
 
     @Transactional
@@ -301,6 +319,12 @@ class AlumnoService {
         this.checkPuedeCursar(alumno, solicitudes, materiasDisponibles)
 
         return solicitudes
+    }
+
+    private fun chequearEstado(formulario: Formulario) {
+        if(formulario.estado === EstadoFormulario.ABIERTO) {
+            throw ExcepcionUNQUE("No se puede cambiar el estado de esta solicitud, el formulario sigue abierto")
+        }
     }
 
     private fun checkFecha(

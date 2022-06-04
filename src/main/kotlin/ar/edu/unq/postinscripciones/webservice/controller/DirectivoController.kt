@@ -128,11 +128,58 @@ class DirectivoController {
         id: Long,
         @ApiParam(value = "Estado a cambiar en la solicitud", example = "APROBADO", required = true)
         @RequestParam
-        estado: EstadoSolicitud
+        estado: EstadoSolicitud,
+        @ApiParam(value = "Id del formulario", example = "1", required = true)
+        @RequestParam
+        formularioId: Long
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.cambiarEstado(id, estado),
+            alumnoService.cambiarEstadoSolicitud(id, estado, formularioId),
             HttpStatus.OK
+        )
+    }
+
+    @ApiOperation("Endpoint que se usa para cerrar un formulario")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/formulario/{id}/cerrar"], method = [RequestMethod.PATCH])
+    fun cerrarFormulario(
+            @ApiParam(value = "Id del formulario", example = "1", required = true)
+            @PathVariable
+            id: Long,
+            @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
+            @RequestParam
+            dni: Int
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+                alumnoService.cerrarFormulario(id, dni),
+                HttpStatus.OK
+        )
+    }
+
+    @ApiOperation("Endpoint que se usa para cerrar un formulario")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/formulario/{id}/abrir"], method = [RequestMethod.PATCH])
+    fun abrirFormulario(
+            @ApiParam(value = "Id del formulario", example = "1", required = true)
+            @PathVariable
+            id: Long,
+            @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
+            @RequestParam
+            dni: Int
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+                alumnoService.abrirFormulario(id, dni),
+                HttpStatus.OK
         )
     }
 

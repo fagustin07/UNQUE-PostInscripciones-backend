@@ -18,6 +18,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.transaction.Transactional
 
 @IntegrationTest
 internal class AlumnoServiceTest {
@@ -164,6 +165,34 @@ internal class AlumnoServiceTest {
     }
 
     @Test
+    fun `Se puede cerrar un formulario`() {
+        val formularioDTO =
+                alumnoService.guardarSolicitudPara(
+                        alumno.dni,
+                        listOf(comision1Algoritmos.id!!),
+                        cuatrimestre
+                )
+        val formulario = alumnoService.cerrarFormulario(formularioDTO.id, alumno.dni)
+
+        assertThat(formulario.estado).isEqualTo(EstadoFormulario.CERRADO)
+    }
+
+    @Test
+    fun `Se puede abrir un formulario cerrado`() {
+        val formularioDTO =
+                alumnoService.guardarSolicitudPara(
+                        alumno.dni,
+                        listOf(comision1Algoritmos.id!!),
+                        cuatrimestre
+                )
+        val formularioCerrado = alumnoService.cerrarFormulario(formularioDTO.id, alumno.dni)
+        val formulario = alumnoService.abrirFormulario(formularioDTO.id, alumno.dni)
+
+        assertThat(formulario.estado).isEqualTo(EstadoFormulario.ABIERTO)
+        assertThat(formularioCerrado.estado).isNotEqualTo(formulario.estado)
+    }
+
+    @Test
     fun `Se puede aprobar una solicitud de sobrecupo`() {
         val formulario =
             alumnoService.guardarSolicitudPara(
@@ -171,8 +200,10 @@ internal class AlumnoServiceTest {
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
+        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
+
         val solicitudPendiente = formulario.solicitudes.first()
-        val solicitudAprobada = alumnoService.cambiarEstado(solicitudPendiente.id, EstadoSolicitud.APROBADO)
+        val solicitudAprobada = alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formulario.id)
 
         assertThat(solicitudAprobada.estado).isEqualTo(EstadoSolicitud.APROBADO)
         assertThat(solicitudAprobada).usingRecursiveComparison().ignoringFields("estado").isEqualTo(solicitudPendiente)
@@ -186,10 +217,67 @@ internal class AlumnoServiceTest {
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
+        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
+
         val solicitudPendiente = formulario.solicitudes.first()
-        val solicitudRechazada = alumnoService.cambiarEstado(solicitudPendiente.id, EstadoSolicitud.RECHAZADO)
+        val solicitudRechazada = alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.RECHAZADO, formulario.id)
 
         assertThat(solicitudRechazada.estado).isEqualTo(EstadoSolicitud.RECHAZADO)
+    }
+
+    @Test
+    fun `Al aprobar una solicitud, el numero de sobrecupos disponibles de una comision baja`() {
+        val formulario =
+                alumnoService.guardarSolicitudPara(
+                        alumno.dni,
+                        listOf(comision1Algoritmos.id!!),
+                        cuatrimestre
+                )
+        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
+
+        val solicitudPendiente = formulario.solicitudes.first()
+        alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formulario.id)
+
+        val comisionDespuesDeAprobarSolicitud = comisionService.obtener(comision1Algoritmos.id!!)
+
+        assertThat(comisionDespuesDeAprobarSolicitud.cuposDisponibles).isEqualTo(comision1Algoritmos.sobrecuposDisponibles() - 1)
+    }
+
+    @Test
+    fun `Al rechazar una solicitud aprobada, el numero de sobrecupos disponibles de una comision aumenta`() {
+        val formulario =
+                alumnoService.guardarSolicitudPara(
+                        alumno.dni,
+                        listOf(comision1Algoritmos.id!!),
+                        cuatrimestre
+                )
+        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
+
+        val solicitudPendiente = formulario.solicitudes.first()
+        alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formulario.id)
+        val comisionDespuesDeAprobarSolicitud = comisionService.obtener(comision1Algoritmos.id!!)
+
+        alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.RECHAZADO, formulario.id)
+
+        val comisionDespuesDeRechazarSolicitud = comisionService.obtener(comision1Algoritmos.id!!)
+
+        assertThat(comisionDespuesDeRechazarSolicitud.cuposDisponibles).isEqualTo(comisionDespuesDeAprobarSolicitud.cuposDisponibles + 1)
+    }
+
+    @Test
+    fun `No se puede cambiar el estado de una solitud si el formulario sigue abierto`() {
+        val formularioAbierto =
+                alumnoService.guardarSolicitudPara(
+                        alumno.dni,
+                        listOf(comision1Algoritmos.id!!),
+                        cuatrimestre
+                )
+
+        val solicitudPendiente = formularioAbierto.solicitudes.first()
+        val exception = assertThrows<ExcepcionUNQUE> {
+            alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formularioAbierto.id)
+        }
+        assertThat(exception.message).isEqualTo("No se puede cambiar el estado de esta solicitud, el formulario sigue abierto")
     }
 
     @Test

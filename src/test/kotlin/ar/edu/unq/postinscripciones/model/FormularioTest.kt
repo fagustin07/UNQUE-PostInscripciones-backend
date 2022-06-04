@@ -51,15 +51,15 @@ internal class FormularioTest {
 
     @Test
     fun `se puede cerrar un formulario`() {
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
         assertThat(formulario.estado).isEqualTo(EstadoFormulario.CERRADO)
     }
 
     @Test
     fun `se puede abrir un formulario ya cerrado`() {
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
         val estadoDelFormularioDespuesDeCambiarEstado = formulario.estado
-        formulario.cambiarEstado()
+        formulario.abrirFormulario()
 
         assertThat(estadoDelFormularioDespuesDeCambiarEstado).isEqualTo(EstadoFormulario.CERRADO)
         assertThat(formulario.estado).isEqualTo(EstadoFormulario.ABIERTO)
@@ -70,7 +70,7 @@ internal class FormularioTest {
         val solicitudes = mutableListOf(SolicitudSobrecupo(), SolicitudSobrecupo())
         val formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = solicitudes)
 
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
 
         assertThat(formulario.solicitudes.map { it.estado })
                 .usingRecursiveComparison()
