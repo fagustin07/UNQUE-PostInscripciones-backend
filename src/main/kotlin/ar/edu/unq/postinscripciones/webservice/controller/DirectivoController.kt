@@ -210,6 +210,33 @@ class DirectivoController {
         )
     }
 
+    @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una materia, junto con el id del formulario y la solicitud #####")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                message = "OK",
+                response = AlumnoSolicitaComision::class,
+                responseContainer = "List"
+            ),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
+    @RequestMapping(value = ["/materia/{id}/solicitantes"], method = [RequestMethod.GET])
+    fun alumnosQueSolicitaronMateria(
+        @ApiParam(value = "Id de la materia", example = "80000", required = true)
+        @PathVariable
+        id: String,
+        @ApiParam(value = "id de la comision", example = "1", required = false)
+        @RequestParam
+        comision: Long?
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            alumnoService.alumnosQueSolicitaron(id, comision),
+            HttpStatus.OK
+        )
+    }
+
     @ApiOperation("Endpoint que se usa para modificar los horarios de una comision ya creada")
     @ApiResponses(
         value = [
