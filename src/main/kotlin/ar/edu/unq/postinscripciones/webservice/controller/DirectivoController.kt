@@ -161,28 +161,6 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para cerrar un formulario")
-    @ApiResponses(
-            value = [
-                ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
-    )
-    @RequestMapping(value = ["/formulario/{id}/abrir"], method = [RequestMethod.PATCH])
-    fun abrirFormulario(
-            @ApiParam(value = "Id del formulario", example = "1", required = true)
-            @PathVariable
-            id: Long,
-            @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
-            @RequestParam
-            dni: Int
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-                alumnoService.abrirFormulario(id, dni),
-                HttpStatus.OK
-        )
-    }
-
 //    CONTROLADOR COMISIONES
 
     @ApiOperation("Endpoint que se usa para registrar nuevas comisiones en el sistema o bien actualizar las fechas para recibir formularios de sobrecupos.")

@@ -124,12 +124,17 @@ class AlumnoService {
     }
 
     @Transactional
-    fun cambiarEstadoSolicitud(solicitudId: Long, estado: EstadoSolicitud, formularioId: Long): SolicitudSobrecupoDTO {
+    fun cambiarEstadoSolicitud(
+            solicitudId: Long,
+            estado: EstadoSolicitud,
+            formularioId: Long,
+            fecha: LocalDateTime = LocalDateTime.now()): SolicitudSobrecupoDTO
+    {
         val solicitud =
             solicitudSobrecupoRepository.findById(solicitudId).orElseThrow { ExcepcionUNQUE("No existe la solicitud") }
         val formulario = formularioRepository.findById(formularioId).get()
 
-        chequearEstado(formulario)
+        chequearEstado(formulario, fecha)
 
         solicitud.cambiarEstado(estado)
         return SolicitudSobrecupoDTO.desdeModelo(solicitudSobrecupoRepository.save(solicitud))
@@ -139,13 +144,6 @@ class AlumnoService {
     fun cerrarFormulario(formularioId: Long, alumnoDni: Int): FormularioDTO {
         val formulario = formularioRepository.findById(formularioId).orElseThrow { ExcepcionUNQUE("No existe el formulario") }
         formulario.cerrarFormulario()
-        return FormularioDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
-    }
-
-    @Transactional
-    fun abrirFormulario(formularioId: Long, alumnoDni: Int): FormularioDTO {
-        val formulario = formularioRepository.findById(formularioId).orElseThrow { ExcepcionUNQUE("No existe el formulario") }
-        formulario.abrirFormulario()
         return FormularioDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
     }
 
@@ -321,9 +319,16 @@ class AlumnoService {
         return solicitudes
     }
 
-    private fun chequearEstado(formulario: Formulario) {
-        if(formulario.estado === EstadoFormulario.ABIERTO) {
+    private fun chequearEstado(formulario: Formulario, fecha: LocalDateTime) {
+        val cuatrimestreObtenido = cuatrimestreRepository
+                .findByAnioAndSemestre(formulario.cuatrimestre.anio, formulario.cuatrimestre.semestre)
+                .get()
+
+        if(cuatrimestreObtenido.finInscripciones > fecha && formulario.estado != EstadoFormulario.CERRADO) {
             throw ExcepcionUNQUE("No se puede cambiar el estado de esta solicitud, el formulario sigue abierto")
+        }
+        if(formulario.estado == EstadoFormulario.CERRADO) {
+            throw ExcepcionUNQUE("No se puede cambiar el estado de esta solicitud, el formulario al que pertenece se encuentra cerrado")
         }
     }
 

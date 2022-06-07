@@ -178,32 +178,26 @@ internal class AlumnoServiceTest {
     }
 
     @Test
-    fun `Se puede abrir un formulario cerrado`() {
-        val formularioDTO =
-                alumnoService.guardarSolicitudPara(
-                        alumno.dni,
-                        listOf(comision1Algoritmos.id!!),
-                        cuatrimestre
-                )
-        val formularioCerrado = alumnoService.cerrarFormulario(formularioDTO.id, alumno.dni)
-        val formulario = alumnoService.abrirFormulario(formularioDTO.id, alumno.dni)
-
-        assertThat(formulario.estado).isEqualTo(EstadoFormulario.ABIERTO)
-        assertThat(formularioCerrado.estado).isNotEqualTo(formulario.estado)
-    }
-
-    @Test
     fun `Se puede aprobar una solicitud de sobrecupo`() {
+        val fechaDeModificacion = LocalDateTime.of(
+                cuatrimestre.finInscripciones.year,
+                cuatrimestre.finInscripciones.month,
+                cuatrimestre.finInscripciones.dayOfMonth + 5,
+                12, 0,0)
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
-        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
 
         val solicitudPendiente = formulario.solicitudes.first()
-        val solicitudAprobada = alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formulario.id)
+        val solicitudAprobada = alumnoService.cambiarEstadoSolicitud(
+                solicitudPendiente.id,
+                EstadoSolicitud.APROBADO,
+                formulario.id,
+                fechaDeModificacion
+        )
 
         assertThat(solicitudAprobada.estado).isEqualTo(EstadoSolicitud.APROBADO)
         assertThat(solicitudAprobada).usingRecursiveComparison().ignoringFields("estado").isEqualTo(solicitudPendiente)
@@ -211,32 +205,50 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Se puede rechazar una solicitud de sobrecupo`() {
+        val fechaDeModificacion = LocalDateTime.of(
+                cuatrimestre.finInscripciones.year,
+                cuatrimestre.finInscripciones.month,
+                cuatrimestre.finInscripciones.dayOfMonth + 5,
+                12, 0,0)
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
-        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
 
         val solicitudPendiente = formulario.solicitudes.first()
-        val solicitudRechazada = alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.RECHAZADO, formulario.id)
+        val solicitudRechazada = alumnoService.cambiarEstadoSolicitud(
+                solicitudPendiente.id,
+                EstadoSolicitud.RECHAZADO,
+                formulario.id,
+                fechaDeModificacion
+        )
 
         assertThat(solicitudRechazada.estado).isEqualTo(EstadoSolicitud.RECHAZADO)
     }
 
     @Test
     fun `Al aprobar una solicitud, el numero de sobrecupos disponibles de una comision baja`() {
+        val fechaDeModificacion = LocalDateTime.of(
+                cuatrimestre.finInscripciones.year,
+                cuatrimestre.finInscripciones.month,
+                cuatrimestre.finInscripciones.dayOfMonth + 5,
+                12, 0,0)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
                         listOf(comision1Algoritmos.id!!),
                         cuatrimestre
                 )
-        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
 
         val solicitudPendiente = formulario.solicitudes.first()
-        alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formulario.id)
+        alumnoService.cambiarEstadoSolicitud(
+                solicitudPendiente.id,
+                EstadoSolicitud.APROBADO,
+                formulario.id,
+                fechaDeModificacion
+        )
 
         val comisionDespuesDeAprobarSolicitud = comisionService.obtener(comision1Algoritmos.id!!)
 
@@ -245,19 +257,33 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al rechazar una solicitud aprobada, el numero de sobrecupos disponibles de una comision aumenta`() {
+        val fechaDeModificacion = LocalDateTime.of(
+                cuatrimestre.finInscripciones.year,
+                cuatrimestre.finInscripciones.month,
+                cuatrimestre.finInscripciones.dayOfMonth + 5,
+                12, 0,0)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
                         listOf(comision1Algoritmos.id!!),
                         cuatrimestre
                 )
-        alumnoService.cerrarFormulario(formulario.id, alumno.dni)
 
         val solicitudPendiente = formulario.solicitudes.first()
-        alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formulario.id)
+        alumnoService.cambiarEstadoSolicitud(
+                solicitudPendiente.id,
+                EstadoSolicitud.APROBADO,
+                formulario.id,
+                fechaDeModificacion
+        )
         val comisionDespuesDeAprobarSolicitud = comisionService.obtener(comision1Algoritmos.id!!)
 
-        alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.RECHAZADO, formulario.id)
+        alumnoService.cambiarEstadoSolicitud(
+                solicitudPendiente.id,
+                EstadoSolicitud.RECHAZADO,
+                formulario.id,
+                fechaDeModificacion
+        )
 
         val comisionDespuesDeRechazarSolicitud = comisionService.obtener(comision1Algoritmos.id!!)
 
@@ -265,7 +291,7 @@ internal class AlumnoServiceTest {
     }
 
     @Test
-    fun `No se puede cambiar el estado de una solitud si el formulario sigue abierto`() {
+    fun `No se puede cambiar el estado de una solitud si la etapa de inscripciones aun no ha finalizado`() {
         val formularioAbierto =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -275,9 +301,40 @@ internal class AlumnoServiceTest {
 
         val solicitudPendiente = formularioAbierto.solicitudes.first()
         val exception = assertThrows<ExcepcionUNQUE> {
-            alumnoService.cambiarEstadoSolicitud(solicitudPendiente.id, EstadoSolicitud.APROBADO, formularioAbierto.id)
+            alumnoService.cambiarEstadoSolicitud(
+                    solicitudPendiente.id,
+                    EstadoSolicitud.APROBADO,
+                    formularioAbierto.id,
+                    LocalDateTime.now().plusDays(2))
         }
         assertThat(exception.message).isEqualTo("No se puede cambiar el estado de esta solicitud, el formulario sigue abierto")
+    }
+
+    @Test
+    fun `No se puede cambiar el estado de una solitud si el formulario se encuentra cerrado`() {
+        val fechaDeModificacion = LocalDateTime.of(
+                cuatrimestre.finInscripciones.year,
+                cuatrimestre.finInscripciones.month,
+                cuatrimestre.finInscripciones.dayOfMonth + 5,
+                12, 0,0)
+        val formularioAbierto =
+                alumnoService.guardarSolicitudPara(
+                        alumno.dni,
+                        listOf(comision1Algoritmos.id!!),
+                        cuatrimestre
+                )
+        alumnoService.cerrarFormulario(formularioId = formularioAbierto.id, alumnoDni = alumno.dni)
+
+        val solicitudPendiente = formularioAbierto.solicitudes.first()
+        val exception = assertThrows<ExcepcionUNQUE> {
+            alumnoService.cambiarEstadoSolicitud(
+                    solicitudPendiente.id,
+                    EstadoSolicitud.APROBADO,
+                    formularioAbierto.id,
+                    fechaDeModificacion
+            )
+        }
+        assertThat(exception.message).isEqualTo("No se puede cambiar el estado de esta solicitud, el formulario al que pertenece se encuentra cerrado")
     }
 
     @Test
