@@ -83,7 +83,7 @@ internal class FormularioTest {
         solicitudes.first().cambiarEstado(EstadoSolicitud.APROBADO)
         val formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = solicitudes)
 
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
 
         assertThat(formulario.solicitudes.map { it.estado })
                 .usingRecursiveComparison()

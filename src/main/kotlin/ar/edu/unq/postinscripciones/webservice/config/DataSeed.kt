@@ -148,6 +148,9 @@ class DataSeed(
                     Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(11, 0, 0)),
                     Horario(Dia.MIERCOLES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
             )
+            val ingles1horariosc1 = listOf(
+                    Horario(Dia.MIERCOLES, LocalTime.of(14, 0, 0), LocalTime.of(18, 0, 0))
+            )
             val cuatrimestre = Cuatrimestre.actual()
 
             val bddc1 = Comision(bdd, 1, cuatrimestre, bddhorariosc1)
@@ -236,7 +239,7 @@ class DataSeed(
             firulais.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             sofia.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             alumnoRepository.saveAll(listOf(jorge,bartolo, roberto, maria, firulais, sofia))
-            alumnoService.guardarSolicitudPara(bartolo.dni, listOf(bddc1.id!!, bddc2.id!!),  cuatrimestre)
+            alumnoService.guardarSolicitudPara(bartolo.dni, listOf(bddc1.id!!, bddc2.id!!),  cuatrimestre, comisionesInscriptoIds = listOf(orgac1.id!!))
             alumnoService.guardarSolicitudPara(jorge.dni, listOf(estrc1.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(maria.dni, listOf(bddc1.id!!), cuatrimestre)

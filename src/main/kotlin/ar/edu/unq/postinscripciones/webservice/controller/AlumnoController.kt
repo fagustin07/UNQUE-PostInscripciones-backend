@@ -75,6 +75,22 @@ class AlumnoController {
             HttpStatus.OK
         )
     }
+
+    @ApiOperation("Endpoint que se usa para obtener el formulario de un alumno")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/formulario"], method = [RequestMethod.GET])
+    fun obtenerFormulario(@RequestHeader("Authorization") token: String): ResponseEntity<*> {
+        return ResponseEntity(
+                alumnoService.obtenerFormulario(token),
+                HttpStatus.OK
+        )
+    }
+
 }
 
 

@@ -21,10 +21,6 @@ class Formulario(
     @Enumerated(EnumType.STRING)
     var estado = EstadoFormulario.ABIERTO
 
-    fun cambiarEstado() {
-        estado.cambiarEstado(this)
-    }
-
     fun agregarSolicitud(solicitud: SolicitudSobrecupo) {
         solicitudes.add(solicitud)
     }

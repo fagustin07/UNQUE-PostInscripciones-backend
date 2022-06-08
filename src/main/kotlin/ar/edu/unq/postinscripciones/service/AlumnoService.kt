@@ -6,6 +6,7 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.*
 import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigInteger
@@ -33,6 +34,9 @@ class AlumnoService {
 
     @Autowired
     private lateinit var solicitudSobrecupoRepository: SolicitudSobrecupoRepository
+
+    @Autowired
+    lateinit var jwtTokenUtil: JWTTokenUtil
 
     @Transactional
     fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumnoDTO> {
@@ -80,7 +84,7 @@ class AlumnoService {
         alumno.guardarFormulario(formulario)
         alumnoRepository.save(alumno)
 
-        return FormularioDTO.desdeModelo(formulario, alumno.dni)
+        return FormularioDTO.desdeModeloParaAlumno(formulario, alumno.dni)
     }
 
     @Transactional
@@ -96,7 +100,7 @@ class AlumnoService {
         alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formulario)
         alumnoRepository.save(alumno)
 
-        return FormularioDTO.desdeModelo(formulario, alumno.dni)
+        return FormularioDTO.desdeModeloParaAlumno(formulario, alumno.dni)
     }
 
     @Transactional
@@ -110,17 +114,24 @@ class AlumnoService {
     }
 
     @Transactional
-    fun obtenerFormulario(dni: Int, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): FormularioDTO {
+    fun obtenerFormulario(token: String, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): FormularioDTO {
         val cuatrimestreObtenido =
-            cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
-                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
-        val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
-        return FormularioDTO.desdeModelo(
-            alumno.obtenerFormulario(
+                cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+                        .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        val dni = jwtTokenUtil.obtenerDni(token)
+        val alumno =  alumnoRepository.findById(dni).orElseThrow{ ExcepcionUNQUE("No existe el alumno") }
+
+        val formulario =  alumno.obtenerFormulario(
                 cuatrimestreObtenido.anio,
                 cuatrimestreObtenido.semestre
-            ), alumno.dni
         )
+
+        return if(formulario.estado === EstadoFormulario.CERRADO) {
+            FormularioDTO.desdeModelo(formulario, dni)
+        } else {
+            FormularioDTO.desdeModeloParaAlumno(formulario, dni)
+        }
+
     }
 
     @Transactional
@@ -153,7 +164,7 @@ class AlumnoService {
         val alumnos = alumnoRepository.findAll()
         alumnos.forEach {
             val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
-            formulario.cambiarEstado()
+            formulario.cerrarFormulario()
         }
     }
 
@@ -325,7 +336,7 @@ class AlumnoService {
                 .get()
 
         if(cuatrimestreObtenido.finInscripciones > fecha && formulario.estado != EstadoFormulario.CERRADO) {
-            throw ExcepcionUNQUE("No se puede cambiar el estado de esta solicitud, el formulario sigue abierto")
+            throw ExcepcionUNQUE("No se puede cambiar el estado de esta solicitud, la fecha de inscripciones no ha concluido")
         }
         if(formulario.estado == EstadoFormulario.CERRADO) {
             throw ExcepcionUNQUE("No se puede cambiar el estado de esta solicitud, el formulario al que pertenece se encuentra cerrado")
