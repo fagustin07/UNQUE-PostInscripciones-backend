@@ -184,33 +184,6 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "##### Endpoint usado para listar todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                code = 200,
-                message = "OK",
-                response = MateriaPorSolicitudes::class,
-                responseContainer = "List"
-            ),
-            ApiResponse(code = 400, message = "Algo salio mal")
-        ]
-    )
-    @RequestMapping(value = ["/materias/solicitudes"], method = [RequestMethod.GET])
-    fun comisionSolicitudes(
-        @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
-        @RequestParam
-        anio: Int,
-        @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
-        @RequestParam
-        semestre: Semestre
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-            materiaService.materiasPorSolicitudes(),
-            HttpStatus.OK
-        )
-    }
-
     @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una comision, junto con el id del formulario y la solicitud #####")
     @ApiResponses(
         value = [
@@ -302,6 +275,33 @@ class DirectivoController {
         return ResponseEntity(
             materiaService.crear(formulariosMaterias),
             HttpStatus.CREATED
+        )
+    }
+
+    @ApiOperation(value = "##### Endpoint usado para listar todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
+    @ApiResponses(
+            value = [
+                ApiResponse(
+                        code = 200,
+                        message = "OK",
+                        response = MateriaPorSolicitudes::class,
+                        responseContainer = "List"
+                ),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/materias/solicitudes"], method = [RequestMethod.GET])
+    fun materiaSolicitudes(
+            @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
+            @RequestParam
+            anio: Int,
+            @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
+            @RequestParam
+            semestre: Semestre
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+                materiaService.materiasPorSolicitudes(),
+                HttpStatus.OK
         )
     }
 

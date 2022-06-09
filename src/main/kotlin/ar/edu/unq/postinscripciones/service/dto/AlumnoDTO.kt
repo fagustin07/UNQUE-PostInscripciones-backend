@@ -2,7 +2,13 @@ package ar.edu.unq.postinscripciones.service.dto
 
 import ar.edu.unq.postinscripciones.model.Alumno
 
-data class AlumnoDTO(val dni: Int, val nombre: String, val apellido: String, val correo: String, val legajo: Int) {
+data class AlumnoDTO(
+        val dni: Int,
+        val nombre: String,
+        val apellido: String,
+        val correo: String,
+        val legajo: Int,
+        val coeficiente: Double) {
     companion object {
         fun desdeModelo(alumno: Alumno): AlumnoDTO {
             return AlumnoDTO(
@@ -10,7 +16,8 @@ data class AlumnoDTO(val dni: Int, val nombre: String, val apellido: String, val
                 alumno.nombre,
                 alumno.apellido,
                 alumno.correo,
-                alumno.legajo
+                alumno.legajo,
+                    alumno.coeficiente
             )
         }
     }

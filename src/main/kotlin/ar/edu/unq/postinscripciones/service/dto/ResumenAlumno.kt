@@ -7,6 +7,7 @@ data class ResumenAlumno(
         val nombre: String,
         @ApiModelProperty(example = "12345677")
         val dni: Int,
+        val coeficiente: Double,
         val formulario: FormularioDTO,
         val resumenCursadas: List<MateriaCursadaResumenDTO>
 )

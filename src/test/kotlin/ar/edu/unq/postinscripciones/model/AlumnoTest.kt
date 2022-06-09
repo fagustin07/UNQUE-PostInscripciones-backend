@@ -140,4 +140,18 @@ internal class AlumnoTest {
 
         assertThat(alumno.materiasAprobadas()).usingRecursiveComparison().isEqualTo(listOf(materiaCursada1.materia))
     }
+
+    @Test
+    fun `Un alumno conoce su coeficiente`() {
+        assertThat(alumno.coeficiente).isEqualTo(0.0)
+    }
+
+    @Test
+    fun `A un alumno se le puede modificar su coeficiente`() {
+        val coeficienteAntes = alumno.coeficiente
+        alumno.cambiarCoeficiente(7.0)
+
+        assertThat(alumno.coeficiente).isEqualTo(7.0)
+        assertThat(alumno.coeficiente).isNotEqualTo(coeficienteAntes)
+    }
 }

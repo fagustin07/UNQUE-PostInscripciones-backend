@@ -168,7 +168,9 @@ class DataSeed(
                 "jorge.arenales20@alu.edu.ar",
                 12345,
                 "contrasenia",
-                Carrera.SIMULTANEIDAD
+                Carrera.SIMULTANEIDAD,
+                8.7
+
             )
             val bartolo = Alumno(
                 12345677,
@@ -177,7 +179,8 @@ class DataSeed(
                 "bartolito@alu.edu.ar",
                 45555,
                 "contrasenia",
-                Carrera.SIMULTANEIDAD
+                Carrera.SIMULTANEIDAD,
+                7.2
             )
             val maria = Alumno(
                     12345680,
@@ -186,7 +189,8 @@ class DataSeed(
                     "mjimenez@alu.edu.ar",
                     45557,
                     "contrasenia",
-                    Carrera.SIMULTANEIDAD
+                    Carrera.SIMULTANEIDAD,
+                    8.2
             )
             val roberto = Alumno(
                     12345679,
@@ -195,7 +199,8 @@ class DataSeed(
                     "rsanchez@alu.edu.ar",
                     45556,
                     "contrasenia",
-                    Carrera.TPI
+                    Carrera.TPI,
+                    6.1
             )
 
             val firulais = Alumno(
@@ -205,7 +210,8 @@ class DataSeed(
                     "ftercero@alu.edu.ar",
                     45559,
                     "contrasenia",
-                    Carrera.TPI
+                    Carrera.TPI,
+                    5.3
             )
 
             val sofia = Alumno(
@@ -215,7 +221,8 @@ class DataSeed(
                     "ssofia@alu.edu.ar",
                     45560,
                     "contrasenia",
-                    Carrera.TPI
+                    Carrera.TPI,
+                    9.1
             )
             cuatrimestreRepository.save(cuatrimestre)
             materiaRepository.saveAll(listOf(epyl, lea, ttu, tti, matematica, ingles1, ingles2, bdd, intro, orga,mate1, estructura, objetos1, objetos2, redes
