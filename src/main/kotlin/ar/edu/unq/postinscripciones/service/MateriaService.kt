@@ -9,6 +9,7 @@ import ar.edu.unq.postinscripciones.persistence.MateriaRepository
 import ar.edu.unq.postinscripciones.service.dto.MateriaPorSolicitudes
 import ar.edu.unq.postinscripciones.service.dto.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.MateriaDTO
+import ar.edu.unq.postinscripciones.service.dto.MateriaConCorrelativas
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -60,18 +61,20 @@ class MateriaService {
     }
 
     @Transactional
-    fun actualizarCorrelativas(codigo: String, correlativas: List<String>): MateriaDTO {
-        val materia = materiaRepository.findMateriaByCodigo(codigo).orElseThrow{ MateriaNoEncontradaExcepcion() }
+    fun actualizarCorrelativas(materiasConCorrelativas: List<MateriaConCorrelativas>): List<MateriaDTO> {
+        return materiasConCorrelativas.map {
+            val materia = materiaRepository.findByNombreIgnoringCase(it.nombre).orElseThrow{ MateriaNoEncontradaExcepcion() }
 
-        val materiasCorrelativas = correlativas.map { codigoCorrelativa ->
-            materiaRepository
-                .findMateriaByCodigo(codigoCorrelativa)
-                .orElseThrow{ ExcepcionUNQUE("No existe la materia con codigo: $codigoCorrelativa") }
+            val materiasCorrelativas = it.correlativas.map { correlativa ->
+                materiaRepository
+                    .findByNombreIgnoringCase(correlativa.nombre)
+                    .orElseThrow{ ExcepcionUNQUE("No existe la materia con nombre: ${correlativa.nombre}") }
+            }
+
+            materia.actualizarCorrelativas(materiasCorrelativas.toMutableList())
+
+            MateriaDTO.desdeModelo(materiaRepository.save(materia))
         }
-
-        materia.actualizarCorrelativas(materiasCorrelativas.toMutableList())
-
-        return MateriaDTO.desdeModelo(materiaRepository.save(materia))
     }
 
     @Transactional

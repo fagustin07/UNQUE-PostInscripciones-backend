@@ -155,19 +155,21 @@ internal class MateriaServiceTest {
     fun `se puede crear una lista de materias con una correlativa`() {
         val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
         materiaService.crear(listOf(orga))
-        val materiaDTO = materiaService.actualizarCorrelativas(orga.codigo, mutableListOf(bdd.codigo))
-        assertThat(materiaDTO.correlativas.first()).isEqualTo(bdd.nombre)
+        val materiasParaActualizar = listOf(MateriaConCorrelativas(orga.nombre, listOf(Correlativa(bdd.nombre))))
+        val materiasDTO = materiaService.actualizarCorrelativas(materiasParaActualizar)
+
+        assertThat(materiasDTO.first().correlativas.first()).isEqualTo(bdd.nombre)
     }
 
     @Test
-    fun `no se puede las correlativas de una materia con un codigo inexistente`() {
+    fun `no se puede las correlativas de una materia con un nombre inexistente`() {
         val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
         materiaService.crear(listOf(orga))
         val excepcion = assertThrows<ExcepcionUNQUE> {
-            materiaService.actualizarCorrelativas(orga.codigo, mutableListOf("EPYL-103"))
+            materiaService.actualizarCorrelativas(listOf(MateriaConCorrelativas(orga.nombre, listOf(Correlativa("NO EXISTE")))))
         }
 
-        assertThat(excepcion.message).isEqualTo("No existe la materia con codigo: EPYL-103")
+        assertThat(excepcion.message).isEqualTo("No existe la materia con nombre: NO EXISTE")
     }
 
     @Test
@@ -195,12 +197,12 @@ internal class MateriaServiceTest {
     fun `Se puede actualizar las materias correlativas de una materia`() {
         val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.SIMULTANEIDAD)
         val correlativasAntes = materia.correlativas
+        val materiasParaActualizar = listOf(MateriaConCorrelativas(materia.nombre, listOf(Correlativa(algo.nombre))))
+        val materiasDespuesDeActualizarCorrelativas =
+                materiaService.actualizarCorrelativas(materiasParaActualizar)
 
-        val materiaDespuesDeActualizarCorrelativas =
-                materiaService.actualizarCorrelativas(materia.codigo, listOf(algo.codigo))
-
-        assertThat(correlativasAntes).isNotEqualTo(materiaDespuesDeActualizarCorrelativas.correlativas)
-        assertThat(materiaDespuesDeActualizarCorrelativas.correlativas.first()).isEqualTo(algo.nombre)
+        assertThat(correlativasAntes).isNotEqualTo(materiasDespuesDeActualizarCorrelativas.first().correlativas)
+        assertThat(materiasDespuesDeActualizarCorrelativas.first().correlativas.first()).isEqualTo(algo.nombre)
 
     }
 

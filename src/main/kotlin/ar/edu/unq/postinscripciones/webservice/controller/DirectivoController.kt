@@ -320,24 +320,21 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "Endpoint usado para actualizar las materias correlativas de una materia registrada")
+    @ApiOperation(value = "Endpoint usado para actualizar las materias correlativas de materias registradas")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = MateriaDTO::class, responseContainer = "List"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/materias/{codigo}/correlativas"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/materias/correlativas"], method = [RequestMethod.PATCH])
     fun actualizarCorrelativas(
-        @PathVariable
-        @ApiParam(value = "Codigo de materia", example = "80000", required = true)
-        codigo: String,
         @RequestBody
-        @ApiParam(value = "Lista de codigos de materias. Ejemplo: [80005, 01032]", required = true)
-        correlativas: List<String>
+        @ApiParam(value = "lista de tuplas de (nombre de la materia, lista de nombres de sus correlativas), case insensitive", required = true)
+        materiasConCorrelativas: List<MateriaConCorrelativas>
     ): ResponseEntity<*> {
         return ResponseEntity(
-            materiaService.actualizarCorrelativas(codigo, correlativas),
+            materiaService.actualizarCorrelativas(materiasConCorrelativas),
             HttpStatus.OK
         )
     }

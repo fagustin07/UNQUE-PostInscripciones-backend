@@ -14,6 +14,7 @@ interface MateriaRepository: CrudRepository<Materia, String> {
 
     fun findMateriaByCodigo(codigo: String): Optional<Materia>
     fun findByNombreIgnoringCaseOrCodigoIgnoringCase(nombre: String, codigo: String): Optional<Materia>
+    fun findByNombreIgnoringCase(nombre: String): Optional<Materia>
     fun findAllByCodigoIn(materias: List<String>): List<Materia>
     @Query(
         "SELECT m.codigo, m.nombre, com " +
@@ -35,7 +36,7 @@ interface MateriaRepository: CrudRepository<Materia, String> {
                 "ON s.comision.id = c.id " +
         "WHERE c.cuatrimestre.anio = ?1 " +
             "AND c.cuatrimestre.semestre = ?2 " +
-        "GROUP BY m.codigo, m.nombre " +
+        "GROUP BY m.codigo " +
         "ORDER BY total_solicitudes DESC"
     )
     fun findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudes(anio: Int, semestre: Semestre): List<Tuple>
