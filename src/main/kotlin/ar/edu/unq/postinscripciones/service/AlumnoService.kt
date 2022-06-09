@@ -43,9 +43,9 @@ class AlumnoService {
         val alumnosConflictivos: MutableList<ConflictoAlumnoDTO> = mutableListOf()
 
         planillaAlumnos.forEach { formulario ->
-            val existeAlumno = alumnoRepository.findByDniOrLegajo(formulario.dni, formulario.legajo)
-            if (existeAlumno.isPresent) {
-                alumnosConflictivos.add(ConflictoAlumnoDTO(AlumnoDTO.desdeModelo(existeAlumno.get()), formulario))
+            val alumnoExistente = alumnoRepository.findByDniOrLegajo(formulario.dni, formulario.legajo)
+            if (alumnoExistente.isPresent) {
+                alumnosConflictivos.add(ConflictoAlumnoDTO(AlumnoDTO.desdeModelo(alumnoExistente.get()), formulario))
             } else {
                 guardarAlumno(formulario)
             }
@@ -203,6 +203,7 @@ class AlumnoService {
         return ResumenAlumno(
             alumno.nombre,
             alumno.dni,
+            alumno.coeficiente,
             FormularioDTO.desdeModelo(
                 alumno.obtenerFormulario(
                     cuatrimestreObtenido.anio,

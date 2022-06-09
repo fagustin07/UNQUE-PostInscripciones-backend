@@ -19,6 +19,7 @@ class Alumno(
     var contrasenia: String = "",
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD,
+    var coeficiente: Double = 0.0
 ) {
     var codigo: Int? = null
     var cargaDeCodigo: LocalDateTime? = null
@@ -101,6 +102,10 @@ class Alumno(
 
     fun puedeCursar(solicitudes : List<Materia>, materiasDisponibles: List<String>) : Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
+    }
+
+    fun cambiarCoeficiente(coeficiente: Double) {
+        this.coeficiente = coeficiente
     }
 
     private fun chequearSiExiste(formulario: Formulario) {

@@ -50,21 +50,23 @@ internal class AlumnoServiceTest {
     @BeforeEach
     fun setUp() {
         val nicoFormularioCrear = FormularioCrearAlumno(
-            45328,
-            "Nicolas",
-            "Martinez",
-            "nicolas.martinez@unq.edu.ar",
-            42256394,
-            Carrera.TPI,
+                45328,
+                "Nicolas",
+                "Martinez",
+                "nicolas.martinez@unq.edu.ar",
+                42256394,
+                Carrera.TPI,
+                5.0
         )
 
         val fedeFormularioCrear = FormularioCrearAlumno(
-            45329,
-            "Fede",
-            "Sandoval",
-            "fede.sando@unq.edu.ar",
-            11223344,
-            Carrera.TPI
+                45329,
+                "Fede",
+                "Sandoval",
+                "fede.sando@unq.edu.ar",
+                11223344,
+                Carrera.TPI,
+                5.0
         )
 
         alumno = alumnoService.crear(nicoFormularioCrear)
@@ -379,12 +381,13 @@ internal class AlumnoServiceTest {
     fun `Se puede cargar la historia academica de un alumno`() {
         val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioAlumno = FormularioCrearAlumno(
-            1234567,
-            "Pepe",
-            "Sanchez",
-            "pepe.sanchez@unq.edu.ar",
-            44556,
-            Carrera.TPI
+                1234567,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                44556,
+                Carrera.TPI,
+                5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
 
@@ -404,7 +407,8 @@ internal class AlumnoServiceTest {
                 "Sanchez",
                 "pepe.sanchez@unq.edu.ar",
                 44556,
-                Carrera.TPI
+                Carrera.TPI,
+                5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
         alumnoService.actualizarHistoriaAcademica(otroAlumno.dni,listOf(materiaCursada))
@@ -447,12 +451,13 @@ internal class AlumnoServiceTest {
     fun `un alumno tiene disponible materias de las cuales cumple los requisitos`() {
         val materiaCursada = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioAlumno = FormularioCrearAlumno(
-            123456712,
-            "Pepe",
-            "Sanchez",
-            "pepe.sanchez@unq.edu.ar",
-            4455611,
-            Carrera.TPI,
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.TPI,
+                5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
@@ -485,12 +490,13 @@ internal class AlumnoServiceTest {
     fun `un alumno no tiene disponible materias que ya aprobo`() {
         val materiaCursada = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioAlumno = FormularioCrearAlumno(
-            123456712,
-            "Pepe",
-            "Sanchez",
-            "pepe.sanchez@unq.edu.ar",
-            4455611,
-            Carrera.TPI
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.TPI,
+                5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
@@ -549,12 +555,13 @@ internal class AlumnoServiceTest {
         )
         val comisionIntro = comisionService.crear(formularioComision2)
         val formularioAlumno = FormularioCrearAlumno(
-            123456712,
-            "Pepe",
-            "Sanchez",
-            "pepe.sanchez@unq.edu.ar",
-            44556,
-            Carrera.SIMULTANEIDAD
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                44556,
+                Carrera.SIMULTANEIDAD,
+                5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada, materiaCursada2, materiaCursada3))
@@ -604,12 +611,13 @@ internal class AlumnoServiceTest {
     fun `se pueden obtener los alumnos que pidieron una comision ordenados descendentemente por cantidad de materias aprobadas`() {
         val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioAlumno = FormularioCrearAlumno(
-            123456712,
-            "Pepe",
-            "Sanchez",
-            "pepe.sanchez@unq.edu.ar",
-            4455611,
-            Carrera.TPI
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.TPI,
+                5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
@@ -747,12 +755,13 @@ internal class AlumnoServiceTest {
     fun `se pueden obtener los alumnos que pidieron una materia ordenados por cantidad de aprobadas`() {
         val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioNuevoAlumno = FormularioCrearAlumno(
-            123456712,
-            "Pepe",
-            "Sanchez",
-            "pepe.sanchez@unq.edu.ar",
-            4455611,
-            Carrera.TPI
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.TPI,
+                5.0
         )
         val nacho = alumnoService.crear(formularioNuevoAlumno)
         alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))

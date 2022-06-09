@@ -43,7 +43,7 @@ internal class ServiceDataTest {
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
         assertThat(alumnosRegistrados)
             .usingRecursiveComparison()
-            .ignoringFields("formularios", "contrasenia")
+            .ignoringFields("formularios", "contrasenia", "coeficiente")
             .isEqualTo(planillaAlumnos)
 
     }
@@ -180,8 +180,8 @@ internal class ServiceDataTest {
         repeat(10) {
             planilla.add(
                 FormularioCrearAlumno(
-                    prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
-                    prefijo + planilla.size, Carrera.TPI
+                        prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
+                        prefijo + planilla.size, Carrera.TPI, 0.0
                 )
             )
         }
