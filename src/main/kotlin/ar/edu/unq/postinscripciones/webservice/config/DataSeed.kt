@@ -160,6 +160,7 @@ class DataSeed(
             val introc1 = Comision(intro, 1, cuatrimestre, introhorariosc1)
             val introc2 = Comision(intro, 2, cuatrimestre, introhorariosc2)
             val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
+            val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1)
 
             val jorge = Alumno(
                 12345678,
@@ -180,7 +181,7 @@ class DataSeed(
                 45555,
                 "contrasenia",
                 Carrera.SIMULTANEIDAD,
-                7.2
+                7.24
             )
             val maria = Alumno(
                     12345680,
@@ -190,7 +191,7 @@ class DataSeed(
                     45557,
                     "contrasenia",
                     Carrera.SIMULTANEIDAD,
-                    8.2
+                    8.21
             )
             val roberto = Alumno(
                     12345679,
@@ -200,7 +201,7 @@ class DataSeed(
                     45556,
                     "contrasenia",
                     Carrera.TPI,
-                    6.1
+                    6.10
             )
 
             val firulais = Alumno(
@@ -211,7 +212,7 @@ class DataSeed(
                     45559,
                     "contrasenia",
                     Carrera.TPI,
-                    5.3
+                    5.34
             )
 
             val sofia = Alumno(
@@ -222,7 +223,7 @@ class DataSeed(
                     45560,
                     "contrasenia",
                     Carrera.TPI,
-                    9.1
+                    9.15
             )
             cuatrimestreRepository.save(cuatrimestre)
             materiaRepository.saveAll(listOf(epyl, lea, ttu, tti, matematica, ingles1, ingles2, bdd, intro, orga,mate1, estructura, objetos1, objetos2, redes
@@ -231,7 +232,7 @@ class DataSeed(
                                             , tecnicas, tip, analisis, mate3, proba, logica, seguridad, requerimientos, gestion, practicaDeDesarrollo, lfa, algoritmos
                                             , teoria, arquitectura1, distribuidos, caracteristicas, arquitectura2, arquitecturaDeComputadoras, parseo, aspectosLegales, seminarioFinal, seminarioCapacitacion
                                             , seguridadTec, tv, streaming, cloud, bajo, semantica, seminarios, calidad, funcionalAvanzada, progCuantica, ciudadana, ludificacion, cdDatos))
-            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1))
+            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1, inglesc1))
             jorge.actualizarHistoriaAcademica(listOf(
                     MateriaCursada(intro, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
                     MateriaCursada(matematica, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),

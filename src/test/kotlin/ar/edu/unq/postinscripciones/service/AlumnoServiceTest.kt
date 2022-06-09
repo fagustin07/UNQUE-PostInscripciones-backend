@@ -391,7 +391,7 @@ internal class AlumnoServiceTest {
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
 
-        alumnoService.actualizarHistoriaAcademica(otroAlumno.dni,listOf(materiaCursada))
+        alumnoService.actualizarHistoriaAcademica(listOf(AlumnoConHistoriaAcademica(otroAlumno.dni,listOf(materiaCursada))))
 
         val alumnoLuegoDeActualizar = alumnoService.buscarAlumno(otroAlumno.dni)
         assertThat(alumnoLuegoDeActualizar.historiaAcademica).isNotEmpty
@@ -411,10 +411,12 @@ internal class AlumnoServiceTest {
                 5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
-        alumnoService.actualizarHistoriaAcademica(otroAlumno.dni,listOf(materiaCursada))
+        val primerActualizarHistoria = listOf(AlumnoConHistoriaAcademica(otroAlumno.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(primerActualizarHistoria)
         val materiaCursada2 = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
-        val dto = alumnoService.actualizarHistoriaAcademica(otroAlumno.dni, listOf(materiaCursada, materiaCursada2))
-        val alumnoDespuesDeActualizar = alumnoService.buscarAlumno(dto.dni)
+        val segundoActualizarHistoria = listOf(AlumnoConHistoriaAcademica(otroAlumno.dni, listOf(materiaCursada, materiaCursada2)))
+        val dto = alumnoService.actualizarHistoriaAcademica(segundoActualizarHistoria)
+        val alumnoDespuesDeActualizar = alumnoService.buscarAlumno(dto.first().dni)
 
         assertThat(alumnoDespuesDeActualizar.historiaAcademica).isNotEmpty
         assertThat(alumnoDespuesDeActualizar.historiaAcademica.map { it.materia.codigo })
@@ -460,7 +462,8 @@ internal class AlumnoServiceTest {
                 5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
-        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
         val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
         val formularioComision = FormularioComision(
             1,
@@ -499,7 +502,8 @@ internal class AlumnoServiceTest {
                 5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
-        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
 
         val materiasdisponibles = alumnoService.materiasDisponibles(nacho.dni, cuatrimestre)
 
@@ -564,7 +568,8 @@ internal class AlumnoServiceTest {
                 5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
-        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada, materiaCursada2, materiaCursada3))
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada, materiaCursada2, materiaCursada3)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
 
         val formulario = alumnoService.guardarSolicitudPara(
             nacho.dni,
@@ -620,7 +625,8 @@ internal class AlumnoServiceTest {
                 5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
-        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
 
         alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!))
@@ -713,8 +719,8 @@ internal class AlumnoServiceTest {
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
-                AlumnoSolicitaMateria(alumno.dni, formularioAlumno.id, formularioAlumno.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, alumno.cantidadAprobadas() ),
-                AlumnoSolicitaMateria(fede.dni, formularioFede.id, formularioFede.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, fede.cantidadAprobadas() ),
+                AlumnoSolicitaMateria(alumno.dni, formularioAlumno.id, formularioAlumno.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, alumno.cantidadAprobadas(), alumno.coeficiente ),
+                AlumnoSolicitaMateria(fede.dni, formularioFede.id, formularioFede.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, fede.cantidadAprobadas(), fede.coeficiente ),
             )
         assertThat(alumnos).hasSize(2)
         assertThat(alumnos).usingRecursiveComparison().isEqualTo(alumnosEsperados)
@@ -745,14 +751,14 @@ internal class AlumnoServiceTest {
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
-                AlumnoSolicitaMateria(alumno.dni, formularioAlumno.id, formularioAlumno.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, alumno.cantidadAprobadas() ),
+                AlumnoSolicitaMateria(alumno.dni, formularioAlumno.id, formularioAlumno.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, alumno.cantidadAprobadas(), alumno.coeficiente ),
             )
         assertThat(alumnos).hasSize(1)
         assertThat(alumnos).usingRecursiveComparison().isEqualTo(alumnosEsperados)
     }
 
     @Test
-    fun `se pueden obtener los alumnos que pidieron una materia ordenados por cantidad de aprobadas`() {
+    fun `se pueden obtener los alumnos que pidieron una materia ordenados por mayor coeficiente`() {
         val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioNuevoAlumno = FormularioCrearAlumno(
                 123456712,
@@ -761,19 +767,23 @@ internal class AlumnoServiceTest {
                 "pepe.sanchez@unq.edu.ar",
                 4455611,
                 Carrera.TPI,
-                5.0
+                8.21
         )
-        val nacho = alumnoService.crear(formularioNuevoAlumno)
-        alumnoService.actualizarHistoriaAcademica(nacho.dni, listOf(materiaCursada))
+        var nacho = alumnoService.crear(formularioNuevoAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
         val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
         val formularioAlumno = alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!))
+        nacho = alumnoService.buscarAlumno(nacho.dni)
+        fede = alumnoService.buscarAlumno(fede.dni)
 
         val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre)
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
-                AlumnoSolicitaMateria(nacho.dni, formularioAlumno.id, formularioAlumno.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, 1 ),
-                AlumnoSolicitaMateria(fede.dni, formularioFede.id, formularioFede.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, fede.cantidadAprobadas() ),
+                AlumnoSolicitaMateria(nacho.dni, formularioAlumno.id, formularioAlumno.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, nacho.cantidadAprobadas(), nacho.coeficiente ),
+                AlumnoSolicitaMateria(fede.dni, formularioFede.id, formularioFede.solicitudes.first().id, comision1Algoritmos.numero, algo.codigo, fede.cantidadAprobadas(), fede.coeficiente ),
             )
+
         assertThat(alumnos).usingRecursiveComparison().isEqualTo(alumnosEsperados)
         assertThat(alumnos.first().cantidadDeAprobadas).isEqualTo(alumnos.maxOf { it.cantidadDeAprobadas })
         assertThat(alumnos.last().cantidadDeAprobadas).isEqualTo(alumnos.minOf { it.cantidadDeAprobadas })

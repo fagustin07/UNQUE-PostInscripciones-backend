@@ -54,21 +54,23 @@ class AlumnoService {
     }
 
     @Transactional
-    fun actualizarHistoriaAcademica(alumnoDni: Int, historiaDada: List<MateriaCursadaDTO>): AlumnoDTO {
-        val alumno = alumnoRepository.findById(alumnoDni).orElseThrow { ExcepcionUNQUE("No se encontro al alumno") }
+    fun actualizarHistoriaAcademica(alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>): List<AlumnoDTO> {
+        return alumnosConHistoriaAcademica.map { alumnoConHistoriaAcademica ->
+            val alumno = alumnoRepository.findById(alumnoConHistoriaAcademica.dni).orElseThrow { ExcepcionUNQUE("No se encontro al alumno") }
 
-        val historiaAcademica: List<MateriaCursada> = historiaDada.map {
-            val materia = materiaRepository
-                .findMateriaByCodigo(it.codigoMateria).orElseThrow { ExcepcionUNQUE("No existe la materia") }
-            val materiaCursada = MateriaCursada(materia)
-            materiaCursada.estado = it.estado
-            materiaCursada.fechaDeCarga = it.fechaDeCarga
-            materiaCursada
+            val historiaAcademica: List<MateriaCursada> = alumnoConHistoriaAcademica.materiasCursadas.map {
+                val materia = materiaRepository
+                    .findMateriaByCodigo(it.codigoMateria).orElseThrow { ExcepcionUNQUE("No existe la materia") }
+                val materiaCursada = MateriaCursada(materia)
+                materiaCursada.estado = it.estado
+                materiaCursada.fechaDeCarga = it.fechaDeCarga
+                materiaCursada
+            }
+
+            alumno.actualizarHistoriaAcademica(historiaAcademica)
+
+            AlumnoDTO.desdeModelo(alumnoRepository.save(alumno))
         }
-
-        alumno.actualizarHistoriaAcademica(historiaAcademica)
-
-        return AlumnoDTO.desdeModelo(alumnoRepository.save(alumno))
     }
 
     @Transactional
@@ -294,7 +296,8 @@ class AlumnoService {
             formulario.correo,
             formulario.legajo,
             "",
-            formulario.carrera
+            formulario.carrera,
+            formulario.coeficiente
         )
 
         return alumnoRepository.save(alumno)

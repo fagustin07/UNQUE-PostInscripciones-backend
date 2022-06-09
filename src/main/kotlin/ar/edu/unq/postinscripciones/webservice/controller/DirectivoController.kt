@@ -60,14 +60,12 @@ class DirectivoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/alumnos/{dni}/historia-academica"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/alumnos/historia-academica"], method = [RequestMethod.PATCH])
     fun actualizarHistoriaAcademica(
-        @ApiParam(value = "Dni del alumno para cargar historia academica", example = "12345677", required = true)
-        @PathVariable dni: Int,
-        @RequestBody historiaAcademica: List<MateriaCursadaDTO>
+        @RequestBody alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.actualizarHistoriaAcademica(dni, historiaAcademica),
+            alumnoService.actualizarHistoriaAcademica(alumnosConHistoriaAcademica),
             HttpStatus.OK
         )
     }
@@ -220,22 +218,22 @@ class DirectivoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/materia/{id}/solicitantes"], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/materia/{codigo}/solicitantes"], method = [RequestMethod.GET])
     fun alumnosQueSolicitaronMateria(
-        @ApiParam(value = "Id de la materia", example = "80000", required = true)
+        @ApiParam(value = "codigo de la materia", example = "01035", required = true)
         @PathVariable
-        id: String,
-        @ApiParam(value = "id de la comision", example = "1", required = false)
+        codigo: String,
+        @ApiParam(value = "id de la comision para filtrar", example = "1", required = false)
         @RequestParam
         comision: Long?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(id, comision),
+            alumnoService.alumnosQueSolicitaron(codigo, comision),
             HttpStatus.OK
         )
     }
 
-    @ApiOperation("Endpoint que se usa para modificar los horarios de una comision ya creada")
+    @ApiOperation("Endpoint que se usa para actualizar los horarios de comisiones existentes")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -247,16 +245,13 @@ class DirectivoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/comisiones/{id}/horarios"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/comisiones/horarios"], method = [RequestMethod.PATCH])
     fun modificarHorarios(
-        @ApiParam(value = "Id de la comision", example = "1", required = true)
-        @PathVariable
-        id: Long,
         @RequestBody
-        nuevosHorarios: List<HorarioDTO>
+        comisionesConHorarios: List<ComisionConHorarios>
     ): ResponseEntity<*> {
         return ResponseEntity(
-            comisionService.modificarHorarios(id, nuevosHorarios),
+            comisionService.modificarHorarios(comisionesConHorarios),
             HttpStatus.OK
         )
     }
