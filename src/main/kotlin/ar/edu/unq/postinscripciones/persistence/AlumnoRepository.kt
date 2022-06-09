@@ -52,7 +52,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findResumenHistoriaAcademica(dni: Int): List<Tuple>
 
     @Query(
-        "SELECT a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas " +
+        "SELECT a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas, a.coeficiente " +
         "FROM Alumno as a " +
         "JOIN Formulario as f " +
             "ON f.id IN (SELECT f2.id FROM a.formularios as f2) " +
@@ -66,7 +66,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
             ") " +
         "WHERE f.cuatrimestre.semestre = ?3 AND f.cuatrimestre.anio = ?4 " +
         "GROUP BY a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo " +
-        "ORDER BY materias_aprobadas DESC"
+        "ORDER BY a.coeficiente DESC"
     )
     fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, comision : Long?, semestre: Semestre, anio: Int, estado : EstadoMateria = EstadoMateria.APROBADO): List<Tuple>
 }

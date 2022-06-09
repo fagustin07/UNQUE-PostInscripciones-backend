@@ -16,6 +16,8 @@ data class AlumnoSolicitaMateria(
     val codigoMateria: String,
     @ApiModelProperty(example = "15")
     val cantidadDeAprobadas: Int,
+    @ApiModelProperty(example = "4.33")
+    val coeficiente: Double,
 
 ) {
     companion object {
@@ -26,7 +28,8 @@ data class AlumnoSolicitaMateria(
                 tupla.get(2) as Long,
                 tupla.get(3) as Int,
                 tupla.get(4) as String,
-                (tupla.get(5) as Long).toInt()
+                (tupla.get(5) as Long).toInt(),
+                tupla.get(6) as Double
             )
         }
     }

@@ -19,7 +19,7 @@ class Alumno(
     var contrasenia: String = "",
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD,
-    var coeficiente: Double = 0.0
+    var coeficiente: Double = 3.0
 ) {
     var codigo: Int? = null
     var cargaDeCodigo: LocalDateTime? = null

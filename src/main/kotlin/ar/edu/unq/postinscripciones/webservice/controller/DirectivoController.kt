@@ -206,7 +206,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una materia, junto con el id del formulario y la solicitud #####")
+    @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una materia, junto con el id del formulario y la solicitud, ordenados por coeficiente #####")
     @ApiResponses(
         value = [
             ApiResponse(

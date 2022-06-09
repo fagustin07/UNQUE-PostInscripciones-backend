@@ -143,7 +143,11 @@ internal class AlumnoTest {
 
     @Test
     fun `Un alumno conoce su coeficiente`() {
-        assertThat(alumno.coeficiente).isEqualTo(0.0)
+        val nuevoCoeficiente = 5.23
+
+        alumno.cambiarCoeficiente(nuevoCoeficiente)
+
+        assertThat(alumno.coeficiente).isEqualTo(nuevoCoeficiente)
     }
 
     @Test
