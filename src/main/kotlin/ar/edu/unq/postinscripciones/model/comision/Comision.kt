@@ -10,19 +10,24 @@ import javax.persistence.*
 class Comision(
     @ManyToOne(fetch = FetchType.EAGER)
     val materia: Materia = Materia("", ""),
+    @Column(nullable = false)
     val numero: Int = 1,
     @ManyToOne(fetch = FetchType.EAGER)
     val cuatrimestre: Cuatrimestre = Cuatrimestre(2009, Semestre.S1),
+    @Column(nullable = false)
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     var horarios: List<Horario> = listOf(),
+    @Column(nullable = false)
     val cuposTotales: Int = 30,
+    @Column(nullable = false)
     val sobrecuposTotales: Int = 5,
+    @Column(nullable = false)
     val modalidad: Modalidad = Modalidad.PRESENCIAL
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
-
+    @Column(nullable = false)
     private var sobrecuposOcupados = 0
 
     fun sobrecuposDisponibles() = sobrecuposTotales - sobrecuposOcupados

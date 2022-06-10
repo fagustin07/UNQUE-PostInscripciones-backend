@@ -5,9 +5,12 @@ import javax.persistence.*
 
 @Entity
 class Horario(
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val dia: Dia,
+    @Column(nullable = false)
     val inicio: LocalTime,
+    @Column(nullable = false)
     val fin: LocalTime
 ) {
     @Id

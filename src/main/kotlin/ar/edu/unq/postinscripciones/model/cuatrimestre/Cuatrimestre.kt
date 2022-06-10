@@ -11,10 +11,14 @@ import javax.persistence.*
 @Entity
 @Table(uniqueConstraints = [UniqueConstraint(name = "unique_anio_semestre", columnNames = ["anio", "semestre"])])
 class Cuatrimestre(
+    @Column(nullable = false)
     val anio: Int = 2020,
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val semestre: Semestre = Semestre.S1,
+    @Column(nullable = false)
     var inicioInscripciones: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0)),
+    @Column(nullable = false)
     var finInscripciones: LocalDateTime = inicioInscripciones.plusDays(14).plusHours(12)
 ) : Serializable {
     @Id

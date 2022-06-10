@@ -11,14 +11,20 @@ import javax.persistence.*
 class Alumno(
     @Id
     val dni: Int = 1234,
+    @Column(nullable = false)
     val nombre: String = "",
+    @Column(nullable = false)
     val apellido: String = "",
+    @Column(nullable = false)
     val correo: String = "",
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     val legajo: Int = 4,
+    @Column(nullable = false)
     var contrasenia: String = "",
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD,
+    @Column(nullable = false)
     var coeficiente: Double = 0.0
 ) {
     var codigo: Int? = null

@@ -1,15 +1,14 @@
 package ar.edu.unq.postinscripciones.model
 
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Directivo(
     @Id
     val correo: String= "",
+    @Column(nullable = false)
     val nombre: String = "",
+    @Column(nullable = false)
     val contrasenia: String = ""
 ) {
     @Enumerated(EnumType.STRING)
