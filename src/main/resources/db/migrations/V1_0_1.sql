@@ -8,19 +8,19 @@ CREATE TABLE directivo
 );
 
 ALTER TABLE cuatrimestre
-    ALTER anio INT NULL;
+    MODIFY anio INT NULL;
 
 ALTER TABLE alumno
     ADD coeficiente DOUBLE NULL;
 
 ALTER TABLE comision
-    ALTER cupos_totales INT NULL;
+    MODIFY cupos_totales INT NULL;
 
 ALTER TABLE comision
-    ALTER numero INT NULL;
+    MODIFY numero INT NULL;
 
 ALTER TABLE comision
-    ALTER sobrecupos_ocupados INT NULL;
+    MODIFY sobrecupos_ocupados INT NULL;
 
 ALTER TABLE comision
-    ALTER sobrecupos_totales INT NULL;
+    MODIFY sobrecupos_totales INT NULL;
