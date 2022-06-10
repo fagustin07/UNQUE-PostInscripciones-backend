@@ -47,10 +47,11 @@ class ComisionService {
     }
 
     @Transactional
-    fun ofertaDelCuatrimestre(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
-        val oferta = comisionRespository.findByCuatrimestreAnioAndCuatrimestreSemestre(
+    fun ofertaDelCuatrimestre(patronNombre: String = "", cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
+        val oferta = comisionRespository.findByCuatrimestreAnioAndCuatrimestreSemestreAndMateriaNombreIgnoreCaseContaining(
             cuatrimestre.anio,
-            cuatrimestre.semestre
+            cuatrimestre.semestre,
+            patronNombre
         )
         chequearSiHayOferta(oferta, cuatrimestre)
         return oferta.map { ComisionDTO.desdeModelo(it) }

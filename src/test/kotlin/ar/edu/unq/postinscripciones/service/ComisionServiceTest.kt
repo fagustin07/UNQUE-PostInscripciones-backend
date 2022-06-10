@@ -193,6 +193,27 @@ internal class ComisionServiceTest {
         assertThat(cuatrimestreActuaActualizado.finInscripciones).isEqualTo(finInscripciones)
     }
 
+    @Test
+    fun `obtener la oferta del cuatrimestre actual segun un patron de nombre de materia`() {
+        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.LICENCIATURA)
+        val formulario = FormularioComision(
+            1,
+            algoritmos.codigo,
+            2022,
+            Semestre.S1,
+            30,
+            8,
+            horarios,
+            Modalidad.PRESENCIAL
+        )
+        val comisionExcluida = comisionService.crear(formulario)
+
+        val ofertaObtenida = comisionService.ofertaDelCuatrimestre("DAT")
+
+        assertThat(ofertaObtenida).contains(ComisionDTO.desdeModelo(comision), ComisionDTO.desdeModelo(comision3), ComisionDTO.desdeModelo(comision2))
+        assertThat(ofertaObtenida).doesNotContain(ComisionDTO.desdeModelo(comisionExcluida))
+    }
+
     @AfterEach
     fun tearDown() {
         dataService.clearDataSet()

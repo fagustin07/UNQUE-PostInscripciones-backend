@@ -16,7 +16,7 @@ interface ComisionRespository : CrudRepository<Comision, Long> {
         cuatrimestre_anio: Int,
         cuatrimestre_semestre: Semestre
     ): List<Comision>
-    fun findByCuatrimestreAnioAndCuatrimestreSemestre(anio: Int, semestre: Semestre): List<Comision>
+    fun findByCuatrimestreAnioAndCuatrimestreSemestreAndMateriaNombreIgnoreCaseContaining(anio: Int, semestre: Semestre, patronNombre: String): List<Comision>
     fun findByNumeroAndMateriaAndCuatrimestre(
         numeroComision: Int,
         materia: Materia,

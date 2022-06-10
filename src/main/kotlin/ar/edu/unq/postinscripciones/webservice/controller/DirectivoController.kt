@@ -371,7 +371,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Retorna la oferta academica de un cuatrimestre")
+    @ApiOperation("Retorna la oferta academica de un cuatrimestre por busqueda del patron de nombre de materia dado")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ComisionDTO::class, responseContainer = "List"),
@@ -385,10 +385,13 @@ class DirectivoController {
         anio: Int,
         @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
         @RequestParam
-        semestre: Semestre
+        semestre: Semestre,
+        @ApiParam(value = "Patron de nombre de materia deseado", example = "DAT", required = false)
+        @RequestParam
+        nombre: String?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            comisionService.ofertaDelCuatrimestre(Cuatrimestre(anio, semestre)),
+            comisionService.ofertaDelCuatrimestre(nombre ?: "", cuatrimestre = Cuatrimestre(anio, semestre)),
             HttpStatus.OK
         )
     }

@@ -109,7 +109,7 @@ internal class ServiceDataTest {
             cuatrimestre = cuatri
         )
 
-        val ofertaDelCuatrimestre = comisionService.ofertaDelCuatrimestre(cuatri)
+        val ofertaDelCuatrimestre = comisionService.ofertaDelCuatrimestre(cuatrimestre = cuatri)
 
         assertThat(ofertaDelCuatrimestre).hasSize(2)
         assertThat(ofertaDelCuatrimestre).allMatch { it.materia == bdd.nombre }
