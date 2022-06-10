@@ -38,7 +38,7 @@ class DirectivoController {
 
     //   CONTROLADOR ALUMNOS
 
-    @ApiOperation("Endpoint que se usa para registrar una lista de alumnos en el sistema")
+    @ApiOperation("Registrar datos basicos de alumnos en el sistema")
     @ApiResponses(
         value = [
             ApiResponse(code = 201, message = "OK", response = ConflictoAlumnoDTO::class, responseContainer = "List"),
@@ -53,7 +53,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para actualizar la historia academica de un alumno registrado en el sistema")
+    @ApiOperation("Actualizar la historia academica de alumnos existentes en el sistema")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = AlumnoDTO::class, responseContainer = "List"),
@@ -70,7 +70,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("#### Endpoint que se usa para obtener el formulario y un resumen de la historia academica del alumno dado ####")
+    @ApiOperation("#### Retorna el formulario actual y un resumen de la historia academica del alumno dado ####")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ResumenAlumno::class, responseContainer = "List"),
@@ -89,7 +89,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para agregar una solicitud de comision  al  formulario de un alumno")
+    @ApiOperation("Agrega una solicitud de comision  al  formulario de un alumno")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
@@ -109,7 +109,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para aprobar o rechazar una solicitud de un alumno")
+    @ApiOperation("Aprobar, rechazar o poner pendiente  una solicitud de sobrecupo")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "Solicitud modificada", response = SolicitudSobrecupoDTO::class),
@@ -137,7 +137,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para cerrar un formulario")
+    @ApiOperation("Cierra un formulario de sobrecupo")
     @ApiResponses(
             value = [
                 ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
@@ -161,7 +161,7 @@ class DirectivoController {
 
 //    CONTROLADOR COMISIONES
 
-    @ApiOperation("Endpoint que se usa para registrar nuevas comisiones en el sistema o bien actualizar las fechas para recibir formularios de sobrecupos.")
+    @ApiOperation("Registra nuevas comisiones en el sistema, o bien, actualiza las fechas para recibir formularios de sobrecupos.")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ConflictoComision::class, responseContainer = "List"),
@@ -182,7 +182,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una comision, junto con el id del formulario y la solicitud #####")
+    @ApiOperation("Retorna los alumnos que solicitaron una comision")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -206,7 +206,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("##### Endpoint que se usa para obtener los alumnos que solicitaron una materia, junto con el id del formulario y la solicitud, ordenados por coeficiente #####")
+    @ApiOperation("##### Retorna los alumnos que solicitaron sobrecupo en alguna comision de la materia, ordenados por coeficiente #####")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -233,7 +233,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para actualizar los horarios de comisiones existentes")
+    @ApiOperation("Actualiza los horarios de comisiones existentes")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -258,7 +258,7 @@ class DirectivoController {
 
 //    CONTROLADOR MATERIAS
 
-    @ApiOperation("Endpoint que se usa para registra nuevas  materias en el sistema")
+    @ApiOperation("Registra nuevas  materias en el sistema")
     @ApiResponses(
         value = [
             ApiResponse(code = 201, message = "Materia creada", response = MateriaDTO::class, responseContainer = "List"),
@@ -273,7 +273,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "##### Endpoint usado para listar todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
+    @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
     @ApiResponses(
             value = [
                 ApiResponse(
@@ -300,7 +300,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "Endpoint usado para listar todas las materias disponibles")
+    @ApiOperation(value = "Lista todas las materias disponibles")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = MateriaDTO::class, responseContainer = "List"),
@@ -315,7 +315,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "Endpoint usado para actualizar las materias correlativas de materias registradas")
+    @ApiOperation(value = "Actualiza las materias correlativas de materias registradas")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = MateriaDTO::class, responseContainer = "List"),
@@ -334,7 +334,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "Endpoint usado para listar todas las comisiones del cuatrimestre actual de una materia especifica")
+    @ApiOperation(value = "Retorna todas las comisiones del cuatrimestre actual de una materia especifica")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ComisionDTO::class, responseContainer = "List"),
@@ -355,7 +355,7 @@ class DirectivoController {
 
 //    CONTROLADOR CUATRIMESTRES
 
-    @ApiOperation("Endpoint que se usa para obtener informacion basica de un cuatrimestre")
+    @ApiOperation("Retorna informacion basica de un cuatrimestre")
     @RequestMapping(value = ["/cuatrimestres"], method = [RequestMethod.GET])
     fun cuatrimestre(
         @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
@@ -371,7 +371,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para obtener la oferta academica de un cuatrimestre")
+    @ApiOperation("Retorna la oferta academica de un cuatrimestre")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ComisionDTO::class, responseContainer = "List"),

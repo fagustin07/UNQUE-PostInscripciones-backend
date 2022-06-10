@@ -17,7 +17,7 @@ class AlumnoController {
     @Autowired
     private lateinit var alumnoService: AlumnoService
 
-    @ApiOperation("Endpoint que se usa para cargar una solicitud de comisiones a un alumno.")
+    @ApiOperation("Realiza carga de una solicitud de comisiones para el alumno.")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "Solicitudes cargadas correctamente", response = FormularioDTO::class),
@@ -37,7 +37,7 @@ class AlumnoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para actualizar las solicitudes de un alumno.")
+    @ApiOperation("Actualiza las comisiones que solicita el alumno.")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
@@ -57,7 +57,7 @@ class AlumnoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para obtener las materias que puede cursar un alumno y comisiones")
+    @ApiOperation("Obtiene las comisiones de las materias que puede cursar")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = MateriaComision::class, responseContainer = "List"),
@@ -76,7 +76,7 @@ class AlumnoController {
         )
     }
 
-    @ApiOperation("Endpoint que se usa para obtener el formulario de un alumno")
+    @ApiOperation("El alumo obtiene el formulario de sobrecupos del cuatrimestre actual")
     @ApiResponses(
             value = [
                 ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),

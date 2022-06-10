@@ -22,7 +22,7 @@ class AutenticacionController {
     @Autowired
     lateinit var autenticacionService: AutenticacionService
 
-    @ApiOperation("Endpoint para que un alumno cree su cuenta")
+    @ApiOperation("Utilizado para que un alumno cree su cuenta")
     @ApiResponses(
         value = [
             ApiResponse(code = 201, message = "OK", response = Int::class),
@@ -39,7 +39,7 @@ class AutenticacionController {
         return ResponseEntity(respuesta, HttpStatus.CREATED)
     }
 
-    @ApiOperation("Endpoint para que un alumno confirme su cuenta con el codigo brindado")
+    @ApiOperation("Se utiliza para que un alumno confirme su cuenta con el codigo brindado")
     @ApiResponses(
         value = [
             ApiResponse(code = 204, message = "Cuenta confirmada"),
@@ -52,7 +52,7 @@ class AutenticacionController {
         return ResponseEntity(HttpStatus.NO_CONTENT)
     }
 
-    @ApiOperation("Endpoint para que un alumno ingrese a la aplicacion")
+    @ApiOperation("Utilizado para que un alumno ingrese a la aplicacion")
     @ApiResponses(
         value = [
             ApiResponse(code = 204, message = "OK"),
@@ -68,7 +68,7 @@ class AutenticacionController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(responseHeaders).body(null)
     }
 
-    @ApiOperation("Endpoint para que un director ingrese a la aplicacion")
+    @ApiOperation("Utilizado para que los directivos ingresen a la aplicacion")
     @ApiResponses(
         value = [
             ApiResponse(code = 204, message = "OK"),
