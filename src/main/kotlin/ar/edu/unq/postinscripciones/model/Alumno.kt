@@ -101,7 +101,7 @@ class Alumno(
     }
 
     fun materiasAprobadas(): List<Materia> {
-        return materiasCursadasPorEstadoDeMateria(EstadoMateria.APROBADO).map { it.materia }
+        return materiasCursadasPorEstadoDeMateria(EstadoMateria.APROBADO).map { it.materia } + materiasCursadasPorEstadoDeMateria(EstadoMateria.PA).map { it.materia }
     }
 
     fun cantidadAprobadas() = historiaAcademica.count { it.estado == EstadoMateria.APROBADO }

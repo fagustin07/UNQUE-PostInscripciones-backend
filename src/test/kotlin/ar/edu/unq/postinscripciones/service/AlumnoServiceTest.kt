@@ -470,6 +470,46 @@ internal class AlumnoServiceTest {
     }
 
     @Test
+    fun `un alumno tiene disponible materias de las cuales cumple los requisitos con materias pendiente de aprobacion`() {
+        val materiaCursada = MateriaCursadaDTO(algo.codigo, EstadoMateria.PA, LocalDate.of(2021, 12, 20))
+        val formularioAlumno = FormularioCrearAlumno(
+            123456712,
+            "Pepe",
+            "Sanchez",
+            "pepe.sanchez@unq.edu.ar",
+            4455611,
+            Carrera.TPI,
+            5.0
+        )
+        val nacho = alumnoService.crear(formularioAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val formularioComision = FormularioComision(
+            1,
+            logica.codigo,
+            cuatrimestre.anio,
+            cuatrimestre.semestre,
+            35,
+            5,
+            listOf(
+                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
+                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+            ),
+            Modalidad.PRESENCIAL
+        )
+        val comisionLogica = comisionService.crear(formularioComision)
+        val materiasdisponibles = alumnoService.materiasDisponibles(nacho.dni, cuatrimestre)
+        assertThat(materiasdisponibles).hasSize(1)
+        assertThat(materiasdisponibles.map { it.codigo }).contains(logica.codigo)
+        assertThat(materiasdisponibles.first().comisiones).allMatch {
+            it == ComisionParaAlumno.desdeModelo(
+                comisionLogica
+            )
+        }
+    }
+
+    @Test
     fun `un alumno no tiene disponible materias que ya aprobo`() {
         val materiaCursada = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioAlumno = FormularioCrearAlumno(
