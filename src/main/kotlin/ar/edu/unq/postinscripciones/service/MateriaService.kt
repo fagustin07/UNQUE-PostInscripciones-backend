@@ -6,10 +6,10 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
-import ar.edu.unq.postinscripciones.service.dto.MateriaPorSolicitudes
-import ar.edu.unq.postinscripciones.service.dto.FormularioMateria
-import ar.edu.unq.postinscripciones.service.dto.MateriaDTO
-import ar.edu.unq.postinscripciones.service.dto.MateriaConCorrelativas
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaPorSolicitudes
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional

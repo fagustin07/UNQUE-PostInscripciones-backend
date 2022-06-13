@@ -5,7 +5,13 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.*
-import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaResumenDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

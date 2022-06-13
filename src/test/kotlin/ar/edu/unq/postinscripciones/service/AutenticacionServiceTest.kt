@@ -3,7 +3,7 @@ package ar.edu.unq.postinscripciones.service
 import ar.edu.unq.postinscripciones.model.Carrera
 import ar.edu.unq.postinscripciones.model.EstadoCuenta
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.FormularioCrearAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test

@@ -1,7 +1,9 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
 import ar.edu.unq.postinscripciones.service.AlumnoService
-import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearOActualizarFormulario
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
 import io.swagger.annotations.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

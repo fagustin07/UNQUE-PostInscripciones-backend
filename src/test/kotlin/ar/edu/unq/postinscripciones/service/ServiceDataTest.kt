@@ -4,7 +4,10 @@ import ar.edu.unq.postinscripciones.model.Carrera
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.service.dto.alumno.AlumnoDTO
+import ar.edu.unq.postinscripciones.service.dto.comision.ComisionACrear
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -39,7 +42,7 @@ internal class ServiceDataTest {
 
         alumnoService.registrarAlumnos(planillaAlumnos)
 
-        val alumnosRegistrados = alumnoService.todos().map {AlumnoDTO.desdeModelo(it)}
+        val alumnosRegistrados = alumnoService.todos().map { AlumnoDTO.desdeModelo(it)}
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
         assertThat(alumnosRegistrados)
             .usingRecursiveComparison()

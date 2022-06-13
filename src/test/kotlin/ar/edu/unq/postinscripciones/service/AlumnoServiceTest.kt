@@ -9,7 +9,15 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.SolicitudSobrecupoRepository
-import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
+import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
+import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

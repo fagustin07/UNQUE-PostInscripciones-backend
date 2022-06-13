@@ -1,10 +1,10 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
 import ar.edu.unq.postinscripciones.service.AutenticacionService
-import ar.edu.unq.postinscripciones.service.dto.ConfirmacionCuenta
-import ar.edu.unq.postinscripciones.service.dto.FormularioRegistro
-import ar.edu.unq.postinscripciones.service.dto.LoguearAlumno
-import ar.edu.unq.postinscripciones.service.dto.LoguearDirectivo
+import ar.edu.unq.postinscripciones.service.dto.autenticacion.ConfirmacionCuenta
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioRegistro
+import ar.edu.unq.postinscripciones.service.dto.autenticacion.LoguearAlumno
+import ar.edu.unq.postinscripciones.service.dto.autenticacion.LoguearDirectivo
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
