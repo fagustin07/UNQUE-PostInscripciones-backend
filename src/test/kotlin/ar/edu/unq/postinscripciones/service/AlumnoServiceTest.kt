@@ -188,11 +188,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Se puede aprobar una solicitud de sobrecupo`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -214,11 +210,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Se puede rechazar una solicitud de sobrecupo`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -239,11 +231,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al aprobar una solicitud, el numero de sobrecupos disponibles de una comision baja`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -266,11 +254,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al rechazar una solicitud aprobada, el numero de sobrecupos disponibles de una comision aumenta`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -321,11 +305,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `No se puede cambiar el estado de una solitud si el formulario se encuentra cerrado`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formularioAbierto =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -801,11 +781,8 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al obtener un formulario cuando aun esta abierto todas sus solicitudes se muestran como pendientes aunque su estado sea otro`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -833,11 +810,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al obtener un formulario cuando se encuentra cerrado todas sus solicitudes se muestran como se encuentran`() {
-        val fechaDeModificacion = LocalDateTime.of(
-                cuatrimestre.finInscripciones.year,
-                cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -860,6 +833,44 @@ internal class AlumnoServiceTest {
         val formularioObtenido = alumnoService.obtenerFormulario(jwt)
 
         assertThat(formularioObtenido.solicitudes.first()).usingRecursiveComparison().isEqualTo(solicitudAprobada)
+    }
+
+    @Test
+    fun `obtener listado de alumnos sin filtro por nombre o apellido`(){
+        val formulario =
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        val formulario2 =
+            alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        val alumnos = alumnoService.alumnosPorNombreOApellido(null)
+        assertThat(alumnos.map{ it.formularioId }).isEqualTo(listOf(formulario.id, formulario2.id))
+    }
+
+    @Test
+    fun `obtener listado de alumnos con filtrado por nombre o apellido`(){
+        val formulario =
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        val formulario2 =
+            alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        val alumnos = alumnoService.alumnosPorNombreOApellido("edE")
+        assertThat(alumnos.map{ it.formularioId }).isEqualTo(listOf(formulario2.id))
+        assertThat(alumnos.first()).usingRecursiveComparison().isEqualTo(AlumnoFormulario(AlumnoDTO.desdeModelo(fede), formulario2.id, EstadoFormulario.ABIERTO, 0, 1))
+        assertThat(alumnos.map{ it.formularioId }).doesNotContain(formulario.id)
     }
 
     @AfterEach

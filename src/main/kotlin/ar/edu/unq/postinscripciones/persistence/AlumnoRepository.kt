@@ -2,6 +2,7 @@ package ar.edu.unq.postinscripciones.persistence
 
 import ar.edu.unq.postinscripciones.model.Alumno
 import ar.edu.unq.postinscripciones.model.EstadoMateria
+import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -69,4 +70,19 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
         "ORDER BY a.coeficiente DESC"
     )
     fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, comision : Long?, semestre: Semestre, anio: Int, estado : EstadoMateria = EstadoMateria.APROBADO): List<Tuple>
+
+    @Query(
+        "SELECT a.dni, a.nombre, a.apellido, a.correo, a.legajo, a.coeficiente, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(s) as total_solicitudes_pendientes " +
+        "FROM Alumno as a " +
+            "JOIN Formulario as f " +
+                "ON f.id IN (SELECT f2.id FROM a.formularios as f2 WHERE f2.cuatrimestre.semestre = ?2 AND f2.cuatrimestre.anio = ?3) " +
+            "LEFT JOIN SolicitudSobrecupo as s " +
+                "ON s.id IN ( " +
+                    "SELECT s2.id  FROM f.solicitudes as s2 WHERE s2.estado = ?4 " +
+                ") " +
+        "WHERE (?1 IS NULL OR LOWER(a.nombre) LIKE %?1% OR LOWER(a.apellido) LIKE %?1%) " +
+        "GROUP BY a.dni, a.nombre, a.apellido, a.correo, a.legajo, f.id " +
+        "ORDER BY a.coeficiente DESC"
+    )
+    fun findAllByNombreOrApellido(nombre: String?, semestre: Semestre, anio: Int, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
 }

@@ -159,6 +159,24 @@ class DirectivoController {
         )
     }
 
+    @ApiOperation("Listado de alumnos con detalle de formulario filtrado por nombre o apellido")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "Ok", response = AlumnoFormulario::class, responseContainer = "List"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
+    @RequestMapping(value = ["/alumnos/formulario"], method = [RequestMethod.PATCH])
+    fun alumnosPorNombreOApellido(
+        @ApiParam(value = "Nombre o Apellido del alumno", example = "Jorge", required = false)
+        @RequestParam string: String?
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            alumnoService.alumnosPorNombreOApellido(string),
+            HttpStatus.OK
+        )
+    }
+
 //    CONTROLADOR COMISIONES
 
     @ApiOperation("Registra nuevas comisiones en el sistema, o bien, actualiza las fechas para recibir formularios de sobrecupos.")

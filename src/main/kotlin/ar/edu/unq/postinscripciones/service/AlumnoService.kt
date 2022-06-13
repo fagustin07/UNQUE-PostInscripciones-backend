@@ -268,6 +268,15 @@ class AlumnoService {
         return alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
     }
 
+    @Transactional
+    fun alumnosPorNombreOApellido(nombre: String?, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<AlumnoFormulario> {
+        val cuatrimestreObtenido =
+            cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        val alumnos = alumnoRepository.findAllByNombreOrApellido(nombre?.lowercase(), cuatrimestreObtenido.semestre, cuatrimestreObtenido.anio)
+        return alumnos.map { AlumnoFormulario.fromTuple(it) }
+    }
+
     fun crearFormulario(
             cuatrimestre: Cuatrimestre,
             alumno: Alumno,
