@@ -34,5 +34,6 @@ jobs:
       - name: Update coverage report in Codacy
         if: success()
         env:
+          CODACY_REPORTER_SKIP_CHECKSUM: true
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Kotlin --force-language -r build/reports/jacoco/test/jacocoTestReport.xml
