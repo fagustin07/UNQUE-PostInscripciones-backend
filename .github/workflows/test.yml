@@ -18,22 +18,18 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: Install jq
-        run: sudo apt-get install jq
-
-      - name: Install Codacy
-        run: wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)
-
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
       - name: Run tests
         run: ./gradlew test -i
 
-
-      - name: Update coverage report in Codacy
+      - name: Run codacy-coverage-reporter
         if: success()
         env:
           CODACY_REPORTER_SKIP_CHECKSUM: true
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Kotlin --force-language -r build/reports/jacoco/test/jacocoTestReport.xml
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: build/reports/jacoco/test/jacocoTestReport.xml
+          language: 'kotlin'
