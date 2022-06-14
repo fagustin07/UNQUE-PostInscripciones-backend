@@ -197,6 +197,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `Se puede aprobar una solicitud de sobrecupo`() {
         val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -239,7 +240,11 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al aprobar una solicitud, el numero de sobrecupos disponibles de una comision baja`() {
-        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val fechaDeModificacion = LocalDateTime.of(
+                cuatrimestre.finInscripciones.year,
+                cuatrimestre.finInscripciones.month,
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
