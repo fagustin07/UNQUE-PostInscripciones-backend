@@ -191,8 +191,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -217,8 +217,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -242,8 +242,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -269,8 +269,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -324,8 +324,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formularioAbierto =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -804,8 +804,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
@@ -836,8 +836,8 @@ internal class AlumnoServiceTest {
         val fechaDeModificacion = LocalDateTime.of(
                 cuatrimestre.finInscripciones.year,
                 cuatrimestre.finInscripciones.month,
-                cuatrimestre.finInscripciones.dayOfMonth + 5,
-                12, 0,0)
+                cuatrimestre.finInscripciones.dayOfMonth,
+                12, 0,0).plusDays(5)
         val formulario =
                 alumnoService.guardarSolicitudPara(
                         alumno.dni,
