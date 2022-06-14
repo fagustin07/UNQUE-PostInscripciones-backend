@@ -30,9 +30,10 @@ jobs:
       - name: Run tests
         run: ./gradlew test -i
 
-
-      - name: Update coverage report in Codacy
+      - name: Run codacy-coverage-reporter
         if: success()
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Kotlin --force-language -r build/reports/jacoco/test/jacocoTestReport.xml
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: jacocoTestReport.xml
+          language: 'kotlin'
