@@ -1,5 +1,6 @@
 package ar.edu.unq.postinscripciones.model
 
+import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import org.assertj.core.api.Assertions.assertThat
@@ -14,12 +15,28 @@ internal class FormularioTest {
     fun `set up`() {
         solicitud = SolicitudSobrecupo()
         cuatrimestre = Cuatrimestre(2010, Semestre.S1)
-        formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = listOf(solicitud))
+        formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = mutableListOf(solicitud))
     }
 
     @Test
     fun `un formulario puede agregar una solicitud de cupo`() {
         assertThat(formulario.solicitudes).containsExactly(solicitud)
+    }
+
+    @Test
+    fun `se puede agregar solicitudes a un formulario`() {
+        val solicitud2 = SolicitudSobrecupo()
+        formulario.agregarSolicitud(solicitud2)
+        assertThat(formulario.solicitudes).containsExactly(solicitud, solicitud2)
+    }
+
+    @Test
+    fun `se puede agregar las materias en las que se encuentra inscripto un alumno`() {
+        val materia = Materia("BDD-102", "Base de datos")
+        val comision = Comision(materia)
+        formulario = Formulario(comisionesInscripto = listOf(comision))
+
+        assertThat(formulario.comisionesInscripto).containsExactly(comision)
     }
 
     @Test
@@ -34,15 +51,15 @@ internal class FormularioTest {
 
     @Test
     fun `se puede cerrar un formulario`() {
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
         assertThat(formulario.estado).isEqualTo(EstadoFormulario.CERRADO)
     }
 
     @Test
     fun `se puede abrir un formulario ya cerrado`() {
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
         val estadoDelFormularioDespuesDeCambiarEstado = formulario.estado
-        formulario.cambiarEstado()
+        formulario.abrirFormulario()
 
         assertThat(estadoDelFormularioDespuesDeCambiarEstado).isEqualTo(EstadoFormulario.CERRADO)
         assertThat(formulario.estado).isEqualTo(EstadoFormulario.ABIERTO)
@@ -50,10 +67,10 @@ internal class FormularioTest {
 
     @Test
     fun `cuando se cierra un formulario todas las solicitudes pendientes se rechazan`() {
-        val solicitudes = listOf(SolicitudSobrecupo(), SolicitudSobrecupo())
+        val solicitudes = mutableListOf(SolicitudSobrecupo(), SolicitudSobrecupo())
         val formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = solicitudes)
 
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
 
         assertThat(formulario.solicitudes.map { it.estado })
                 .usingRecursiveComparison()
@@ -62,11 +79,11 @@ internal class FormularioTest {
 
     @Test
     fun `cuando se cierra un formulario todas las solicitudes aprobadas no se rechazan`() {
-        val solicitudes = listOf(SolicitudSobrecupo(), SolicitudSobrecupo())
+        val solicitudes = mutableListOf(SolicitudSobrecupo(), SolicitudSobrecupo())
         solicitudes.first().cambiarEstado(EstadoSolicitud.APROBADO)
         val formulario = Formulario(cuatrimestre = cuatrimestre, solicitudes = solicitudes)
 
-        formulario.cambiarEstado()
+        formulario.cerrarFormulario()
 
         assertThat(formulario.solicitudes.map { it.estado })
                 .usingRecursiveComparison()

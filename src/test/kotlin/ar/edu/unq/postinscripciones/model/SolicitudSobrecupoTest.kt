@@ -37,4 +37,31 @@ internal class SolicitudSobrecupoTest {
         solicitud.cambiarEstado(EstadoSolicitud.RECHAZADO)
         assertThat(solicitud.estado).isEqualTo(EstadoSolicitud.RECHAZADO)
     }
+
+    @Test
+    fun `cuando una solicitud cambia su estado a APROBADO el conteo de sobrecupos baja en uno`() {
+        val sobrecuposAntes = solicitud.comision.sobrecuposDisponibles()
+        solicitud.cambiarEstado(EstadoSolicitud.APROBADO)
+        assertThat(solicitud.comision.sobrecuposDisponibles()).isEqualTo(sobrecuposAntes - 1)
+    }
+
+    @Test
+    fun `cuando una solicitud cambia su estado de APROBADO a RECHAZADO el conteo de sobrecupos sube en uno`() {
+        solicitud.cambiarEstado(EstadoSolicitud.APROBADO)
+        val sobrecuposAntes = solicitud.comision.sobrecuposDisponibles()
+
+        solicitud.cambiarEstado(EstadoSolicitud.RECHAZADO)
+
+        assertThat(solicitud.comision.sobrecuposDisponibles()).isEqualTo(sobrecuposAntes + 1)
+    }
+
+    @Test
+    fun `cuando una solicitud cambia su estado de APROBADO a PENDIENTE el conteo de sobrecupos sube en uno`() {
+        solicitud.cambiarEstado(EstadoSolicitud.APROBADO)
+        val sobrecuposAntes = solicitud.comision.sobrecuposDisponibles()
+
+        solicitud.cambiarEstado(EstadoSolicitud.PENDIENTE)
+
+        assertThat(solicitud.comision.sobrecuposDisponibles()).isEqualTo(sobrecuposAntes + 1)
+    }
 }

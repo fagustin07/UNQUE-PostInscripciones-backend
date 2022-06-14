@@ -19,6 +19,14 @@ data class SolicitudSobrecupoDTO(
                 ComisionInfoCursadaDTO.desdeModelo(solicitudSobrecupo.comision)
             )
         }
+
+        fun desdeModeloParaAlumno(solicitudSobrecupo: SolicitudSobrecupo): SolicitudSobrecupoDTO {
+            return SolicitudSobrecupoDTO(
+                    solicitudSobrecupo.id!!,
+                    EstadoSolicitud.PENDIENTE,
+                    ComisionInfoCursadaDTO.desdeModelo(solicitudSobrecupo.comision)
+            )
+        }
     }
 
 }

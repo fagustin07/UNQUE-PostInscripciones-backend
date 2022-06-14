@@ -44,9 +44,9 @@ internal class ComisionServiceTest {
     @BeforeEach
     fun setUp() {
         val alumno =
-            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, "", Carrera.LICENCIATURA, listOf()))
+            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.LICENCIATURA, 5.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, "", Carrera.LICENCIATURA, listOf()))
+            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.LICENCIATURA, 5.0))
 
         bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.SIMULTANEIDAD)
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
@@ -132,15 +132,6 @@ internal class ComisionServiceTest {
     }
 
     @Test
-    fun `Obtener comisiones ordenadas por cantidad de solicitudes`() {
-        val comisionesObtenidas = comisionService.comisionesPorSolicitudes(cuatrimestre)
-        assertThat(comisionesObtenidas.maxOf { it.cantidadSolicitudes }).isEqualTo(comisionesObtenidas.first().cantidadSolicitudes)
-        assertThat(comisionesObtenidas.minOf { it.cantidadSolicitudes }).isEqualTo(comisionesObtenidas.last().cantidadSolicitudes)
-        assertThat(comisionesObtenidas.first().cantidadSolicitudes).isEqualTo(2)
-        assertThat(comisionesObtenidas.last().cantidadSolicitudes).isEqualTo(0)
-    }
-
-    @Test
     fun `se puede guardar una oferta academica con un inicio y un fin para registrar formularios`() {
         val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
         val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
@@ -152,7 +143,6 @@ internal class ComisionServiceTest {
                 ComisionACrear(
                     1,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.LUNES, "18:00", "21:00")),
                     30,
                     8
                 ),
@@ -201,6 +191,27 @@ internal class ComisionServiceTest {
         assertThat(cuatrimestreActuaActualizado.inicioInscripciones).isEqualTo(inicioInscripciones)
         assertThat(cuatrimestreActuaActualizado.finInscripciones).isNotEqualTo(cuatrimestre.finInscripciones)
         assertThat(cuatrimestreActuaActualizado.finInscripciones).isEqualTo(finInscripciones)
+    }
+
+    @Test
+    fun `obtener la oferta del cuatrimestre actual segun un patron de nombre de materia`() {
+        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.LICENCIATURA)
+        val formulario = FormularioComision(
+            1,
+            algoritmos.codigo,
+            2022,
+            Semestre.S1,
+            30,
+            8,
+            horarios,
+            Modalidad.PRESENCIAL
+        )
+        val comisionExcluida = comisionService.crear(formulario)
+
+        val ofertaObtenida = comisionService.ofertaDelCuatrimestre("DAT")
+
+        assertThat(ofertaObtenida).contains(ComisionDTO.desdeModelo(comision), ComisionDTO.desdeModelo(comision3), ComisionDTO.desdeModelo(comision2))
+        assertThat(ofertaObtenida).doesNotContain(ComisionDTO.desdeModelo(comisionExcluida))
     }
 
     @AfterEach

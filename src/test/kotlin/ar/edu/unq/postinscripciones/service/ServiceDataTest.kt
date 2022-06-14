@@ -1,14 +1,10 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.ComisionACrear
-import ar.edu.unq.postinscripciones.service.dto.FormularioCrearAlumno
-import ar.edu.unq.postinscripciones.service.dto.FormularioCuatrimestre
-import ar.edu.unq.postinscripciones.service.dto.HorarioDTO
+import ar.edu.unq.postinscripciones.service.dto.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -43,11 +39,11 @@ internal class ServiceDataTest {
 
         alumnoService.registrarAlumnos(planillaAlumnos)
 
-        val alumnosRegistrados = alumnoService.todos()
+        val alumnosRegistrados = alumnoService.todos().map {AlumnoDTO.desdeModelo(it)}
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
         assertThat(alumnosRegistrados)
             .usingRecursiveComparison()
-            .ignoringFields("formularios")
+            .ignoringFields("formularios", "contrasenia", "coeficiente")
             .isEqualTo(planillaAlumnos)
 
     }
@@ -100,14 +96,12 @@ internal class ServiceDataTest {
                 ComisionACrear(
                     1,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.LUNES, "18:00", "21:00")),
                     30,
                     8
                 ),
                 ComisionACrear(
                     2,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.MIERCOLES, "15:00", "18:00")),
                     30,
                     8
                 )
@@ -115,7 +109,7 @@ internal class ServiceDataTest {
             cuatrimestre = cuatri
         )
 
-        val ofertaDelCuatrimestre = comisionService.ofertaDelCuatrimestre(cuatri)
+        val ofertaDelCuatrimestre = comisionService.ofertaDelCuatrimestre(cuatrimestre = cuatri)
 
         assertThat(ofertaDelCuatrimestre).hasSize(2)
         assertThat(ofertaDelCuatrimestre).allMatch { it.materia == bdd.nombre }
@@ -129,7 +123,6 @@ internal class ServiceDataTest {
         val crearBdd = ComisionACrear(
             1,
             bdd.codigo,
-            listOf(),
             30,
             8
         )
@@ -139,7 +132,6 @@ internal class ServiceDataTest {
                 ComisionACrear(
                     2,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.MIERCOLES, "15:00", "18:00")),
                     30,
                     8
                 )
@@ -163,7 +155,6 @@ internal class ServiceDataTest {
                 ComisionACrear(
                     1,
                     bdd.codigo,
-                    listOf(HorarioDTO(Dia.LUNES, "18:00", "21:00")),
                     30,
                     8
                 ),
@@ -189,8 +180,8 @@ internal class ServiceDataTest {
         repeat(10) {
             planilla.add(
                 FormularioCrearAlumno(
-                    prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
-                    prefijo + planilla.size, "asdas", Carrera.TPI, listOf()
+                        prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
+                        prefijo + planilla.size, Carrera.TPI, 0.0
                 )
             )
         }

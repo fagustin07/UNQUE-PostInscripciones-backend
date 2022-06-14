@@ -8,8 +8,6 @@ data class FormularioMateria(
     val nombre: String,
     @ApiModelProperty(example = "LW-540", required = true)
     val codigo: String,
-    @ApiModelProperty(example = "[LW-540]", required = true)
-    val correlativas: List<String>,
     @ApiModelProperty(example = "TPI", required = true)
     val carrera: Carrera
 )

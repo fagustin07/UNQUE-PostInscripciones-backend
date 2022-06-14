@@ -6,10 +6,11 @@ import javax.persistence.*
 class Materia(
     @Id
     val codigo: String = "",
-    @Column(unique=true)
+    @Column(unique=true, nullable = false)
     val nombre: String = "",
     @ManyToMany(fetch = FetchType.LAZY)
     var correlativas: MutableList<Materia> = mutableListOf(),
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD
 ) {

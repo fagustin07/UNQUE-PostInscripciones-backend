@@ -47,23 +47,14 @@ class ComisionService {
     }
 
     @Transactional
-    fun ofertaDelCuatrimestre(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
-        val oferta = comisionRespository.findByCuatrimestreAnioAndCuatrimestreSemestre(
+    fun ofertaDelCuatrimestre(patronNombre: String = "", cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
+        val oferta = comisionRespository.findByCuatrimestreAnioAndCuatrimestreSemestreAndMateriaNombreIgnoreCaseContaining(
             cuatrimestre.anio,
-            cuatrimestre.semestre
+            cuatrimestre.semestre,
+            patronNombre
         )
         chequearSiHayOferta(oferta, cuatrimestre)
         return oferta.map { ComisionDTO.desdeModelo(it) }
-    }
-
-    @Transactional
-    fun comisionesPorSolicitudes(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionPorSolicitudes> {
-        return comisionRespository
-            .findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudes(
-                cuatrimestre.anio,
-                cuatrimestre.semestre
-            )
-            .map { ComisionPorSolicitudes.desdeTupla(it) }
     }
 
     @Transactional
@@ -113,13 +104,18 @@ class ComisionService {
     }
 
     @Transactional
-    fun modificarHorarios(comisionId: Long, nuevosHorarios: List<HorarioDTO>): ComisionDTO {
-        val comision = comisionRespository
-                .findById(comisionId)
+    fun modificarHorarios(comisionesConHorarios: List<ComisionConHorarios>, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
+        return comisionesConHorarios.map { comisionConHorarios ->
+            val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { ExcepcionUNQUE("Cuatrimestre no encontrado") }
+            val materia = materiaRepository.findByNombreIgnoringCase(comisionConHorarios.materia).orElseThrow { MateriaNoEncontradaExcepcion() }
+            val comision = comisionRespository
+                .findByNumeroAndMateriaAndCuatrimestre(comisionConHorarios.comision, materia, cuatrimestreObtenido)
                 .orElseThrow { ExcepcionUNQUE("No se encontro la comision") }
 
-        comision.modificarHorarios(nuevosHorarios.map { HorarioDTO.aModelo(it) })
-        return ComisionDTO.desdeModelo(comisionRespository.save(comision))
+            comision.modificarHorarios(comisionConHorarios.horarios.map { HorarioDTO.aModelo(it) })
+
+            ComisionDTO.desdeModelo(comisionRespository.save(comision))
+        }
     }
 
     private fun actualizarCuatrimestre(
@@ -148,7 +144,7 @@ class ComisionService {
                 materia,
                 comisionACrear.numeroComision,
                 cuatrimestre,
-                comisionACrear.horarios.map { HorarioDTO.aModelo(it) },
+                listOf(),
                 comisionACrear.cuposTotales,
                 comisionACrear.sobrecuposTotales
             )

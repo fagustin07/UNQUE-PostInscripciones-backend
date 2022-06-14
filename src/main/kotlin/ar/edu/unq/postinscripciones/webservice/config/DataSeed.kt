@@ -10,10 +10,13 @@ import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
 import ar.edu.unq.postinscripciones.service.AlumnoService
+import ar.edu.unq.postinscripciones.service.AutenticacionService
+import ar.edu.unq.postinscripciones.service.CreacionDirectivo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 import java.time.LocalTime
 
 @Profile("!test")
@@ -23,7 +26,8 @@ class DataSeed(
     @Autowired private val cuatrimestreRepository: CuatrimestreRepository,
     @Autowired private val comisionRespository: ComisionRespository,
     @Autowired private val alumnoRepository: AlumnoRepository,
-    @Autowired private val alumnoService: AlumnoService
+    @Autowired private val alumnoService: AlumnoService,
+    @Autowired private val autenticacionService: AutenticacionService
 ) : CommandLineRunner {
 
     @Throws(Exception::class)
@@ -144,6 +148,9 @@ class DataSeed(
                     Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(11, 0, 0)),
                     Horario(Dia.MIERCOLES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
             )
+            val ingles1horariosc1 = listOf(
+                    Horario(Dia.MIERCOLES, LocalTime.of(14, 0, 0), LocalTime.of(18, 0, 0))
+            )
             val cuatrimestre = Cuatrimestre.actual()
 
             val bddc1 = Comision(bdd, 1, cuatrimestre, bddhorariosc1)
@@ -153,6 +160,7 @@ class DataSeed(
             val introc1 = Comision(intro, 1, cuatrimestre, introhorariosc1)
             val introc2 = Comision(intro, 2, cuatrimestre, introhorariosc2)
             val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
+            val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1)
 
             val jorge = Alumno(
                 12345678,
@@ -161,7 +169,9 @@ class DataSeed(
                 "jorge.arenales20@alu.edu.ar",
                 12345,
                 "contrasenia",
-                Carrera.SIMULTANEIDAD
+                Carrera.SIMULTANEIDAD,
+                8.7
+
             )
             val bartolo = Alumno(
                 12345677,
@@ -170,7 +180,8 @@ class DataSeed(
                 "bartolito@alu.edu.ar",
                 45555,
                 "contrasenia",
-                Carrera.SIMULTANEIDAD
+                Carrera.SIMULTANEIDAD,
+                7.24
             )
             val maria = Alumno(
                     12345680,
@@ -179,7 +190,8 @@ class DataSeed(
                     "mjimenez@alu.edu.ar",
                     45557,
                     "contrasenia",
-                    Carrera.SIMULTANEIDAD
+                    Carrera.SIMULTANEIDAD,
+                    8.21
             )
             val roberto = Alumno(
                     12345679,
@@ -188,7 +200,8 @@ class DataSeed(
                     "rsanchez@alu.edu.ar",
                     45556,
                     "contrasenia",
-                    Carrera.TPI
+                    Carrera.TPI,
+                    6.10
             )
 
             val firulais = Alumno(
@@ -198,7 +211,8 @@ class DataSeed(
                     "ftercero@alu.edu.ar",
                     45559,
                     "contrasenia",
-                    Carrera.TPI
+                    Carrera.TPI,
+                    5.34
             )
 
             val sofia = Alumno(
@@ -208,7 +222,8 @@ class DataSeed(
                     "ssofia@alu.edu.ar",
                     45560,
                     "contrasenia",
-                    Carrera.TPI
+                    Carrera.TPI,
+                    9.15
             )
             cuatrimestreRepository.save(cuatrimestre)
             materiaRepository.saveAll(listOf(epyl, lea, ttu, tti, matematica, ingles1, ingles2, bdd, intro, orga,mate1, estructura, objetos1, objetos2, redes
@@ -217,19 +232,27 @@ class DataSeed(
                                             , tecnicas, tip, analisis, mate3, proba, logica, seguridad, requerimientos, gestion, practicaDeDesarrollo, lfa, algoritmos
                                             , teoria, arquitectura1, distribuidos, caracteristicas, arquitectura2, arquitecturaDeComputadoras, parseo, aspectosLegales, seminarioFinal, seminarioCapacitacion
                                             , seguridadTec, tv, streaming, cloud, bajo, semantica, seminarios, calidad, funcionalAvanzada, progCuantica, ciudadana, ludificacion, cdDatos))
-            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1))
-            jorge.actualizarHistoriaAcademica(listOf(MateriaCursada(intro, EstadoMateria.APROBADO), MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
+            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1, inglesc1))
+            jorge.actualizarHistoriaAcademica(listOf(
+                    MateriaCursada(intro, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(matematica, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(epyl, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(lea, EstadoMateria.DESAPROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(bdd, EstadoMateria.DESAPROBADO, LocalDate.of(2021, 12, 20)),
+                    MateriaCursada(bdd, EstadoMateria.APROBADO)
+            ))
             roberto.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             bartolo.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             maria.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO)))
             firulais.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             sofia.actualizarHistoriaAcademica(listOf(MateriaCursada(matematica, EstadoMateria.APROBADO), MateriaCursada(epyl, EstadoMateria.APROBADO), MateriaCursada(lea, EstadoMateria.APROBADO)))
             alumnoRepository.saveAll(listOf(jorge,bartolo, roberto, maria, firulais, sofia))
-            alumnoService.guardarSolicitudPara(bartolo.dni, listOf(bddc1.id!!, bddc2.id!!), cuatrimestre)
+            alumnoService.guardarSolicitudPara(bartolo.dni, listOf(bddc1.id!!, bddc2.id!!),  cuatrimestre, comisionesInscriptoIds = listOf(orgac1.id!!))
             alumnoService.guardarSolicitudPara(jorge.dni, listOf(estrc1.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(maria.dni, listOf(bddc1.id!!), cuatrimestre)
 
+            autenticacionService.crearDirectivo(CreacionDirectivo("gabi@unque.edu.ar", "Gabi A", "1234"))
             val cantMaterias = materiaRepository.count()
             val cantComisiones = comisionRespository.count()
             val cantAlumnos = alumnoRepository.count()

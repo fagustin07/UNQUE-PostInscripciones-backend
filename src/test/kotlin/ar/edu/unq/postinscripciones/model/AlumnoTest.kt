@@ -23,11 +23,11 @@ internal class AlumnoTest {
     @Test
     fun `un alumno puede completar un formulario de solicitud de cupo por cuatrimestre`() {
         val otraComision = Comision()
-        val formulario = Formulario(comisionBdd.cuatrimestre, listOf())
+        val formulario = Formulario(comisionBdd.cuatrimestre, mutableListOf())
 
         alumno.guardarFormulario(formulario)
 
-        assertThat(alumno.llenoElFormularioDelCuatrimestre(comisionBdd.cuatrimestre)).isTrue
+        assertThat(alumno.yaGuardoUnFormulario(comisionBdd.cuatrimestre)).isTrue
         assertThat(alumno.haSolicitado(otraComision)).isFalse
     }
 
@@ -38,14 +38,14 @@ internal class AlumnoTest {
 
         val excepcion = assertThrows<ExcepcionUNQUE> { alumno.guardarFormulario(formulario) }
 
-        assertThat(excepcion.message).isEqualTo("Ya has solicitado materias para este cuatrimestre")
+        assertThat(excepcion.message).isEqualTo("Ya has guardado un formulario para este cuatrimestre")
     }
 
     @Test
     fun `un alumno puede solicitar cupo para mas de una comision`() {
         val formulario = Formulario(
             comisionBdd.cuatrimestre,
-            listOf(
+            mutableListOf(
                 SolicitudSobrecupo(comisionBdd),
                 SolicitudSobrecupo(otraComision)
             )
@@ -139,5 +139,23 @@ internal class AlumnoTest {
         alumno.cargarHistoriaAcademica(materiaCursada1)
 
         assertThat(alumno.materiasAprobadas()).usingRecursiveComparison().isEqualTo(listOf(materiaCursada1.materia))
+    }
+
+    @Test
+    fun `Un alumno conoce su coeficiente`() {
+        val nuevoCoeficiente = 5.23
+
+        alumno.cambiarCoeficiente(nuevoCoeficiente)
+
+        assertThat(alumno.coeficiente).isEqualTo(nuevoCoeficiente)
+    }
+
+    @Test
+    fun `A un alumno se le puede modificar su coeficiente`() {
+        val coeficienteAntes = alumno.coeficiente
+        alumno.cambiarCoeficiente(7.0)
+
+        assertThat(alumno.coeficiente).isEqualTo(7.0)
+        assertThat(alumno.coeficiente).isNotEqualTo(coeficienteAntes)
     }
 }

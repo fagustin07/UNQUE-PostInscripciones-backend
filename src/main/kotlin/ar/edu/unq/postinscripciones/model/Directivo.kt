@@ -1,15 +1,19 @@
 package ar.edu.unq.postinscripciones.model
 
-import javax.persistence.Id
+import javax.persistence.*
 
-class Director(
+@Entity
+class Directivo(
     @Id
-    val dni: Int = 123,
+    val correo: String= "",
+    @Column(nullable = false)
     val nombre: String = "",
-    val apellido: String = "",
-    val correo: String = "",
+    @Column(nullable = false)
     val contrasenia: String = ""
 ) {
+    @Enumerated(EnumType.STRING)
+    val rol = Role.ROLE_DIRECTIVO
+
     fun decidir(solicitudSobrecupo: SolicitudSobrecupo, decision: EstadoSolicitud) {
         solicitudSobrecupo.estado = decision
     }
