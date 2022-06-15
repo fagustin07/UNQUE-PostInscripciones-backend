@@ -815,7 +815,7 @@ internal class AlumnoServiceTest {
         )
 
         val formularioComision = FormularioComision(
-            1,
+            2,
             algo.codigo,
             2022,
             Semestre.S1,
@@ -827,7 +827,7 @@ internal class AlumnoServiceTest {
         val comision2Algoritmos = comisionService.crear(formularioComision)
         alumnoService.guardarSolicitudPara(fede.dni, listOf(comision2Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, comision1Algoritmos.id!!, cuatrimestre)
+        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, comision1Algoritmos.numero, cuatrimestre)
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(

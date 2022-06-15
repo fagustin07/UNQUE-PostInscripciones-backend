@@ -235,19 +235,20 @@ class AlumnoService {
     @Transactional
     fun alumnosQueSolicitaron(
         codigo: String,
-        idComision: Long?,
+        numeroComision: Int?,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual()
     ): List<AlumnoSolicitaMateria> {
-        if (idComision != null) {
-            comisionRepository.findById(idComision).orElseThrow { ExcepcionUNQUE("No existe la comision") }
-        }
-        materiaRepository.findById(codigo).orElseThrow { ExcepcionUNQUE("No existe la materia") }
-        cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+        val materia = materiaRepository.findById(codigo).orElseThrow { ExcepcionUNQUE("No existe la materia") }
+        val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
             .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        if (numeroComision != null) {
+            comisionRepository.findByNumeroAndMateriaAndCuatrimestre(numeroComision, materia, cuatrimestreObtenido).orElseThrow { ExcepcionUNQUE("No existe la comision") }
+        }
+
         val alumnos: List<Tuple> =
             alumnoRepository.findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(
                 codigo,
-                idComision,
+                numeroComision,
                 cuatrimestre.semestre,
                 cuatrimestre.anio
             )

@@ -59,7 +59,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
             "ON f.id IN (SELECT f2.id FROM a.formularios as f2) " +
         "JOIN SolicitudSobrecupo as s " +
             "ON s.id IN ( " +
-                "SELECT s2.id FROM f.solicitudes as s2 WHERE s2.comision.materia.codigo = ?1 AND (?2 IS NULL OR s2.comision.id = ?2)" +
+                "SELECT s2.id FROM f.solicitudes as s2 WHERE s2.comision.materia.codigo = ?1 AND (?2 IS NULL OR s2.comision.numero = ?2)" +
             ") " +
         "LEFT JOIN MateriaCursada as m " +
             "ON m.id IN ( " +
@@ -69,7 +69,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
         "GROUP BY a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo " +
         "ORDER BY a.coeficiente DESC"
     )
-    fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, comision : Long?, semestre: Semestre, anio: Int, estado : EstadoMateria = EstadoMateria.APROBADO): List<Tuple>
+    fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, numero : Int?, semestre: Semestre, anio: Int, estado : EstadoMateria = EstadoMateria.APROBADO): List<Tuple>
 
     @Query(
         "SELECT a.dni, a.nombre, a.apellido, a.correo, a.legajo, a.coeficiente, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(s) as total_solicitudes_pendientes " +

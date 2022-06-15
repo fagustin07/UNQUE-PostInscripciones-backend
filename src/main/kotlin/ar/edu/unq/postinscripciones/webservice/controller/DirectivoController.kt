@@ -252,12 +252,12 @@ class DirectivoController {
         @ApiParam(value = "codigo de la materia", example = "01035", required = true)
         @PathVariable
         codigo: String,
-        @ApiParam(value = "id de la comision para filtrar", example = "1", required = false)
+        @ApiParam(value = "numero de la comision para filtrar", example = "1", required = false)
         @RequestParam
-        comision: Long?
+        numero: Int?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(codigo, comision),
+            alumnoService.alumnosQueSolicitaron(codigo, numero),
             HttpStatus.OK
         )
     }
