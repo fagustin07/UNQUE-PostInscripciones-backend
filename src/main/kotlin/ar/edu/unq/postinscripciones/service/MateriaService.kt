@@ -87,7 +87,7 @@ class MateriaService {
     @Transactional
     fun materiasPorSolicitudes(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<MateriaPorSolicitudes> {
         return materiaRepository
-            .findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudes(
+            .findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(
                 cuatrimestre.anio,
                 cuatrimestre.semestre
             )

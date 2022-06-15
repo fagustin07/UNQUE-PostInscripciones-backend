@@ -1,6 +1,7 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
+import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.comision.Modalidad
@@ -8,10 +9,7 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
+import ar.edu.unq.postinscripciones.service.dto.formulario.*
 import ar.edu.unq.postinscripciones.service.dto.materia.Correlativa
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
@@ -21,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 
 @IntegrationTest
 internal class MateriaServiceTest {
@@ -214,22 +213,33 @@ internal class MateriaServiceTest {
     }
 
     @Test
-    fun `Obtener comisiones ordenadas por cantidad de solicitudes`() {
+    fun `Obtener comisiones ordenadas por cantidad de solicitudes pendientes`() {
         val alumno1 =
             alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LICENCIATURA, 0.0))
         val alumno2 =
             alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LICENCIATURA, 0.0))
 
-        alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
+        val formulario : FormularioDTO= alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
 
+        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)
+        alumnoService.cambiarEstadoSolicitud(
+            formulario.solicitudes.first().id,
+            EstadoSolicitud.APROBADO,
+            formulario.id
+        )
+        alumnoService.cambiarEstadoSolicitud(
+            formulario.solicitudes.last().id,
+            EstadoSolicitud.APROBADO,
+            formulario.id
+        )
         val materiasObtenidas = materiaService.materiasPorSolicitudes(cuatrimestre)
 
-        assertThat(materiasObtenidas.maxOf { it.cantidadSolicitudes }).isEqualTo(materiasObtenidas.first().cantidadSolicitudes)
-        assertThat(materiasObtenidas.minOf { it.cantidadSolicitudes }).isEqualTo(materiasObtenidas.last().cantidadSolicitudes)
-        assertThat(materiasObtenidas.first().cantidadSolicitudes).isEqualTo(2)
-        assertThat(materiasObtenidas.first().codigo).isEqualTo(bdd.codigo)
-        assertThat(materiasObtenidas.last().cantidadSolicitudes).isEqualTo(1)
+        assertThat(materiasObtenidas.maxOf { it.cantidadSolicitudesPendientes }).isEqualTo(materiasObtenidas.first().cantidadSolicitudesPendientes)
+        assertThat(materiasObtenidas.minOf { it.cantidadSolicitudesPendientes }).isEqualTo(materiasObtenidas.last().cantidadSolicitudesPendientes)
+        assertThat(materiasObtenidas.first().cantidadSolicitudesPendientes).isEqualTo(1)
+        assertThat(materiasObtenidas.first().codigo).isEqualTo(comision.materia.codigo)
+        assertThat(materiasObtenidas.last().cantidadSolicitudesPendientes).isEqualTo(0)
     }
 
     @AfterEach

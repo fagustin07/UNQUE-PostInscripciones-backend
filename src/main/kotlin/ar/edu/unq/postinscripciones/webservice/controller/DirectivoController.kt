@@ -302,7 +302,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
+    @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes pendientes #####")
     @ApiResponses(
             value = [
                 ApiResponse(
