@@ -13,6 +13,15 @@ class Horario(
     @Column(nullable = false)
     val fin: LocalTime
 ) {
+    fun tieneSuperposicionCon(comision: Comision): Boolean {
+        val coincidenDias = comision.horarios.filter { it.dia == this.dia }
+        return coincidenDias.any { this.superponeHorario(it) || it.superponeHorario(this) }
+    }
+
+    private fun superponeHorario(it: Horario) =
+        (it.inicio >= this.inicio && it.inicio < this.fin) ||
+                (it.fin <= this.fin && it.fin > this.inicio)
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null

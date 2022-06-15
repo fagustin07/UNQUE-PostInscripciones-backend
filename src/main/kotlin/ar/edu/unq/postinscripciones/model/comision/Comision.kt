@@ -61,4 +61,8 @@ class Comision(
 
     private fun coincideEn(materia: Materia, numero: Int) =
         this.materia.esLaMateria(materia) && this.numero == numero
+
+    fun tieneSuperposicionHoraria(comision: Comision): Boolean {
+        return this.horarios.any { it.tieneSuperposicionCon(comision) }
+    }
 }
