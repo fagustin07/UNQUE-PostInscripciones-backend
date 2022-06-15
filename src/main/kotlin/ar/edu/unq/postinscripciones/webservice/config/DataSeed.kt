@@ -13,8 +13,10 @@ import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.AutenticacionService
 import ar.edu.unq.postinscripciones.service.CreacionDirectivo
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalTime
@@ -29,6 +31,12 @@ class DataSeed(
     @Autowired private val alumnoService: AlumnoService,
     @Autowired private val autenticacionService: AutenticacionService
 ) : CommandLineRunner {
+
+    @Value("\${admin.password}")
+    private lateinit var adminPassword: String
+
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
 
     @Throws(Exception::class)
     override fun run(vararg args: String?) {
@@ -162,13 +170,15 @@ class DataSeed(
             val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
             val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1)
 
+            val contrasenia = passwordEncoder.encode("contrasenia")
+
             val jorge = Alumno(
                 12345678,
                 "Jorge",
                 "Arenales",
                 "jorge.arenales20@alu.edu.ar",
                 12345,
-                "contrasenia",
+                contrasenia,
                 Carrera.SIMULTANEIDAD,
                 8.7
 
@@ -179,7 +189,7 @@ class DataSeed(
                 "Gutierrez",
                 "bartolito@alu.edu.ar",
                 45555,
-                "contrasenia",
+                contrasenia,
                 Carrera.SIMULTANEIDAD,
                 7.24
             )
@@ -189,7 +199,7 @@ class DataSeed(
                     "Jimenez",
                     "mjimenez@alu.edu.ar",
                     45557,
-                    "contrasenia",
+                contrasenia,
                     Carrera.SIMULTANEIDAD,
                     8.21
             )
@@ -199,7 +209,7 @@ class DataSeed(
                     "Sanchez",
                     "rsanchez@alu.edu.ar",
                     45556,
-                    "contrasenia",
+                contrasenia,
                     Carrera.TPI,
                     6.10
             )
@@ -210,7 +220,7 @@ class DataSeed(
                     "Tercero",
                     "ftercero@alu.edu.ar",
                     45559,
-                    "contrasenia",
+                contrasenia,
                     Carrera.TPI,
                     5.34
             )
@@ -221,7 +231,7 @@ class DataSeed(
                     "Sofia",
                     "ssofia@alu.edu.ar",
                     45560,
-                    "contrasenia",
+                contrasenia,
                     Carrera.TPI,
                     9.15
             )
@@ -252,7 +262,7 @@ class DataSeed(
             alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(maria.dni, listOf(bddc1.id!!), cuatrimestre)
 
-            autenticacionService.crearDirectivo(CreacionDirectivo("gabi@unque.edu.ar", "Gabi A", "1234"))
+            autenticacionService.crearDirectivo(CreacionDirectivo("gabi@unque.edu.ar", "Gabi A", adminPassword))
             val cantMaterias = materiaRepository.count()
             val cantComisiones = comisionRespository.count()
             val cantAlumnos = alumnoRepository.count()

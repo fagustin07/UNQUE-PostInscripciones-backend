@@ -74,10 +74,9 @@ class Alumno(
         return formularios.any { formulario -> formulario.cuatrimestre.esElCuatrimestre(cuatrimestre) }
     }
 
-    fun actualizarCodigoYContrasenia(codigo: Int, contrasenia: String, confirmarContrasenia: String, horaDeCarga: LocalDateTime) {
+    fun actualizarCodigoYContrasenia(codigo: Int, contrasenia: String, horaDeCarga: LocalDateTime) {
         checkEstadoCuenta()
         checkTiempoDeCodigo(horaDeCarga)
-        if (contrasenia != confirmarContrasenia) throw ExcepcionUNQUE("La contrasenia no coincide.")
 
         this.cargaDeCodigo = horaDeCarga
         this.codigo = codigo

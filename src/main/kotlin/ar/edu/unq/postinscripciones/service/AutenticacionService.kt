@@ -8,6 +8,7 @@ import ar.edu.unq.postinscripciones.persistence.DirectivoRepository
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import javax.transaction.Transactional
@@ -24,6 +25,9 @@ class AutenticacionService {
     @Autowired
     lateinit var jwtTokenUtil: JWTTokenUtil
 
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+
     @Transactional
     fun crearCuenta(
         dni: Int,
@@ -34,7 +38,8 @@ class AutenticacionService {
         val alumno = alumnoRepository.findById(dni)
             .orElseThrow { ExcepcionUNQUE("No puedes registrarte. Comunicate con el equipo directivo") }
         val codigo = (1000000 + Math.random() * 9000000).toInt()
-        alumno.actualizarCodigoYContrasenia(codigo, contrasenia, confirmarContrasenia, carga)
+        alumno.actualizarCodigoYContrasenia(codigo, passwordEncoder.encode(contrasenia), carga)
+        if (contrasenia != confirmarContrasenia) throw ExcepcionUNQUE("Las contrasenias no coinciden")
         alumnoRepository.save(alumno)
         return codigo
     }
@@ -51,7 +56,7 @@ class AutenticacionService {
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("Cree o confirme su cuenta") }
         if (alumno.estadoCuenta == EstadoCuenta.SIN_CONFIRMAR) throw ExcepcionUNQUE("Cree o confirme su cuenta")
 
-        return if (contrasenia == alumno.contrasenia) {
+        return if (passwordEncoder.matches(contrasenia, alumno.contrasenia)) {
             jwtTokenUtil.generarTokenAlumno(alumno)
         } else {
             throw credencialesInvalidas()
@@ -64,7 +69,7 @@ class AutenticacionService {
             Directivo(
                 creacionDirectivo.correo,
                 creacionDirectivo.nombre,
-                creacionDirectivo.contrasenia
+                passwordEncoder.encode(creacionDirectivo.contrasenia)
             )
         )
     }
@@ -73,7 +78,7 @@ class AutenticacionService {
     fun loguearDirectivo(correoDirectivo: String, contrasenia: String): String {
         val directivo = directivoRepository.findByCorreo(correoDirectivo)
         directivo?.let {
-            if (it.contrasenia == contrasenia) {
+            if (passwordEncoder.matches(contrasenia, directivo.contrasenia)) {
                 return jwtTokenUtil.generarTokenDirectivo(it)
             } else {
                 throw credencialesInvalidas()
