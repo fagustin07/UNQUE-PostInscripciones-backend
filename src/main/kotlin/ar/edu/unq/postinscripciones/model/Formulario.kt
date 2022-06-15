@@ -18,6 +18,7 @@ class Formulario(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
+
     @Enumerated(EnumType.STRING)
     var estado = EstadoFormulario.ABIERTO
 
@@ -27,7 +28,7 @@ class Formulario(
 
     fun cerrarFormulario() {
         solicitudes.forEach {
-            if (it.estado == EstadoSolicitud.PENDIENTE){
+            if (it.estado == EstadoSolicitud.PENDIENTE) {
                 it.cambiarEstado(EstadoSolicitud.RECHAZADO)
             }
         }
@@ -39,4 +40,7 @@ class Formulario(
     }
 
     fun tieneLaComision(comision: Comision) = solicitudes.any { it.solicitaLaComision(comision) }
+
+    fun tieneAprobadaAlgunaDe(materia: Materia) =
+        solicitudes.any { it.comision.materia.esLaMateria(materia) && it.estado == EstadoSolicitud.APROBADO }
 }

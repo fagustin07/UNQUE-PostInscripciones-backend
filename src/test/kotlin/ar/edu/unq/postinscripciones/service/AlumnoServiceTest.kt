@@ -218,6 +218,48 @@ internal class AlumnoServiceTest {
     }
 
     @Test
+    fun `No se puede aprobar una solicitud de una materia que ya tiene otra solicitud aprobada`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val formularioComision = FormularioComision(
+            2,
+            algo.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            comision1Algoritmos.horarios.map { HorarioDTO.desdeModelo(it) },
+            Modalidad.PRESENCIAL
+        )
+        val c2Algoritmos = comisionService.crear(formularioComision)
+        val formulario =
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!, c2Algoritmos.id!!),
+                cuatrimestre
+            )
+
+        val solicitudC1 = formulario.solicitudes.first()
+        alumnoService.cambiarEstadoSolicitud(
+            solicitudC1.id,
+            EstadoSolicitud.APROBADO,
+            formulario.id,
+            fechaDeModificacion
+        )
+
+        val excepcion = assertThrows<ExcepcionUNQUE> {
+            val solicitudC2 = formulario.solicitudes.last()
+            alumnoService.cambiarEstadoSolicitud(
+                solicitudC2.id,
+                EstadoSolicitud.APROBADO,
+                formulario.id,
+                fechaDeModificacion
+            )
+        }
+
+        assertThat(excepcion.message).isEqualTo("El alumno ya tiene una comision aprobada de la materia ${algo.nombre}")
+    }
+
+    @Test
     fun `Se puede rechazar una solicitud de sobrecupo`() {
         val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formulario =
@@ -1064,7 +1106,11 @@ internal class AlumnoServiceTest {
         )
         val c1Pf = comisionService.crear(formularioComision)
 
-        val formularioCargado = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!), comisionesInscriptoIds = listOf(c1Pf.id!!))
+        val formularioCargado = alumnoService.guardarSolicitudPara(
+            alumno.dni,
+            listOf(comision1Algoritmos.id!!),
+            comisionesInscriptoIds = listOf(c1Pf.id!!)
+        )
 
         val resumenAlumno = alumnoService.obtenerResumenAlumno(alumno.dni)
         assertThat(resumenAlumno.formulario).usingRecursiveComparison().isEqualTo(formularioCargado)

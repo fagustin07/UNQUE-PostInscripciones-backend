@@ -155,7 +155,10 @@ class AlumnoService {
         val formulario = formularioRepository.findById(formularioId).get()
 
         chequearEstado(formulario, fecha)
-
+        val materia = solicitud.comision.materia
+        if(estado == EstadoSolicitud.APROBADO && formulario.tieneAprobadaAlgunaDe(materia)) {
+            throw ExcepcionUNQUE("El alumno ya tiene una comision aprobada de la materia ${materia.nombre}")
+        }
         solicitud.cambiarEstado(estado)
         return SolicitudSobrecupoDTO.desdeModelo(solicitudSobrecupoRepository.save(solicitud))
     }
