@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearOActualizarFormulario
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
+import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import io.swagger.annotations.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -13,11 +14,14 @@ import org.springframework.web.bind.annotation.*
 
 @ServiceREST
 @PreAuthorize("hasRole('ALUMNO')")
-@RequestMapping("/api/alumnos")
+@RequestMapping("/api/alumno")
 class AlumnoController {
 
     @Autowired
     private lateinit var alumnoService: AlumnoService
+
+    @Autowired
+    private lateinit var jwtTokenUtil: JWTTokenUtil
 
     @ApiOperation("Realiza carga de una solicitud de comisiones para el alumno.")
     @ApiResponses(
@@ -26,13 +30,15 @@ class AlumnoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/{dni}/solicitudes"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/solicitudes"], method = [RequestMethod.POST])
     fun cargarSolicitudes(
-        @ApiParam(value = "Dni del alumno para cargar solicitudes", example = "12345678", required = true)
-        @PathVariable dni: Int,
+        @ApiParam(hidden=true)
+        @RequestHeader("Authorization")
+        token: String,
         @ApiParam(value = "Lista de id de comisiones solicitadas y de comisiones en las que el alumno se encuentra inscripto.", required = true)
         @RequestBody formulario: FormularioCrearOActualizarFormulario,
     ): ResponseEntity<*> {
+        val dni = jwtTokenUtil.obtenerDni(token)
         return ResponseEntity(
             alumnoService.guardarSolicitudPara(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
             HttpStatus.OK
@@ -46,13 +52,15 @@ class AlumnoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/{dni}/solicitudes"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/solicitudes"], method = [RequestMethod.PATCH])
     fun actualizarFormulario(
-        @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
-        @PathVariable dni: Int,
+        @ApiParam(hidden=true)
+        @RequestHeader("Authorization")
+        token: String,
         @ApiParam(value = "Lista de id de comisiones solicitadas y de comisiones en las que el alumno se encuentra inscripto.", required = true)
         @RequestBody formulario: FormularioCrearOActualizarFormulario,
     ): ResponseEntity<*> {
+        val dni = jwtTokenUtil.obtenerDni(token)
         return ResponseEntity(
             alumnoService.actualizarFormulario(dni, formulario.comisiones, comisionesInscriptoIds = formulario.comisionesInscripto),
             HttpStatus.OK
@@ -66,12 +74,13 @@ class AlumnoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/{dni}/materias"], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/materias"], method = [RequestMethod.GET])
     fun materiasDisponibles(
-        @ApiParam(value = "Dni del alumno", example = "12345678", required = true)
-        @PathVariable
-        dni: Int,
+        @ApiParam(hidden=true)
+        @RequestHeader("Authorization")
+        token: String,
     ): ResponseEntity<*> {
+        val dni = jwtTokenUtil.obtenerDni(token)
         return ResponseEntity(
             alumnoService.materiasDisponibles(dni),
             HttpStatus.OK
@@ -86,7 +95,7 @@ class AlumnoController {
             ]
     )
     @RequestMapping(value = ["/formulario"], method = [RequestMethod.GET])
-    fun obtenerFormulario(@RequestHeader("Authorization") token: String): ResponseEntity<*> {
+    fun obtenerFormulario(@ApiParam(hidden=true) @RequestHeader("Authorization") token: String): ResponseEntity<*> {
         return ResponseEntity(
                 alumnoService.obtenerFormulario(token),
                 HttpStatus.OK
