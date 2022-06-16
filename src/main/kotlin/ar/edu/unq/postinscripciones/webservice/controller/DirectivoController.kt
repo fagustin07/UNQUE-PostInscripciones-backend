@@ -230,7 +230,7 @@ class DirectivoController {
         id: Long,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(id),
+            alumnoService.alumnosQueSolicitaronComision(id),
             HttpStatus.OK
         )
     }
@@ -257,7 +257,7 @@ class DirectivoController {
         numero: Int?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(codigo, numero),
+            alumnoService.alumnosQueSolicitaronMateria(codigo, numero),
             HttpStatus.OK
         )
     }
@@ -380,6 +380,23 @@ class DirectivoController {
             comisionService.obtenerComisionesMateria(codigo),
             HttpStatus.OK
         )
+    }
+
+    @ApiOperation(value = "Rechaza todas las solicitudes pendientes de una materia especifica")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 204, message = "NO CONTENT"),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PUT])
+    fun rechazarSolicitudesMateria(
+            @PathVariable
+            @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+            codigo: String
+    ): ResponseEntity<*> {
+        alumnoService.rechazarSolicitudesPendientesMateria(codigo)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
     }
 
 //    CONTROLADOR CUATRIMESTRES

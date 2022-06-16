@@ -225,7 +225,7 @@ class AlumnoService {
     }
 
     @Transactional
-    fun alumnosQueSolicitaron(idComision: Long): List<AlumnoSolicitaComision> {
+    fun alumnosQueSolicitaronComision(idComision: Long): List<AlumnoSolicitaComision> {
         comisionRepository.findById(idComision).orElseThrow { ExcepcionUNQUE("No existe la comision") }
         val alumnos = alumnoRepository.findBySolicitaComisionIdOrderByCantidadAprobadas(idComision)
 
@@ -233,9 +233,9 @@ class AlumnoService {
     }
 
     @Transactional
-    fun alumnosQueSolicitaron(
+    fun alumnosQueSolicitaronMateria(
         codigo: String,
-        numeroComision: Int?,
+        numeroComision: Int? = null,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual()
     ): List<AlumnoSolicitaMateria> {
         val materia = materiaRepository.findById(codigo).orElseThrow { ExcepcionUNQUE("No existe la materia") }
@@ -301,6 +301,20 @@ class AlumnoService {
             cuatrimestreObtenido.anio
         )
         return alumnos.map { AlumnoFormulario.fromTuple(it) }
+    }
+
+    @Transactional
+    fun rechazarSolicitudesPendientesMateria(
+            codigo: String,
+            cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+            fecha: LocalDateTime = LocalDateTime.now()
+    ) {
+        val solicitudes = solicitudSobrecupoRepository.findByMateria(codigo)
+        solicitudes.forEach {
+            val solicitudId = (it.get(0) as BigInteger).toLong()
+            val formularioId = (it.get(1) as BigInteger).toLong()
+            cambiarEstadoSolicitud(solicitudId, EstadoSolicitud.RECHAZADO, formularioId, fecha)
+        }
     }
 
     fun crearFormulario(
