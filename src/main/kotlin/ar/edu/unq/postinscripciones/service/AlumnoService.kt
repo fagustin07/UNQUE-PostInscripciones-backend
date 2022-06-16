@@ -270,17 +270,11 @@ class AlumnoService {
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
+        val comision = comisionRepository.findById(idComision).get()
 
-        val comision = comisionRepository.findById(idComision)
-        val solicitud = SolicitudSobrecupo(comision.get())
-
-        val formulario = alumno.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
-        formulario.agregarSolicitud(solicitud)
-
-        formularioRepository.save(formulario)
+        val formulario = alumno.agregarSolicitud(comision, cuatrimestreObtenido)
 
         alumnoRepository.save(alumno)
-
         return FormularioDTO.desdeModelo(formulario, alumno.dni)
 
     }
@@ -339,35 +333,8 @@ class AlumnoService {
                 ExcepcionUNQUE("La comision no existe")
             }
         }
-        checkNoHaySuperposiciones(solicitudes, comisionesInscripto)
 
         return formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
-    }
-
-    private fun checkNoHaySuperposiciones(solicitudes: List<SolicitudSobrecupo>, comisionesInscripto: List<Comision>) {
-        val materiasSuperpuestas =
-            solicitudes.filter { solicitud ->
-                comisionesInscripto.any { comision ->
-                    comision.materia.esLaMateria(solicitud.comision.materia)
-                }
-            }
-        if (materiasSuperpuestas.isNotEmpty()) {
-            throw ExcepcionUNQUE("No podes solicitar comisiones de materias " +
-                    "en las que ya estas inscripto por Guaraní")
-        }
-
-        val horariosSuperpuestosGuarani =
-            solicitudes.filter { solicitud ->
-                comisionesInscripto.any { comision ->
-                    comision.tieneSuperposicionHoraria(solicitud.comision)
-                }
-            }
-
-        if(horariosSuperpuestosGuarani.isNotEmpty()) {
-            throw ExcepcionUNQUE("Tenes solicitudes de sobrecupos de " +
-                    "comisiones que se superponen con las que estas inscripto en guaraní")
-        }
-
     }
 
     private fun guardarAlumno(formulario: FormularioCrearAlumno): Alumno {
@@ -452,6 +419,4 @@ class AlumnoService {
                 materiasDisponibles.map { it.codigo })
         ) throw ExcepcionUNQUE("El alumno no puede cursar las materias solicitadas")
     }
-
-
 }
