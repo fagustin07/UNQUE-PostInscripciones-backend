@@ -10,7 +10,6 @@ import java.util.*
 
 @Repository
 interface ComisionRespository : CrudRepository<Comision, Long> {
-
     fun findAllByMateriaAndCuatrimestreAnioAndCuatrimestreSemestre(
         materia: Materia,
         cuatrimestre_anio: Int,

@@ -230,7 +230,7 @@ class DirectivoController {
         id: Long,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(id),
+            alumnoService.alumnosQueSolicitaronComision(id),
             HttpStatus.OK
         )
     }
@@ -252,12 +252,12 @@ class DirectivoController {
         @ApiParam(value = "codigo de la materia", example = "01035", required = true)
         @PathVariable
         codigo: String,
-        @ApiParam(value = "id de la comision para filtrar", example = "1", required = false)
+        @ApiParam(value = "numero de la comision para filtrar", example = "1", required = false)
         @RequestParam
-        comision: Long?
+        numero: Int?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(codigo, comision),
+            alumnoService.alumnosQueSolicitaronMateria(codigo, numero),
             HttpStatus.OK
         )
     }
@@ -380,6 +380,26 @@ class DirectivoController {
             comisionService.obtenerComisionesMateria(codigo),
             HttpStatus.OK
         )
+    }
+
+    @ApiOperation(value = "Rechaza todas las solicitudes pendientes de una materia especifica o una materia y comision especifica")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 204, message = "NO CONTENT"),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PATCH])
+    fun rechazarSolicitudesMateria(
+            @PathVariable
+            @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+            codigo: String,
+            @ApiParam(value = "Numero de comision", example = "1", required = false)
+            @RequestParam
+            numero: Int?
+    ): ResponseEntity<*> {
+        alumnoService.rechazarSolicitudesPendientesMateria(codigo, numero)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
     }
 
 //    CONTROLADOR CUATRIMESTRES

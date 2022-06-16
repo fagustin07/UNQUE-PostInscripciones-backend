@@ -52,6 +52,7 @@ internal class AlumnoServiceTest {
     private lateinit var fede: Alumno
     private lateinit var cuatrimestre: Cuatrimestre
     private lateinit var comision1Algoritmos: Comision
+    private lateinit var comision2Algoritmos: Comision
     private lateinit var algo: MateriaDTO
     private lateinit var funcional: MateriaDTO
 
@@ -88,7 +89,7 @@ internal class AlumnoServiceTest {
             HorarioDTO(Dia.JUEVES, "18:30", "21:30")
         )
 
-        val formularioComision = FormularioComision(
+        val formularioComision1 = FormularioComision(
             1,
             algo.codigo,
             2022,
@@ -98,10 +99,25 @@ internal class AlumnoServiceTest {
             horarios,
             Modalidad.PRESENCIAL
         )
-        comision1Algoritmos = comisionService.crear(formularioComision)
 
-        val codigo = autenticacionService.crearCuenta(alumno.dni, "contrasenia", "contrasenia")
-        autenticacionService.confirmarCuenta(alumno.dni, codigo)
+        val formularioComision2 = FormularioComision(
+                2,
+                algo.codigo,
+                2022,
+                Semestre.S1,
+                35,
+                5,
+                horarios,
+                Modalidad.PRESENCIAL
+        )
+        comision1Algoritmos = comisionService.crear(formularioComision1)
+        comision2Algoritmos = comisionService.crear(formularioComision2)
+
+        val codigoAlumno = autenticacionService.crearCuenta(alumno.dni, "contrasenia", "contrasenia")
+        autenticacionService.confirmarCuenta(alumno.dni, codigoAlumno)
+
+        val codigoFede = autenticacionService.crearCuenta(fede.dni, "contrasenia", "contrasenia")
+        autenticacionService.confirmarCuenta(fede.dni, codigoFede)
 
     }
 
@@ -676,7 +692,7 @@ internal class AlumnoServiceTest {
         val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
+        val alumnos = alumnoService.alumnosQueSolicitaronComision(comision1Algoritmos.id!!)
 
         val alumnosEsperados: List<AlumnoSolicitaComision> =
             listOf(
@@ -702,7 +718,7 @@ internal class AlumnoServiceTest {
         val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
+        val alumnos = alumnoService.alumnosQueSolicitaronComision(comision1Algoritmos.id!!)
 
         assertThat(alumnos.first().idFormulario).isEqualTo(formularioAlumno.id)
         assertThat(alumnos.last().idFormulario).isEqualTo(formularioFede.id)
@@ -727,7 +743,7 @@ internal class AlumnoServiceTest {
         alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(comision1Algoritmos.id!!)
+        val alumnos = alumnoService.alumnosQueSolicitaronComision(comision1Algoritmos.id!!)
         assertThat(alumnos.first().cantidadDeAprobadas).isEqualTo(alumnos.maxOf { it.cantidadDeAprobadas })
         assertThat(alumnos.last().cantidadDeAprobadas).isEqualTo(alumnos.minOf { it.cantidadDeAprobadas })
     }
@@ -821,7 +837,7 @@ internal class AlumnoServiceTest {
         val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre)
+        val alumnos = alumnoService.alumnosQueSolicitaronMateria(algo.codigo, null, cuatrimestre)
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
@@ -857,7 +873,7 @@ internal class AlumnoServiceTest {
         )
 
         val formularioComision = FormularioComision(
-            1,
+            2,
             algo.codigo,
             2022,
             Semestre.S1,
@@ -869,7 +885,7 @@ internal class AlumnoServiceTest {
         val comision2Algoritmos = comisionService.crear(formularioComision)
         alumnoService.guardarSolicitudPara(fede.dni, listOf(comision2Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, comision1Algoritmos.id!!, cuatrimestre)
+        val alumnos = alumnoService.alumnosQueSolicitaronMateria(algo.codigo, comision1Algoritmos.numero, cuatrimestre)
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
@@ -907,7 +923,7 @@ internal class AlumnoServiceTest {
         nacho = alumnoService.buscarAlumno(nacho.dni)
         fede = alumnoService.buscarAlumno(fede.dni)
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre)
+        val alumnos = alumnoService.alumnosQueSolicitaronMateria(algo.codigo, null, cuatrimestre)
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
                 AlumnoSolicitaMateria(
@@ -1114,6 +1130,102 @@ internal class AlumnoServiceTest {
 
         val resumenAlumno = alumnoService.obtenerResumenAlumno(alumno.dni)
         assertThat(resumenAlumno.formulario).usingRecursiveComparison().isEqualTo(formularioCargado)
+    }
+
+    @Test
+    fun `Se pueden rechazar todas las solicitudes pendientes de una materia especifica`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val formularioAlu = alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+        val formularioFede = alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+
+        val solicitudesAntesDeRechazar =
+                listOf(formularioAlu.solicitudes.first(), formularioFede.solicitudes.first())
+                        .map { solicitudRepository.findById(it.id).get() }
+
+        alumnoService.rechazarSolicitudesPendientesMateria(algo.codigo, fecha = fechaDeModificacion)
+
+        val solicitudes =
+                listOf(formularioAlu.solicitudes.first(), formularioFede.solicitudes.first())
+                        .map { solicitudRepository.findById(it.id).get() }
+
+        assertThat(solicitudes.map { it.estado })
+                .usingRecursiveComparison().isEqualTo(listOf(EstadoSolicitud.RECHAZADO, EstadoSolicitud.RECHAZADO))
+
+        assertThat(solicitudesAntesDeRechazar.map { it.estado })
+                .usingRecursiveComparison().isEqualTo(listOf(EstadoSolicitud.PENDIENTE, EstadoSolicitud.PENDIENTE))
+    }
+
+    @Test
+    fun `Al rechazar todas las solicitudes pendientes de una materia especifica las solicitudes aprobadas se mantienen`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val formularioAlu = alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+        val formularioFede = alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+
+        alumnoService.cambiarEstadoSolicitud(
+                formularioAlu.solicitudes.first().id,
+                EstadoSolicitud.APROBADO,
+                formularioAlu.id,
+                fechaDeModificacion
+        )
+
+        val solicitudesAntesDeRechazar =
+                listOf(formularioAlu.solicitudes.first(), formularioFede.solicitudes.first())
+                        .map { solicitudRepository.findById(it.id).get() }
+
+        alumnoService.rechazarSolicitudesPendientesMateria(algo.codigo, fecha = fechaDeModificacion)
+
+        val solicitudes =
+                listOf(formularioAlu.solicitudes.first(), formularioFede.solicitudes.first())
+                        .map { solicitudRepository.findById(it.id).get() }
+
+        assertThat(solicitudesAntesDeRechazar.map { it.estado })
+                .usingRecursiveComparison().isEqualTo(listOf(EstadoSolicitud.APROBADO, EstadoSolicitud.PENDIENTE))
+
+        assertThat(solicitudes.map { it.estado })
+                .usingRecursiveComparison().isEqualTo(listOf(EstadoSolicitud.APROBADO, EstadoSolicitud.RECHAZADO))
+    }
+
+    @Test
+    fun `Se pueden rechazar todas las solicitudes pendientes de una materia y comision especifica`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val formularioAlu = alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+        val formularioFede = alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision2Algoritmos.id!!),
+                cuatrimestre
+        )
+
+        alumnoService.rechazarSolicitudesPendientesMateria(algo.codigo, 1, fecha = fechaDeModificacion)
+
+        val solicitudes =
+                listOf(formularioAlu.solicitudes.first(), formularioFede.solicitudes.first())
+                        .map { solicitudRepository.findById(it.id).get() }
+
+        assertThat(solicitudes.map { it.estado })
+                .usingRecursiveComparison().isEqualTo(listOf(EstadoSolicitud.RECHAZADO, EstadoSolicitud.PENDIENTE))
+
+        assertThat(solicitudes.get(1).comision.numero).isEqualTo(2)
+
     }
 
 
