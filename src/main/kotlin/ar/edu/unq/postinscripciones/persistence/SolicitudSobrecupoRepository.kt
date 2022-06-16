@@ -15,10 +15,9 @@ interface SolicitudSobrecupoRepository: CrudRepository<SolicitudSobrecupo, Long>
             "FROM solicitud_sobrecupo ss " +
             "JOIN comision AS c ON c.id = ss.comision_id " +
             "JOIN formulario_solicitudes fs ON fs.solicitudes_id = ss.id " +
-            "WHERE estado = 'PENDIENTE' AND c.materia_codigo = :codigo",
+            "WHERE estado = 'PENDIENTE' AND c.materia_codigo = :codigo AND (:numero IS NULL OR c.numero = :numero)",
             nativeQuery = true
     )
-    fun findByMateria(codigo: String): List<Tuple>
-
+    fun findByMateria(codigo: String, numero: Int?): List<Tuple>
 
 }

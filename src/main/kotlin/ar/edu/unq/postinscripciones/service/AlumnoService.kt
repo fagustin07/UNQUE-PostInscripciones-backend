@@ -306,10 +306,11 @@ class AlumnoService {
     @Transactional
     fun rechazarSolicitudesPendientesMateria(
             codigo: String,
+            numeroComision: Int? = null,
             cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
             fecha: LocalDateTime = LocalDateTime.now()
     ) {
-        val solicitudes = solicitudSobrecupoRepository.findByMateria(codigo)
+        val solicitudes = solicitudSobrecupoRepository.findByMateria(codigo, numeroComision)
         solicitudes.forEach {
             val solicitudId = (it.get(0) as BigInteger).toLong()
             val formularioId = (it.get(1) as BigInteger).toLong()

@@ -382,20 +382,23 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "Rechaza todas las solicitudes pendientes de una materia especifica")
+    @ApiOperation(value = "Rechaza todas las solicitudes pendientes de una materia especifica o una materia y comision especifica")
     @ApiResponses(
             value = [
                 ApiResponse(code = 204, message = "NO CONTENT"),
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )
-    @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PUT])
+    @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PATCH])
     fun rechazarSolicitudesMateria(
             @PathVariable
             @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
-            codigo: String
+            codigo: String,
+            @ApiParam(value = "Numero de comision", example = "1", required = false)
+            @RequestParam
+            numero: Int?
     ): ResponseEntity<*> {
-        alumnoService.rechazarSolicitudesPendientesMateria(codigo)
+        alumnoService.rechazarSolicitudesPendientesMateria(codigo, numero)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
     }
 
