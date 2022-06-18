@@ -14,6 +14,11 @@ import javax.persistence.Tuple
 interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findByDniOrLegajo(dni: Int, legajo: Int): Optional<Alumno>
 
+    @Query("FROM Alumno " +
+            "WHERE cast(dni as string) LIKE concat(:dniString, '%') " +
+            "ORDER BY coeficiente DESC")
+    fun findByDniStartsWithOrderByCoeficienteDesc(dniString: String): List<Alumno>
+
     @Query(
         "SELECT alu.dni, afs.formulario_id, afs.solicitudes_id, count(aha.historia_academica_id) AS aprobadas\n" +
                 "FROM alumno AS alu\n" +
@@ -51,7 +56,6 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
         nativeQuery = true
     )
     fun findResumenHistoriaAcademica(dni: Int): List<Tuple>
-
     @Query(
         "SELECT a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas, a.coeficiente " +
         "FROM Alumno as a " +

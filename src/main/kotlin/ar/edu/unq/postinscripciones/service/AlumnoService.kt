@@ -118,8 +118,8 @@ class AlumnoService {
     }
 
     @Transactional
-    fun todos(): List<Alumno> {
-        return alumnoRepository.findAll().toList()
+    fun todos(patronDni: String = ""): List<AlumnoDTO> {
+        return alumnoRepository.findByDniStartsWithOrderByCoeficienteDesc(patronDni).map { AlumnoDTO.desdeModelo(it) }
     }
 
     @Transactional

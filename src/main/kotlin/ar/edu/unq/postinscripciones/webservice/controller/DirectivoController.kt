@@ -177,7 +177,7 @@ class DirectivoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/alumnos/formulario"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/alumnos/formulario"], method = [RequestMethod.GET])
     fun alumnosPorNombreOApellido(
         @ApiParam(value = "Nombre o Apellido del alumno", example = "Jorge", required = false)
         @RequestParam string: String?
@@ -188,22 +188,40 @@ class DirectivoController {
         )
     }
 
+    @ApiOperation("Listado de alumnos con datos basicos, filtrarlos por comienzo de dni, ordenados por coeficiente")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "Ok", response = AlumnoDTO::class, responseContainer = "List"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
+    @RequestMapping(value = ["/alumnos"], method = [RequestMethod.GET])
+    fun alumnos(
+        @ApiParam(value = "patron del dni", example = "1234567", required = false)
+        @RequestParam dni: String?
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            alumnoService.todos(dni ?: ""),
+            HttpStatus.OK
+        )
+    }
+
 //    CONTROLADOR COMISIONES
 
-    @ApiOperation("Registra nuevas comisiones en el sistema, o bien, actualiza las fechas para recibir formularios de sobrecupos.")
+    @ApiOperation("Registra nuevas comisiones a la oferta academica y actualiza los plazos del periodo de inscripciones.")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ConflictoComision::class, responseContainer = "List"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/comisiones"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/comisiones/oferta"], method = [RequestMethod.POST])
     fun actualizarOfertaAcademica(
         @RequestBody oferta: OfertaAcademicaDTO,
     ): ResponseEntity<*> {
         return ResponseEntity(
             comisionService.actualizarOfertaAcademica(
-                oferta.comisionesACargar,
+                oferta.comisionesACargar ?: listOf(),
                 oferta.inicioInscripciones,
                 oferta.finInscripciones
             ),
