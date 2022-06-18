@@ -236,6 +236,7 @@ class AlumnoService {
     fun alumnosQueSolicitaron(
         codigo: String,
         numeroComision: Int?,
+        pendiente: Boolean? = null,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual()
     ): List<AlumnoSolicitaMateria> {
         val materia = materiaRepository.findById(codigo).orElseThrow { ExcepcionUNQUE("No existe la materia") }
@@ -250,7 +251,8 @@ class AlumnoService {
                 codigo,
                 numeroComision,
                 cuatrimestre.semestre,
-                cuatrimestre.anio
+                cuatrimestre.anio,
+                pendiente
             )
 
         return alumnos.map { AlumnoSolicitaMateria.desdeTupla(it) }

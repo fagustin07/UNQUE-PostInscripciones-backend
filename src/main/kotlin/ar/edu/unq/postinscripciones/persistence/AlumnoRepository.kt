@@ -53,7 +53,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findResumenHistoriaAcademica(dni: Int): List<Tuple>
 
     @Query(
-        "SELECT a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas, a.coeficiente " +
+        "SELECT a.dni, a.nombre, a.apellido, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas, a.coeficiente, s.estado " +
         "FROM Alumno as a " +
         "JOIN Formulario as f " +
             "ON f.id IN (SELECT f2.id FROM a.formularios as f2) " +
@@ -63,13 +63,13 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
             ") " +
         "LEFT JOIN MateriaCursada as m " +
             "ON m.id IN ( " +
-                "SELECT m2.id FROM a.historiaAcademica as m2 WHERE m2.estado = ?5 " +
+                "SELECT m2.id FROM a.historiaAcademica as m2 WHERE m2.estado = ?6 " +
             ") " +
-        "WHERE f.cuatrimestre.semestre = ?3 AND f.cuatrimestre.anio = ?4 " +
+        "WHERE f.cuatrimestre.semestre = ?3 AND f.cuatrimestre.anio = ?4 AND (?5 IS NULL OR (?5 IS TRUE AND s.estado = ?7) OR (?5 IS FALSE AND NOT s.estado = ?7)) " +
         "GROUP BY a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo " +
         "ORDER BY a.coeficiente DESC"
     )
-    fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, numero : Int?, semestre: Semestre, anio: Int, estado : EstadoMateria = EstadoMateria.APROBADO): List<Tuple>
+    fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, numero : Int?, semestre: Semestre, anio: Int, pendiente: Boolean?,estado : EstadoMateria = EstadoMateria.APROBADO, estadoSolicitud: EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
 
     @Query(
         "SELECT a.dni, a.nombre, a.apellido, a.correo, a.legajo, a.coeficiente, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(s) as total_solicitudes_pendientes " +

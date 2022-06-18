@@ -776,30 +776,48 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se pueden obtener los alumnos que pidieron una materia sin una comision especifica`() {
+        val horarios = listOf(
+            HorarioDTO(Dia.MARTES, "18:30", "21:30"),
+            HorarioDTO(Dia.VIERNES, "18:30", "21:30")
+        )
+        val formularioComision = FormularioComision(
+            1,
+            algo.codigo,
+            2022,
+            Semestre.S1,
+            35,
+            5,
+            horarios,
+            Modalidad.PRESENCIAL
+        )
+        val comisionAlgoritmos2 = comisionService.crear(formularioComision)
         val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
-        val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
-
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre)
+        val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comisionAlgoritmos2.id!!))
+        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre = cuatrimestre)
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
                 AlumnoSolicitaMateria(
                     alumno.dni,
+                    alumno.nombre + " " + alumno.apellido,
                     formularioAlumno.id,
                     formularioAlumno.solicitudes.first().id,
                     comision1Algoritmos.numero,
                     algo.codigo,
                     alumno.cantidadAprobadas(),
-                    alumno.coeficiente
+                    alumno.coeficiente,
+                    EstadoSolicitud.PENDIENTE
                 ),
                 AlumnoSolicitaMateria(
                     fede.dni,
+                    fede.nombre + " " + fede.apellido,
                     formularioFede.id,
                     formularioFede.solicitudes.first().id,
                     comision1Algoritmos.numero,
                     algo.codigo,
                     fede.cantidadAprobadas(),
-                    fede.coeficiente
+                    fede.coeficiente,
+                    EstadoSolicitud.PENDIENTE
                 ),
             )
         assertThat(alumnos).hasSize(2)
@@ -827,18 +845,20 @@ internal class AlumnoServiceTest {
         val comision2Algoritmos = comisionService.crear(formularioComision)
         alumnoService.guardarSolicitudPara(fede.dni, listOf(comision2Algoritmos.id!!))
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, comision1Algoritmos.numero, cuatrimestre)
+        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, comision1Algoritmos.numero, cuatrimestre = cuatrimestre)
 
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
                 AlumnoSolicitaMateria(
                     alumno.dni,
+                    alumno.nombre + " " + alumno.apellido,
                     formularioAlumno.id,
                     formularioAlumno.solicitudes.first().id,
                     comision1Algoritmos.numero,
                     algo.codigo,
                     alumno.cantidadAprobadas(),
-                    alumno.coeficiente
+                    alumno.coeficiente,
+                    EstadoSolicitud.PENDIENTE
                 ),
             )
         assertThat(alumnos).hasSize(1)
@@ -865,32 +885,83 @@ internal class AlumnoServiceTest {
         nacho = alumnoService.buscarAlumno(nacho.dni)
         fede = alumnoService.buscarAlumno(fede.dni)
 
-        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre)
+        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, cuatrimestre = cuatrimestre)
         val alumnosEsperados: List<AlumnoSolicitaMateria> =
             listOf(
                 AlumnoSolicitaMateria(
                     nacho.dni,
+                    nacho.nombre + " " + nacho.apellido,
                     formularioAlumno.id,
                     formularioAlumno.solicitudes.first().id,
                     comision1Algoritmos.numero,
                     algo.codigo,
                     nacho.cantidadAprobadas(),
-                    nacho.coeficiente
+                    nacho.coeficiente,
+                    EstadoSolicitud.PENDIENTE
                 ),
                 AlumnoSolicitaMateria(
                     fede.dni,
+                    fede.nombre + " " + fede.apellido,
                     formularioFede.id,
                     formularioFede.solicitudes.first().id,
                     comision1Algoritmos.numero,
                     algo.codigo,
                     fede.cantidadAprobadas(),
-                    fede.coeficiente
+                    fede.coeficiente,
+                    EstadoSolicitud.PENDIENTE
                 ),
             )
 
         assertThat(alumnos).usingRecursiveComparison().isEqualTo(alumnosEsperados)
         assertThat(alumnos.first().cantidadDeAprobadas).isEqualTo(alumnos.maxOf { it.cantidadDeAprobadas })
         assertThat(alumnos.last().cantidadDeAprobadas).isEqualTo(alumnos.minOf { it.cantidadDeAprobadas })
+    }
+
+    @Test
+    fun `se pueden obtener los alumnos que pidieron una materia filtrado por estado pendiente`() {
+        val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val formularioNuevoAlumno = FormularioCrearAlumno(
+            123456712,
+            "Pepe",
+            "Sanchez",
+            "pepe.sanchez@unq.edu.ar",
+            4455611,
+            Carrera.TPI,
+            8.21
+        )
+        var nacho = alumnoService.crear(formularioNuevoAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
+        val formularioFede = alumnoService.guardarSolicitudPara(fede.dni, listOf(comision1Algoritmos.id!!))
+        val formularioAlumno = alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!))
+        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)
+        alumnoService.cambiarEstadoSolicitud(
+            formularioFede.solicitudes.last().id,
+            EstadoSolicitud.APROBADO,
+            formularioFede.id
+        )
+        nacho = alumnoService.buscarAlumno(nacho.dni)
+        fede = alumnoService.buscarAlumno(fede.dni)
+
+        val alumnos = alumnoService.alumnosQueSolicitaron(algo.codigo, null, true,cuatrimestre = cuatrimestre)
+        val alumnosEsperados: List<AlumnoSolicitaMateria> =
+            listOf(
+                AlumnoSolicitaMateria(
+                    nacho.dni,
+                    nacho.nombre + " " + nacho.apellido,
+                    formularioAlumno.id,
+                    formularioAlumno.solicitudes.first().id,
+                    comision1Algoritmos.numero,
+                    algo.codigo,
+                    nacho.cantidadAprobadas(),
+                    nacho.coeficiente,
+                    EstadoSolicitud.PENDIENTE
+                )
+            )
+
+        assertThat(alumnos).usingRecursiveComparison().isEqualTo(alumnosEsperados)
+        assertThat(alumnos).hasSize(1)
+        assertThat(alumnos.first().estado).isEqualTo(EstadoSolicitud.PENDIENTE)
     }
 
     @Test

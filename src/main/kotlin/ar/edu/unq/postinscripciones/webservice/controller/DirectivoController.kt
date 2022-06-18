@@ -254,10 +254,13 @@ class DirectivoController {
         codigo: String,
         @ApiParam(value = "numero de la comision para filtrar", example = "1", required = false)
         @RequestParam
-        numero: Int?
+        numero: Int?,
+        @ApiParam(value = "estado de la solicitud para filtrar", example = "true", required = false)
+        @RequestParam
+        pendiente: Boolean?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(codigo, numero),
+            alumnoService.alumnosQueSolicitaron(codigo, numero, pendiente),
             HttpStatus.OK
         )
     }
