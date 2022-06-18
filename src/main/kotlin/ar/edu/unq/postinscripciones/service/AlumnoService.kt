@@ -118,8 +118,8 @@ class AlumnoService {
     }
 
     @Transactional
-    fun todos(): List<Alumno> {
-        return alumnoRepository.findAll().toList()
+    fun todos(patronDni: String = ""): List<AlumnoDTO> {
+        return alumnoRepository.findByDniStartsWithOrderByCoeficienteDesc(patronDni).map { AlumnoDTO.desdeModelo(it) }
     }
 
     @Transactional
@@ -155,7 +155,10 @@ class AlumnoService {
         val formulario = formularioRepository.findById(formularioId).get()
 
         chequearEstado(formulario, fecha)
-
+        val materia = solicitud.comision.materia
+        if(estado == EstadoSolicitud.APROBADO && formulario.tieneAprobadaAlgunaDe(materia)) {
+            throw ExcepcionUNQUE("El alumno ya tiene una comision aprobada de la materia ${materia.nombre}")
+        }
         solicitud.cambiarEstado(estado)
         return SolicitudSobrecupoDTO.desdeModelo(solicitudSobrecupoRepository.save(solicitud))
     }
@@ -213,6 +216,8 @@ class AlumnoService {
         return ResumenAlumno(
             alumno.nombre,
             alumno.dni,
+            alumno.legajo,
+            alumno.carrera,
             alumno.coeficiente,
             FormularioDTO.desdeModelo(
                 alumno.obtenerFormulario(
@@ -225,7 +230,7 @@ class AlumnoService {
     }
 
     @Transactional
-    fun alumnosQueSolicitaron(idComision: Long): List<AlumnoSolicitaComision> {
+    fun alumnosQueSolicitaronComision(idComision: Long): List<AlumnoSolicitaComision> {
         comisionRepository.findById(idComision).orElseThrow { ExcepcionUNQUE("No existe la comision") }
         val alumnos = alumnoRepository.findBySolicitaComisionIdOrderByCantidadAprobadas(idComision)
 
@@ -233,9 +238,9 @@ class AlumnoService {
     }
 
     @Transactional
-    fun alumnosQueSolicitaron(
+    fun alumnosQueSolicitaronMateria(
         codigo: String,
-        numeroComision: Int?,
+        numeroComision: Int? = null,
         pendiente: Boolean? = null,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual()
     ): List<AlumnoSolicitaMateria> {
@@ -269,17 +274,11 @@ class AlumnoService {
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
+        val comision = comisionRepository.findById(idComision).get()
 
-        val comision = comisionRepository.findById(idComision)
-        val solicitud = SolicitudSobrecupo(comision.get())
-
-        val formulario = alumno.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
-        formulario.agregarSolicitud(solicitud)
-
-        formularioRepository.save(formulario)
+        val formulario = alumno.agregarSolicitud(comision, cuatrimestreObtenido)
 
         alumnoRepository.save(alumno)
-
         return FormularioDTO.desdeModelo(formulario, alumno.dni)
 
     }
@@ -305,6 +304,21 @@ class AlumnoService {
         return alumnos.map { AlumnoFormulario.fromTuple(it) }
     }
 
+    @Transactional
+    fun rechazarSolicitudesPendientesMateria(
+            codigo: String,
+            numeroComision: Int? = null,
+            cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+            fecha: LocalDateTime = LocalDateTime.now()
+    ) {
+        val solicitudes = solicitudSobrecupoRepository.findByMateria(codigo, numeroComision)
+        solicitudes.forEach {
+            val solicitudId = (it.get(0) as BigInteger).toLong()
+            val formularioId = (it.get(1) as BigInteger).toLong()
+            cambiarEstadoSolicitud(solicitudId, EstadoSolicitud.RECHAZADO, formularioId, fecha)
+        }
+    }
+
     fun crearFormulario(
         cuatrimestre: Cuatrimestre,
         alumno: Alumno,
@@ -323,35 +337,8 @@ class AlumnoService {
                 ExcepcionUNQUE("La comision no existe")
             }
         }
-        checkNoHaySuperposiciones(solicitudes, comisionesInscripto)
 
         return formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
-    }
-
-    private fun checkNoHaySuperposiciones(solicitudes: List<SolicitudSobrecupo>, comisionesInscripto: List<Comision>) {
-        val materiasSuperpuestas =
-            solicitudes.filter { solicitud ->
-                comisionesInscripto.any { comision ->
-                    comision.materia.esLaMateria(solicitud.comision.materia)
-                }
-            }
-        if (materiasSuperpuestas.isNotEmpty()) {
-            throw ExcepcionUNQUE("No podes solicitar comisiones de materias " +
-                    "en las que ya estas inscripto por Guaraní")
-        }
-
-        val horariosSuperpuestosGuarani =
-            solicitudes.filter { solicitud ->
-                comisionesInscripto.any { comision ->
-                    comision.tieneSuperposicionHoraria(solicitud.comision)
-                }
-            }
-
-        if(horariosSuperpuestosGuarani.isNotEmpty()) {
-            throw ExcepcionUNQUE("Tenes solicitudes de sobrecupos de " +
-                    "comisiones que se superponen con las que estas inscripto en guaraní")
-        }
-
     }
 
     private fun guardarAlumno(formulario: FormularioCrearAlumno): Alumno {
@@ -436,6 +423,4 @@ class AlumnoService {
                 materiasDisponibles.map { it.codigo })
         ) throw ExcepcionUNQUE("El alumno no puede cursar las materias solicitadas")
     }
-
-
 }

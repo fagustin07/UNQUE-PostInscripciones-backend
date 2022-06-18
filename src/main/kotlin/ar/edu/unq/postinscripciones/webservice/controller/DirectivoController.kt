@@ -177,7 +177,7 @@ class DirectivoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/alumnos/formulario"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/alumnos/formulario"], method = [RequestMethod.GET])
     fun alumnosPorNombreOApellido(
         @ApiParam(value = "Nombre o Apellido del alumno", example = "Jorge", required = false)
         @RequestParam string: String?
@@ -188,22 +188,40 @@ class DirectivoController {
         )
     }
 
+    @ApiOperation("Listado de alumnos con datos basicos, filtrarlos por comienzo de dni, ordenados por coeficiente")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "Ok", response = AlumnoDTO::class, responseContainer = "List"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
+    )
+    @RequestMapping(value = ["/alumnos"], method = [RequestMethod.GET])
+    fun alumnos(
+        @ApiParam(value = "patron del dni", example = "1234567", required = false)
+        @RequestParam dni: String?
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+            alumnoService.todos(dni ?: ""),
+            HttpStatus.OK
+        )
+    }
+
 //    CONTROLADOR COMISIONES
 
-    @ApiOperation("Registra nuevas comisiones en el sistema, o bien, actualiza las fechas para recibir formularios de sobrecupos.")
+    @ApiOperation("Registra nuevas comisiones a la oferta academica y actualiza los plazos del periodo de inscripciones.")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "OK", response = ConflictoComision::class, responseContainer = "List"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/comisiones"], method = [RequestMethod.POST])
+    @RequestMapping(value = ["/comisiones/oferta"], method = [RequestMethod.POST])
     fun actualizarOfertaAcademica(
         @RequestBody oferta: OfertaAcademicaDTO,
     ): ResponseEntity<*> {
         return ResponseEntity(
             comisionService.actualizarOfertaAcademica(
-                oferta.comisionesACargar,
+                oferta.comisionesACargar ?: listOf(),
                 oferta.inicioInscripciones,
                 oferta.finInscripciones
             ),
@@ -230,7 +248,7 @@ class DirectivoController {
         id: Long,
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(id),
+            alumnoService.alumnosQueSolicitaronComision(id),
             HttpStatus.OK
         )
     }
@@ -260,7 +278,7 @@ class DirectivoController {
         pendiente: Boolean?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosQueSolicitaron(codigo, numero, pendiente),
+            alumnoService.alumnosQueSolicitaronMateria(codigo, numero, pendiente),
             HttpStatus.OK
         )
     }
@@ -305,7 +323,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes pendientes #####")
+    @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
     @ApiResponses(
             value = [
                 ApiResponse(
@@ -383,6 +401,26 @@ class DirectivoController {
             comisionService.obtenerComisionesMateria(codigo),
             HttpStatus.OK
         )
+    }
+
+    @ApiOperation(value = "Rechaza todas las solicitudes pendientes de una materia especifica o una materia y comision especifica")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 204, message = "NO CONTENT"),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PATCH])
+    fun rechazarSolicitudesMateria(
+            @PathVariable
+            @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+            codigo: String,
+            @ApiParam(value = "Numero de comision", example = "1", required = false)
+            @RequestParam
+            numero: Int?
+    ): ResponseEntity<*> {
+        alumnoService.rechazarSolicitudesPendientesMateria(codigo, numero)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
     }
 
 //    CONTROLADOR CUATRIMESTRES
