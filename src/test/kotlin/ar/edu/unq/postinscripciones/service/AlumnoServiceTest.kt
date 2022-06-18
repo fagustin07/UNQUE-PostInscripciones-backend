@@ -230,7 +230,7 @@ internal class AlumnoServiceTest {
         )
 
         assertThat(solicitudAprobada.estado).isEqualTo(EstadoSolicitud.APROBADO)
-        assertThat(solicitudAprobada).usingRecursiveComparison().ignoringFields("estado").isEqualTo(solicitudPendiente)
+        assertThat(solicitudAprobada).usingRecursiveComparison().ignoringFields("estado", "comision.sobrecuposDisponibles").isEqualTo(solicitudPendiente)
     }
 
     @Test

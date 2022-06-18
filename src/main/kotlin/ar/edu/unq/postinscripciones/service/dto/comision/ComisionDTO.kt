@@ -44,6 +44,10 @@ data class ComisionInfoCursadaDTO(
     val materia: String,
     @ApiModelProperty(example = "VIRTUAL")
     val modalidad: Modalidad,
+    @ApiModelProperty(example = "5")
+    val sobrecuposTotales: Int,
+    @ApiModelProperty(example = "3")
+    val sobrecuposDisponibles: Int,
     val horarios: List<HorarioDTO>
 ) {
     companion object {
@@ -53,8 +57,9 @@ data class ComisionInfoCursadaDTO(
                 comision.numero,
                 comision.materia.nombre,
                 comision.modalidad,
-                comision.horarios.map { HorarioDTO.desdeModelo(it) }
-            )
+                comision.sobrecuposTotales,
+                comision.sobrecuposDisponibles(),
+                comision.horarios.map { HorarioDTO.desdeModelo(it) })
         }
     }
 }

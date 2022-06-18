@@ -216,6 +216,8 @@ class AlumnoService {
         return ResumenAlumno(
             alumno.nombre,
             alumno.dni,
+            alumno.legajo,
+            alumno.carrera,
             alumno.coeficiente,
             FormularioDTO.desdeModelo(
                 alumno.obtenerFormulario(
