@@ -12,7 +12,7 @@ services:
       - mysql
     environment:
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url": "${SPRING_DATABASE_URL-jdbc:h2:mem:testdb}",
+        "spring.datasource.url": "${SPRING_DATABASE_URL-jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL}",
         "spring.datasource.username": "${MYSQLDB_USER-root}",
         "spring.datasource.password": "${MYSQLDB_ROOT_PASSWORD-root}",
         "spring.datasource.driver-class-name": "${SPRING_DATABASE_DRIVER-org.h2.Driver}",
