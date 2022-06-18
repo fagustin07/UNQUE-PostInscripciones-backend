@@ -170,7 +170,7 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Listado de alumnos con detalle de formulario filtrado por nombre o apellido")
+    @ApiOperation("Listado de alumnos con detalle de formulario filtrado por dni")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "Ok", response = AlumnoFormulario::class, responseContainer = "List"),
@@ -179,11 +179,15 @@ class DirectivoController {
     )
     @RequestMapping(value = ["/alumnos/formulario"], method = [RequestMethod.GET])
     fun alumnosPorNombreOApellido(
-        @ApiParam(value = "Nombre o Apellido del alumno", example = "Jorge", required = false)
-        @RequestParam string: String?
+        @ApiParam(value = "dni del alumno", example = "12345678", required = false)
+        @RequestParam dni: Int?,
+        @ApiParam(value = "booleano para filtrar alumnos sin procesar", example = "true", required = false)
+        @RequestParam sinProcesar: Boolean?,
+        @ApiParam(value = "booleano para filtrar alumnos con solicitudes pendientes", example = "true", required = false)
+        @RequestParam pendiente: Boolean?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.alumnosPorNombreOApellido(string),
+            alumnoService.alumnosPorDni(dni, sinProcesar, pendiente),
             HttpStatus.OK
         )
     }

@@ -1040,12 +1040,12 @@ internal class AlumnoServiceTest {
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
-        val alumnos = alumnoService.alumnosPorNombreOApellido(null)
+        val alumnos = alumnoService.alumnosPorDni()
         assertThat(alumnos.map { it.formularioId }).isEqualTo(listOf(formulario.id, formulario2.id))
     }
 
     @Test
-    fun `obtener listado de alumnos con filtrado por nombre o apellido`() {
+    fun `obtener listado de alumnos con filtrado por dni`() {
         val formulario =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -1058,11 +1058,77 @@ internal class AlumnoServiceTest {
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
             )
-        val alumnos = alumnoService.alumnosPorNombreOApellido("edE")
+        val alumnos = alumnoService.alumnosPorDni(532)
+        assertThat(alumnos.map { it.formularioId }).isEqualTo(listOf(formulario.id, formulario2.id))
+        assertThat(alumnos).hasSize(2)
+        assertThat(alumnos.map { it.alumno.dni }).isEqualTo(listOf(alumno.dni, fede.dni))
+    }
+
+    @Test
+    fun `obtener listado de alumnos sin procesar`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val formulario =
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!, comision2Algoritmos.id!!),
+                cuatrimestre
+            )
+        val formulario2 =
+            alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        alumnoService.cambiarEstadoSolicitud(
+            formulario.solicitudes.first().id,
+            EstadoSolicitud.APROBADO,
+            formulario.id,
+            fechaDeModificacion
+        )
+
+        val alumnos = alumnoService.alumnosPorDni(sinProcesar = true)
         assertThat(alumnos.map { it.formularioId }).isEqualTo(listOf(formulario2.id))
-        assertThat(alumnos.first()).usingRecursiveComparison()
-            .isEqualTo(AlumnoFormulario(AlumnoDTO.desdeModelo(fede), formulario2.id, EstadoFormulario.ABIERTO, 0, 1))
-        assertThat(alumnos.map { it.formularioId }).doesNotContain(formulario.id)
+        assertThat(alumnos).hasSize(1)
+        assertThat(alumnos.map { it.alumno.dni }).isEqualTo(listOf(fede.dni))
+        assertThat(alumnos.first().cantSolicitudesPendientes).isEqualTo(1)
+        assertThat(alumnos.first().cantSolicitudesAprobadas).isEqualTo(0)
+    }
+
+    @Test
+    fun `obtener listado de alumnos con solicitudes pendientes`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val formulario =
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!, comision2Algoritmos.id!!),
+                cuatrimestre
+            )
+        val formulario2 =
+            alumnoService.guardarSolicitudPara(
+                fede.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        alumnoService.cambiarEstadoSolicitud(
+            formulario.solicitudes.first().id,
+            EstadoSolicitud.APROBADO,
+            formulario.id,
+            fechaDeModificacion
+        )
+
+        alumnoService.cambiarEstadoSolicitud(
+            formulario2.solicitudes.first().id,
+            EstadoSolicitud.APROBADO,
+            formulario2.id,
+            fechaDeModificacion
+        )
+
+        val alumnos = alumnoService.alumnosPorDni(pendiente = true)
+        assertThat(alumnos.map { it.formularioId }).isEqualTo(listOf(formulario.id))
+        assertThat(alumnos).hasSize(1)
+        assertThat(alumnos.map { it.alumno.dni }).isEqualTo(listOf(alumno.dni))
+        assertThat(alumnos.first().cantSolicitudesPendientes).isEqualTo(1)
+        assertThat(alumnos.first().cantSolicitudesAprobadas).isEqualTo(1)
     }
 
     @Test

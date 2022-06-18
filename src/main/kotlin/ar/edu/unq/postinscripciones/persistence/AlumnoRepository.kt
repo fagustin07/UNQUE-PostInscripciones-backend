@@ -14,9 +14,11 @@ import javax.persistence.Tuple
 interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findByDniOrLegajo(dni: Int, legajo: Int): Optional<Alumno>
 
-    @Query("FROM Alumno " +
-            "WHERE cast(dni as string) LIKE concat(:dniString, '%') " +
-            "ORDER BY coeficiente DESC")
+    @Query(
+        "FROM Alumno " +
+        "WHERE CAST(dni as string) LIKE concat(:dniString, '%') " +
+        "ORDER BY coeficiente DESC"
+    )
     fun findByDniStartsWithOrderByCoeficienteDesc(dniString: String): List<Alumno>
 
     @Query(
@@ -76,17 +78,23 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, numero : Int?, semestre: Semestre, anio: Int, pendiente: Boolean?,estado : EstadoMateria = EstadoMateria.APROBADO, estadoSolicitud: EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
 
     @Query(
-        "SELECT a.dni, a.nombre, a.apellido, a.correo, a.legajo, a.coeficiente, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(s) as total_solicitudes_pendientes " +
+        "SELECT a.dni, a.nombre, a.apellido, a.correo, a.legajo, a.coeficiente, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(solicitudes_pendientes) as total_solicitudes_pendientes, count(solicitudes_aprobadas) as total_solicitudes_aprobadas " +
         "FROM Alumno as a " +
             "JOIN Formulario as f " +
                 "ON f.id IN (SELECT f2.id FROM a.formularios as f2 WHERE f2.cuatrimestre.semestre = ?2 AND f2.cuatrimestre.anio = ?3) " +
-            "LEFT JOIN SolicitudSobrecupo as s " +
-                "ON s.id IN ( " +
-                    "SELECT s2.id  FROM f.solicitudes as s2 WHERE s2.estado = ?4 " +
+            "LEFT JOIN SolicitudSobrecupo as solicitudes_pendientes " +
+                "ON solicitudes_pendientes.id IN ( " +
+                    "SELECT s2.id  FROM f.solicitudes as s2 WHERE s2.estado = ?6 " +
                 ") " +
-        "WHERE (?1 IS NULL OR LOWER(a.nombre) LIKE %?1% OR LOWER(a.apellido) LIKE %?1%) " +
+            "LEFT JOIN SolicitudSobrecupo as solicitudes_aprobadas " +
+                "ON solicitudes_aprobadas.id IN ( " +
+                    "SELECT solicitudes.id FROM f.solicitudes as solicitudes WHERE solicitudes.estado = ?7 " +
+                ") " +
+        "WHERE (?1 IS NULL OR concat(a.dni, '') LIKE %?1% ) " +
         "GROUP BY a.dni, a.nombre, a.apellido, a.correo, a.legajo, f.id " +
+        "HAVING (?4 IS NULL OR (?4 IS TRUE AND f.solicitudes.size = count(solicitudes_pendientes)) OR (?4 IS FALSE AND NOT f.solicitudes.size = count(solicitudes_pendientes))) " +
+            "AND (?5 IS NULL OR (?5 IS TRUE AND count(solicitudes_pendientes) > 0)) " +
         "ORDER BY a.coeficiente DESC"
     )
-    fun findAllByNombreOrApellido(nombre: String?, semestre: Semestre, anio: Int, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
+    fun findAllByDni(dni: String?, semestre: Semestre, anio: Int, sinProcesar: Boolean? = null, pendiente: Boolean? = null, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE, estadoAprobado : EstadoSolicitud = EstadoSolicitud.APROBADO): List<Tuple>
 }

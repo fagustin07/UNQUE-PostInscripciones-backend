@@ -9,6 +9,7 @@ data class AlumnoFormulario(
     val estadoFormulario: EstadoFormulario,
     val cantComisionesInscripto : Int,
     val cantSolicitudesPendientes : Int,
+    val cantSolicitudesAprobadas : Int,
 ) {
     companion object {
         fun fromTuple(tupla: Tuple): AlumnoFormulario {
@@ -24,7 +25,8 @@ data class AlumnoFormulario(
                 tupla.get(6) as Long,
                 tupla.get(7) as EstadoFormulario,
                 tupla.get(8) as Int,
-                (tupla.get(9) as Long).toInt()
+                (tupla.get(9) as Long).toInt(),
+                (tupla.get(10) as Long).toInt(),
             )
         }
     }
