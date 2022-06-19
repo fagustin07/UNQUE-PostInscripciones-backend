@@ -170,6 +170,19 @@ class DirectivoController {
         )
     }
 
+    @ApiOperation("Cierra todos los formularios de sobrecupo")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 200, message = "Formularios Cerrados"),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/formulario/cerrar"], method = [RequestMethod.PATCH])
+    fun cerrarFormularios(): ResponseEntity<*> {
+        alumnoService.cerrarFormularios()
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
+    }
+
     @ApiOperation("Listado de alumnos con detalle de formulario filtrado por dni")
     @ApiResponses(
         value = [

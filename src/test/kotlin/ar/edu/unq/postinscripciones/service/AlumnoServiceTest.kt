@@ -402,6 +402,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `Se pueden cerrar todos los formularios del cuatrimestre corriente`() {
         val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
         val formularioAntesDeCerrar =
             alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -415,7 +416,7 @@ internal class AlumnoServiceTest {
                 cuatrimestre
             )
 
-        alumnoService.cambiarEstadoFormularios()
+        alumnoService.cerrarFormularios(fechaDeModificacion)
         val formularioDespuesDeCerrar =
             alumnoService.obtenerFormulario(jwt, cuatrimestre)
         val formulario2DespuesDeCerrar =
@@ -428,6 +429,18 @@ internal class AlumnoServiceTest {
         assertThat(listOf(formularioDespuesDeCerrar, formulario2DespuesDeCerrar).map { it.estado })
             .usingRecursiveComparison()
             .isEqualTo(listOf(EstadoFormulario.CERRADO, EstadoFormulario.CERRADO))
+    }
+
+    @Test
+    fun `No se pueden cerrar todos los formularios del cuatrimestre si la fecha de inscripciones no ha concluido`() {
+        alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+        val exception =  assertThrows<ExcepcionUNQUE> { alumnoService.cerrarFormularios() }
+
+        assertThat(exception.message).isEqualTo("No se puede cerrar los formularios aun, la fecha de inscripciones no ha concluido")
     }
 
     @Test

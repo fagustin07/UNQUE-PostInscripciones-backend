@@ -172,11 +172,17 @@ class AlumnoService {
     }
 
     @Transactional
-    fun cambiarEstadoFormularios() {
+    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now()) {
         val cuatrimestreObtenido = Cuatrimestre.actual()
         val alumnos = alumnoRepository.findAll()
+
+        if (cuatrimestreObtenido.finInscripciones > fecha) {
+            throw ExcepcionUNQUE("No se puede cerrar los formularios aun, la fecha de inscripciones no ha concluido")
+        }
+
         alumnos.forEach {
             val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
+            chequearEstado(formulario, fecha)
             formulario.cerrarFormulario()
         }
     }
