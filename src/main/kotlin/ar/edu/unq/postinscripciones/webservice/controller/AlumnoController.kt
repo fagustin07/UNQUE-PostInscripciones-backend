@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 @RequestMapping("/api/alumno")
 class AlumnoController {
 
+    @Autowired
     private lateinit var cuatrimestreService: CuatrimestreService
 
     @Autowired
