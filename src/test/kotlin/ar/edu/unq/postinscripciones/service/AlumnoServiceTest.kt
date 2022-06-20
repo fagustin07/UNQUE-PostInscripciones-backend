@@ -113,10 +113,10 @@ internal class AlumnoServiceTest {
         comision1Algoritmos = comisionService.crear(formularioComision1)
         comision2Algoritmos = comisionService.crear(formularioComision2)
 
-        val codigoAlumno = autenticacionService.crearCuenta(alumno.dni, "contrasenia", "contrasenia")
+        val codigoAlumno = autenticacionService.crearCuenta(alumno.dni, "contrasenia", "contrasenia").codigo
         autenticacionService.confirmarCuenta(alumno.dni, codigoAlumno)
 
-        val codigoFede = autenticacionService.crearCuenta(fede.dni, "contrasenia", "contrasenia")
+        val codigoFede = autenticacionService.crearCuenta(fede.dni, "contrasenia", "contrasenia").codigo
         autenticacionService.confirmarCuenta(fede.dni, codigoFede)
 
     }
