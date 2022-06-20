@@ -1,6 +1,7 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
 import ar.edu.unq.postinscripciones.service.AutenticacionService
+import ar.edu.unq.postinscripciones.service.MailSenderService
 import ar.edu.unq.postinscripciones.service.dto.autenticacion.ConfirmacionCuenta
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioRegistro
 import ar.edu.unq.postinscripciones.service.dto.autenticacion.LoguearAlumno
@@ -20,23 +21,28 @@ import org.springframework.web.bind.annotation.RequestMethod
 @RequestMapping("/api/auth")
 class AutenticacionController {
     @Autowired
-    lateinit var autenticacionService: AutenticacionService
+    private lateinit var autenticacionService: AutenticacionService
+
+    @Autowired
+    private lateinit var mailSenderService: MailSenderService
 
     @ApiOperation("Utilizado para que un alumno cree su cuenta")
     @ApiResponses(
         value = [
-            ApiResponse(code = 201, message = "OK", response = Int::class),
+            ApiResponse(code = 204, message = "Correo de confirmación enviado"),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
     @RequestMapping(value = ["/alumno/registrar"], method = [RequestMethod.POST])
     fun registrarse(@RequestBody formularioRegistro: FormularioRegistro): ResponseEntity<*> {
-        val respuesta = autenticacionService.crearCuenta(
+        val alumnoCodigo = autenticacionService.crearCuenta(
             formularioRegistro.dni,
             formularioRegistro.contrasenia,
             formularioRegistro.confirmacionContrasenia
         )
-        return ResponseEntity(respuesta, HttpStatus.CREATED)
+        mailSenderService.enviarCodigo(alumnoCodigo.alumno, alumnoCodigo.codigo)
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
     }
 
     @ApiOperation("Se utiliza para que un alumno confirme su cuenta con el codigo brindado")

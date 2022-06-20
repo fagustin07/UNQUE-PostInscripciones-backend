@@ -5,8 +5,10 @@ import ar.edu.unq.postinscripciones.model.EstadoCuenta
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.AlumnoRepository
 import ar.edu.unq.postinscripciones.persistence.DirectivoRepository
+import ar.edu.unq.postinscripciones.service.dto.CreacionDirectivo
+import ar.edu.unq.postinscripciones.service.dto.alumno.AlumnoCodigo
+import ar.edu.unq.postinscripciones.service.dto.alumno.AlumnoDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
-import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -34,14 +36,14 @@ class AutenticacionService {
         contrasenia: String,
         confirmarContrasenia: String,
         carga: LocalDateTime = LocalDateTime.now()
-    ): Int {
+    ): AlumnoCodigo {
         val alumno = alumnoRepository.findById(dni)
             .orElseThrow { ExcepcionUNQUE("No puedes registrarte. Comunicate con el equipo directivo") }
         val codigo = (1000000 + Math.random() * 9000000).toInt()
         alumno.actualizarCodigoYContrasenia(codigo, passwordEncoder.encode(contrasenia), carga)
         if (contrasenia != confirmarContrasenia) throw ExcepcionUNQUE("Las contrasenias no coinciden")
         alumnoRepository.save(alumno)
-        return codigo
+        return AlumnoCodigo(AlumnoDTO.desdeModelo(alumno), codigo)
     }
 
     @Transactional
@@ -89,13 +91,3 @@ class AutenticacionService {
 
     private fun credencialesInvalidas() = ExcepcionUNQUE("Credenciales invalidas")
 }
-
-
-data class CreacionDirectivo(
-    @ApiModelProperty(example = "fla@unque.edu.ar")
-    val correo: String,
-    @ApiModelProperty(example = "Flavia S")
-    val nombre: String,
-    @ApiModelProperty(example = "123456")
-    val contrasenia: String
-)

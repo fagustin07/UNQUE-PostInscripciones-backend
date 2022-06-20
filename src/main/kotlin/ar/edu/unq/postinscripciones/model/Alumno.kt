@@ -151,7 +151,7 @@ class Alumno(
     }
 
     private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
-        if (this.cargaDeCodigo!= null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(30))) {
+        if (this.cargaDeCodigo!= null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
             throw ExcepcionUNQUE("Su codigo ha expirado. Cree su cuenta nuevamente")
         }
     }
