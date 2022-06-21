@@ -13,7 +13,7 @@ class Formulario(
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     val solicitudes: MutableList<SolicitudSobrecupo> = mutableListOf(),
     @ManyToMany(fetch = FetchType.LAZY)
-    val comisionesInscripto: List<Comision> = listOf()
+    val comisionesInscripto: List<Comision> = listOf(),
 ) {
 
     @Id
@@ -23,12 +23,18 @@ class Formulario(
     @Enumerated(EnumType.STRING)
     var estado = EstadoFormulario.ABIERTO
 
+    var comentarios: String = ""
+
     init {
         checkNoHaySuperposiciones(solicitudes, comisionesInscripto)
     }
 
     fun agregarSolicitud(solicitud: SolicitudSobrecupo) {
         solicitudes.add(solicitud)
+    }
+
+    fun agregarComentarios(comentarios: String) {
+        this.comentarios = comentarios
     }
 
     fun cerrarFormulario() {

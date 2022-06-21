@@ -164,15 +164,16 @@ class AlumnoService {
     }
 
     @Transactional
-    fun cerrarFormulario(formularioId: Long, alumnoDni: Int): FormularioDTO {
+    fun cerrarFormulario(formularioId: Long, alumnoDni: Int, comentarios: String = ""): FormularioDTO {
         val formulario =
             formularioRepository.findById(formularioId).orElseThrow { ExcepcionUNQUE("No existe el formulario") }
         formulario.cerrarFormulario()
+        formulario.agregarComentarios(comentarios)
         return FormularioDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
     }
 
     @Transactional
-    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now()) {
+    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now(), comentarioGeneral: String = "") {
         val cuatrimestreObtenido = Cuatrimestre.actual()
         val alumnos = alumnoRepository.findAll()
 
@@ -183,6 +184,7 @@ class AlumnoService {
         alumnos.forEach {
             val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
             chequearEstado(formulario, fecha)
+            formulario.agregarComentarios(comentarioGeneral)
             formulario.cerrarFormulario()
         }
     }

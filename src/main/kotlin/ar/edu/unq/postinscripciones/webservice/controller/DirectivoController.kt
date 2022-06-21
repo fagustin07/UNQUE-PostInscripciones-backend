@@ -162,10 +162,13 @@ class DirectivoController {
             id: Long,
             @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
             @RequestParam
-            dni: Int
+            dni: Int,
+            @ApiParam(value = "Comentarios para el alumno", example ="Un comentario", required = false)
+            @RequestParam
+            comentarios: String
     ): ResponseEntity<*> {
         return ResponseEntity(
-                alumnoService.cerrarFormulario(id, dni),
+                alumnoService.cerrarFormulario(id, dni, comentarios),
                 HttpStatus.OK
         )
     }
