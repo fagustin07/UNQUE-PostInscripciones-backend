@@ -1,5 +1,6 @@
 package ar.edu.unq.postinscripciones.model
 
+import ar.edu.unq.postinscripciones.model.comision.Comision
 import javax.persistence.*
 
 @Entity
@@ -14,6 +15,7 @@ class Materia(
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.SIMULTANEIDAD
 ) {
+
     fun esLaMateria(materia: Materia) = this.codigo == materia.codigo
 
     fun actualizarCorrelativas(correlativasDadas: MutableList<Materia>) {

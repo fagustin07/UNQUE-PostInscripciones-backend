@@ -5,9 +5,12 @@ import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
+import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
+import ar.edu.unq.postinscripciones.persistence.SolicitudSobrecupoRepository
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaPorSolicitudes
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioModificarMateria
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +21,12 @@ import javax.transaction.Transactional
 class MateriaService {
     @Autowired
     private lateinit var materiaRepository: MateriaRepository
+
+    @Autowired
+    private lateinit var comisionRespository: ComisionRespository
+
+    @Autowired
+    private lateinit var solicitudSobrecupoRepository: SolicitudSobrecupoRepository
 
 
     @Transactional
@@ -85,6 +94,36 @@ class MateriaService {
     }
 
     @Transactional
+    fun modificar(formularioMateria: FormularioModificarMateria): MateriaDTO {
+        val materia = materiaRepository.findMateriaByCodigo(formularioMateria.codigo).orElseThrow {
+            ExcepcionUNQUE("No existe la materia con codigo: ${formularioMateria.codigo}")
+        }
+        val materiaActualizada = Materia(formularioMateria.codigo, formularioMateria.nombre, materia.correlativas, formularioMateria.carrera)
+        materiaRepository.save(materiaActualizada)
+
+        return MateriaDTO.desdeModelo(materiaRepository.save(materiaActualizada))
+    }
+
+//    @Transactional
+//    fun borrar(codigo: String, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()) {
+//        val materia = materiaRepository.findMateriaByCodigo(codigo).orElseThrow {
+//            ExcepcionUNQUE("No existe la materia con codigo: $codigo")
+//        }
+//        val comisiones = comisionRespository
+//                .findAllByMateriaAndCuatrimestreAnioAndCuatrimestreSemestre(
+//                        materia,
+//                        cuatrimestre.anio,
+//                        cuatrimestre.semestre
+//                )
+//
+//        comisiones.forEach {comision ->
+//            solicitudSobrecupoRepository.deleteByComision(comision)
+//            comisionRespository.delete(comision)
+//        }
+//        materiaRepository.delete(materia)
+//    }
+
+    @Transactional
     fun materiasPorSolicitudes(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<MateriaPorSolicitudes> {
         return materiaRepository
             .findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(
@@ -93,5 +132,4 @@ class MateriaService {
             )
             .map { MateriaPorSolicitudes.desdeTupla(it) }
     }
-
 }

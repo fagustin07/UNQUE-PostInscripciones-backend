@@ -242,6 +242,27 @@ internal class MateriaServiceTest {
         assertThat(materiasObtenidas.last().cantidadSolicitudesPendientes).isEqualTo(0)
     }
 
+    @Test
+    fun `se puede modificar una materia ya creada`() {
+        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.LICENCIATURA)
+        val nuevaMateria = materiaService.modificar(formulario)
+
+        val materiaPersistida = materiaService.obtener(algo.codigo)
+
+        assertThat(nuevaMateria).usingRecursiveComparison().isNotEqualTo(algo)
+        assertThat(nuevaMateria.nombre).isEqualTo(materiaPersistida.nombre)
+        assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera)
+    }
+
+//    @Test
+//    fun `se puede borrar una materia`() {
+//        materiaService.borrar(algo.codigo)
+//        val exception = assertThrows<ExcepcionUNQUE> { materiaService.obtener(algo.codigo) }
+//
+//        assertThat(exception.message).isEqualTo("No se encuentra la materia")
+//    }
+
+
     @AfterEach
     fun tearDown() {
         dataService.clearDataSet()
