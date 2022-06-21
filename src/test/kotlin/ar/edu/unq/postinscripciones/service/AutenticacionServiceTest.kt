@@ -213,6 +213,6 @@ internal class AutenticacionServiceTest {
 
     @AfterEach
     fun tearDown() {
-        dataService.clearDataSet()
+        autenticacionService.borrarTodos()
     }
 }

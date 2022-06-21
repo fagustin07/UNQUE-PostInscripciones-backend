@@ -22,4 +22,7 @@ interface ComisionRespository : CrudRepository<Comision, Long> {
         cuatrimestre: Cuatrimestre
     ): Optional<Comision>
 
+    fun findByMateriaCodigo(codigo: String): List<Comision>
+    fun deleteByMateriaCodigo(codigo: String)
+
 }

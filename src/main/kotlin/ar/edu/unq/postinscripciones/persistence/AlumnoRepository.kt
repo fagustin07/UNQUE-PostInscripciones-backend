@@ -22,21 +22,17 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findByDniStartsWithOrderByCoeficienteDesc(dniString: String): List<Alumno>
 
     @Query(
-        "SELECT alu.dni, afs.formulario_id, afs.solicitudes_id, count(aha.historia_academica_id) AS aprobadas\n" +
+        "SELECT alu.dni, afs.formulario_id, afs.solicitud_id, count(mc.id) AS aprobadas\n" +
                 "FROM alumno AS alu\n" +
-                "JOIN (SELECT alu.dni, fs.*\n" +
+                "JOIN (SELECT alu.dni, ss.id as solicitud_id, ss.formulario_id \n" +
                 "                FROM alumno AS alu\n" +
                 "                JOIN alumno_formularios AS af\n" +
                 "                ON alu.dni = af.alumno_dni\n" +
-                "                JOIN formulario_solicitudes AS fs\n" +
-                "                ON fs.formulario_id = af.formularios_id\n" +
                 "                JOIN solicitud_sobrecupo AS ss\n" +
-                "                ON ss.id = fs.solicitudes_id AND ss.comision_id = :idComision) AS afs\n" +
+                "                ON af.formularios_id = ss.formulario_id AND ss.comision_id = :idComision) AS afs\n" +
                 "ON afs.dni = alu.dni\n" +
-                "LEFT JOIN alumno_historia_academica AS aha\n" +
-                "ON aha.alumno_dni = alu.dni\n" +
                 "LEFT JOIN materia_cursada AS mc\n" +
-                "ON mc.id = aha.historia_academica_id AND mc.estado = :estadoMateria\n" +
+                "ON mc.id = alu.dni AND mc.estado = :estadoMateria\n" +
                 "GROUP BY alu.dni\n" +
                 "ORDER BY aprobadas DESC", nativeQuery = true
     )
@@ -48,8 +44,6 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
         "JOIN " +
             "(SELECT alumno_dni, materia_codigo, max(fecha_de_carga) as fecha, count(*) AS intentos " +
             "FROM materia_cursada " +
-            "JOIN alumno_historia_academica " +
-            "ON historia_academica_id = id " +
             "WHERE alumno_dni = ?1 " +
             "GROUP BY alumno_dni, materia_codigo) AS info " +
         "ON info.materia_codigo = cursada.materia_codigo " +

@@ -1,7 +1,5 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
-import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
-import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.CuatrimestreService
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearOActualizarFormulario
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
 
 @ServiceREST
 @PreAuthorize("hasRole('ALUMNO')")
@@ -131,7 +128,7 @@ class AlumnoController {
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )
-    @RequestMapping(value = ["/formulario"], method = [RequestMethod.PATCH])
+    @RequestMapping(value = ["/formulario"], method = [RequestMethod.DELETE])
     fun borrarFormulario(
             @ApiParam(hidden=true)
             @RequestHeader("Authorization") token: String

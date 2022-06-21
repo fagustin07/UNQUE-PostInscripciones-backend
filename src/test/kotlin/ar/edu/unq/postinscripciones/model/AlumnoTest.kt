@@ -180,7 +180,7 @@ internal class AlumnoTest {
         val intro = Materia("int-102", "Intro", mutableListOf())
         val cuatrimestre = Cuatrimestre()
         val comision = Comision(intro, 1, cuatrimestre)
-        val formulario = Formulario(cuatrimestre, comisionesInscripto = listOf(comision))
+        val formulario = Formulario(cuatrimestre, comisionesInscripto = mutableListOf(comision))
         alumno.guardarFormulario(formulario)
 
         val excepcion = assertThrows<ExcepcionUNQUE> { alumno.agregarSolicitud(comision, cuatrimestre) }

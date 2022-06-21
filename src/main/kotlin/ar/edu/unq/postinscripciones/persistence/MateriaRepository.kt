@@ -43,5 +43,6 @@ interface MateriaRepository: CrudRepository<Materia, String> {
         "ORDER BY total_pendientes DESC"
     )
     fun findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(anio: Int, semestre: Semestre, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
+    fun findByCorrelativasCodigo(codigo: String): List<Materia>
 
 }

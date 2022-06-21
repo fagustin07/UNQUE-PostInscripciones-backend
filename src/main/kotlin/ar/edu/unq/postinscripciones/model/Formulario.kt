@@ -4,16 +4,20 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
 
 @Entity
 class Formulario(
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val cuatrimestre: Cuatrimestre = Cuatrimestre(2009, Semestre.S1),
-    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name="formulario_id")
     val solicitudes: MutableList<SolicitudSobrecupo> = mutableListOf(),
     @ManyToMany(fetch = FetchType.LAZY)
-    val comisionesInscripto: List<Comision> = listOf(),
+    val comisionesInscripto: MutableList<Comision> = mutableListOf(),
 ) {
 
     @Id
@@ -79,5 +83,9 @@ class Formulario(
                     "comisiones que se superponen con las que estas inscripto en guaraní")
         }
 
+    }
+
+    fun quitarInscripcionDe(id: Long) {
+        comisionesInscripto.removeIf { it.id == id }
     }
 }

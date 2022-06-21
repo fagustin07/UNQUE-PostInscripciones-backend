@@ -90,4 +90,10 @@ class AutenticacionService {
     }
 
     private fun credencialesInvalidas() = ExcepcionUNQUE("Credenciales invalidas")
+
+    @Transactional
+    fun borrarTodos() {
+        alumnoRepository.deleteAll()
+        directivoRepository.deleteAll()
+    }
 }

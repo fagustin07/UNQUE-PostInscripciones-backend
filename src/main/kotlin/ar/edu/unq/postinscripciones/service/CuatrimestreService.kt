@@ -37,4 +37,9 @@ class CuatrimestreService {
         return cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
             .orElseThrow { ExcepcionUNQUE("No se ha encontrado el cuatrimestre") }
     }
+
+    @Transactional
+    fun borrarTodos() {
+        cuatrimestreRepository.deleteAll()
+    }
 }

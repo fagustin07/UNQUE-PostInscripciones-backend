@@ -140,7 +140,11 @@ class AlumnoService {
         } else {
             FormularioDTO.desdeModeloParaAlumno(formulario, dni)
         }
+    }
 
+    @Transactional
+    fun borrarAlumno(dni: Int) {
+        alumnoRepository.deleteById(dni)
     }
 
     @Transactional
@@ -363,7 +367,7 @@ class AlumnoService {
             }
         }
 
-        return formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto))
+        return formularioRepository.save(Formulario(cuatrimestreObtenido, solicitudes, comisionesInscripto.toMutableList()))
     }
 
     private fun guardarAlumno(formulario: FormularioCrearAlumno): Alumno {
@@ -447,5 +451,10 @@ class AlumnoService {
                 solicitudesPorMateria.map { it.comision.materia },
                 materiasDisponibles.map { it.codigo })
         ) throw ExcepcionUNQUE("El alumno no puede cursar las materias solicitadas")
+    }
+
+    @Transactional
+    fun borrarTodos() {
+        alumnoRepository.findAll().forEach { alumnoRepository.deleteById(it.dni) }
     }
 }

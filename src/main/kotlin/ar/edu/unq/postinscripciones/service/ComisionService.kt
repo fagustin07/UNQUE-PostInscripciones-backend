@@ -7,6 +7,7 @@ import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
 import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
+import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
 import ar.edu.unq.postinscripciones.service.dto.comision.*
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
@@ -17,6 +18,9 @@ import javax.transaction.Transactional
 
 @Service
 class ComisionService {
+
+    @Autowired
+    private lateinit var formularioRepository: FormularioRepository
 
     @Autowired
     private lateinit var comisionRespository: ComisionRespository
@@ -67,6 +71,15 @@ class ComisionService {
     fun obtener(id: Long): ComisionDTO {
         val comision = comisionRespository.findById(id).orElseThrow { ExcepcionUNQUE("No se encuentra la comision") }
         return ComisionDTO.desdeModelo(comision)
+    }
+
+    @Transactional
+    fun borrarComision(id: Long) {
+        formularioRepository.findByComisionesInscriptoId(id).forEach {
+            it.quitarInscripcionDe(id)
+            formularioRepository.save(it)
+        }
+        comisionRespository.deleteById(id)
     }
 
     @Transactional

@@ -38,6 +38,7 @@ class Alumno(
     private val formularios: MutableList<Formulario> = mutableListOf()
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name="alumno_dni")
     var historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
 
     fun guardarFormulario(formulario: Formulario) {
@@ -55,7 +56,7 @@ class Alumno(
     }
 
     fun cambiarFormulario(anio: Int, semestre: Semestre, formulario: Formulario) {
-        formularios.removeIf { it.cuatrimestre.esElCuatrimestre(anio,semestre) }
+        borrarFormulario(anio, semestre)
         formularios.add(formulario)
     }
 

@@ -403,7 +403,7 @@ class DataSeed(
                 cuatrimestre,
                 comisionesInscriptoIds = listOf(introc1.id!!)
             )
-            alumnoService.guardarSolicitudPara(jorge.dni, listOf(estrc1.id!!), cuatrimestre)
+            alumnoService.guardarSolicitudPara(jorge.dni, listOf(estrc1.id!!), cuatrimestre, comisionesInscriptoIds = listOf(bddc1.id!!))
             alumnoService.guardarSolicitudPara(roberto.dni, listOf(introc1.id!!, introc2.id!!), cuatrimestre)
             alumnoService.guardarSolicitudPara(maria.dni, listOf(bddc1.id!!), cuatrimestre)
 

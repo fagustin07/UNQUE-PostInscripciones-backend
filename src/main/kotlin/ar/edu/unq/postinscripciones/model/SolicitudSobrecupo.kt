@@ -1,11 +1,14 @@
 package ar.edu.unq.postinscripciones.model
 
 import ar.edu.unq.postinscripciones.model.comision.Comision
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
 
 @Entity
 class SolicitudSobrecupo(
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val comision: Comision = Comision()
 ) {
     @Id

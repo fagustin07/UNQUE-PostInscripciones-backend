@@ -150,35 +150,35 @@ class DirectivoController {
 
     @ApiOperation("Cierra un formulario de sobrecupo")
     @ApiResponses(
-            value = [
-                ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
+        value = [
+            ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
     )
     @RequestMapping(value = ["/formulario/{id}/cerrar"], method = [RequestMethod.PATCH])
     fun cerrarFormulario(
-            @ApiParam(value = "Id del formulario", example = "1", required = true)
-            @PathVariable
-            id: Long,
-            @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
-            @RequestParam
-            dni: Int,
-            @ApiParam(value = "Comentarios para el alumno", example ="Un comentario", required = false)
-            @RequestParam
-            comentarios: String
+        @ApiParam(value = "Id del formulario", example = "1", required = true)
+        @PathVariable
+        id: Long,
+        @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
+        @RequestParam
+        dni: Int,
+        @ApiParam(value = "Comentarios para el alumno", example = "Un comentario", required = false)
+        @RequestParam
+        comentarios: String
     ): ResponseEntity<*> {
         return ResponseEntity(
-                alumnoService.cerrarFormulario(id, dni, comentarios),
-                HttpStatus.OK
+            alumnoService.cerrarFormulario(id, dni, comentarios),
+            HttpStatus.OK
         )
     }
 
     @ApiOperation("Cierra todos los formularios de sobrecupo")
     @ApiResponses(
-            value = [
-                ApiResponse(code = 200, message = "Formularios Cerrados"),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
+        value = [
+            ApiResponse(code = 200, message = "Formularios Cerrados"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
     )
     @RequestMapping(value = ["/formulario/cerrar"], method = [RequestMethod.PATCH])
     fun cerrarFormularios(): ResponseEntity<*> {
@@ -199,7 +199,11 @@ class DirectivoController {
         @RequestParam dni: Int?,
         @ApiParam(value = "booleano para filtrar alumnos sin procesar", example = "true", required = false)
         @RequestParam sinProcesar: Boolean?,
-        @ApiParam(value = "booleano para filtrar alumnos con solicitudes pendientes", example = "true", required = false)
+        @ApiParam(
+            value = "booleano para filtrar alumnos con solicitudes pendientes",
+            example = "true",
+            required = false
+        )
         @RequestParam pendiente: Boolean?
     ): ResponseEntity<*> {
         return ResponseEntity(
@@ -285,7 +289,7 @@ class DirectivoController {
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
-    @RequestMapping(value = ["/materia/{codigo}/solicitantes"], method = [RequestMethod.GET])
+    @RequestMapping(value = ["/materias/{codigo}/solicitantes"], method = [RequestMethod.GET])
     fun alumnosQueSolicitaronMateria(
         @ApiParam(value = "codigo de la materia", example = "01035", required = true)
         @PathVariable
@@ -331,7 +335,12 @@ class DirectivoController {
     @ApiOperation("Registra nuevas  materias en el sistema")
     @ApiResponses(
         value = [
-            ApiResponse(code = 201, message = "Materia creada", response = MateriaDTO::class, responseContainer = "List"),
+            ApiResponse(
+                code = 201,
+                message = "Materia creada",
+                response = MateriaDTO::class,
+                responseContainer = "List"
+            ),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
@@ -345,28 +354,28 @@ class DirectivoController {
 
     @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
     @ApiResponses(
-            value = [
-                ApiResponse(
-                        code = 200,
-                        message = "OK",
-                        response = MateriaPorSolicitudes::class,
-                        responseContainer = "List"
-                ),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
+        value = [
+            ApiResponse(
+                code = 200,
+                message = "OK",
+                response = MateriaPorSolicitudes::class,
+                responseContainer = "List"
+            ),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
     )
     @RequestMapping(value = ["/materias/solicitudes"], method = [RequestMethod.GET])
     fun materiaSolicitudes(
-            @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
-            @RequestParam
-            anio: Int,
-            @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
-            @RequestParam
-            semestre: Semestre
+        @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
+        @RequestParam
+        anio: Int,
+        @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
+        @RequestParam
+        semestre: Semestre
     ): ResponseEntity<*> {
         return ResponseEntity(
-                materiaService.materiasPorSolicitudes(),
-                HttpStatus.OK
+            materiaService.materiasPorSolicitudes(),
+            HttpStatus.OK
         )
     }
 
@@ -395,7 +404,10 @@ class DirectivoController {
     @RequestMapping(value = ["/materias/correlativas"], method = [RequestMethod.PATCH])
     fun actualizarCorrelativas(
         @RequestBody
-        @ApiParam(value = "lista de tuplas de (nombre de la materia, lista de nombres de sus correlativas), case insensitive", required = true)
+        @ApiParam(
+            value = "lista de tuplas de (nombre de la materia, lista de nombres de sus correlativas), case insensitive",
+            required = true
+        )
         materiasConCorrelativas: List<MateriaConCorrelativas>
     ): ResponseEntity<*> {
         return ResponseEntity(
@@ -425,19 +437,19 @@ class DirectivoController {
 
     @ApiOperation(value = "Rechaza todas las solicitudes pendientes de una materia especifica o una materia y comision especifica")
     @ApiResponses(
-            value = [
-                ApiResponse(code = 204, message = "NO CONTENT"),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
+        value = [
+            ApiResponse(code = 204, message = "NO CONTENT"),
+            ApiResponse(code = 400, message = "Algo salio mal")
+        ]
     )
     @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PATCH])
     fun rechazarSolicitudesMateria(
-            @PathVariable
-            @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
-            codigo: String,
-            @ApiParam(value = "Numero de comision", example = "1", required = false)
-            @RequestParam
-            numero: Int?
+        @PathVariable
+        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+        codigo: String,
+        @ApiParam(value = "Numero de comision", example = "1", required = false)
+        @RequestParam
+        numero: Int?
     ): ResponseEntity<*> {
         alumnoService.rechazarSolicitudesPendientesMateria(codigo, numero)
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
@@ -486,4 +498,37 @@ class DirectivoController {
         )
     }
 
+    //   DELETE
+    @ApiOperation("Elimina un alumno del sistema y todo lo relacionado al mismo")
+    @RequestMapping(value = ["/alumnos"], method = [RequestMethod.DELETE])
+    fun borrarAlumno(
+        @ApiParam(value = "DNI del alumno", example = "12345678", required = true)
+        @RequestParam
+        dni: Int,
+    ): ResponseEntity<*> {
+        alumnoService.borrarAlumno(dni)
+        return ResponseEntity(null, HttpStatus.NO_CONTENT)
+    }
+
+    @ApiOperation("Elimina una materia del sistema y todo lo relacionado al mismo")
+    @RequestMapping(value = ["/materias"], method = [RequestMethod.DELETE])
+    fun borrarMateria(
+        @ApiParam(value = "codigo de materia", example = "01035", required = true)
+        @RequestParam
+        codigo: String,
+    ): ResponseEntity<*> {
+        materiaService.borrarMateria(codigo)
+        return ResponseEntity(null, HttpStatus.NO_CONTENT)
+    }
+
+    @ApiOperation("Elimina una comision del sistema junto con todo lo relacionado a la misma")
+    @RequestMapping(value = ["/comisiones"], method = [RequestMethod.DELETE])
+    fun borrarComision(
+        @ApiParam(value = "Id de la comision", example = "1", required = true)
+        @RequestParam
+        id: Long,
+    ): ResponseEntity<*> {
+        comisionService.borrarComision(id)
+        return ResponseEntity(null, HttpStatus.NO_CONTENT)
+    }
 }

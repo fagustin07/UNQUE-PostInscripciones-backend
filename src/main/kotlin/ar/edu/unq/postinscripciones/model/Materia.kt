@@ -1,6 +1,7 @@
 package ar.edu.unq.postinscripciones.model
 
-import ar.edu.unq.postinscripciones.model.comision.Comision
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
 
 @Entity
@@ -10,6 +11,7 @@ class Materia(
     @Column(unique=true, nullable = false)
     val nombre: String = "",
     @ManyToMany(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     var correlativas: MutableList<Materia> = mutableListOf(),
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -20,5 +22,9 @@ class Materia(
 
     fun actualizarCorrelativas(correlativasDadas: MutableList<Materia>) {
         correlativas = correlativasDadas
+    }
+
+    fun quitarCorrelativa(codigo: String) {
+        correlativas.removeIf { it.codigo == codigo }
     }
 }

@@ -1410,7 +1410,9 @@ internal class AlumnoServiceTest {
 
     @AfterEach
     fun tearDown() {
-        dataService.clearDataSet()
+        materiaService.borrarTodos()
+        alumnoService.borrarTodos()
+        cuatrimestreService.borrarTodos()
     }
 
 }
