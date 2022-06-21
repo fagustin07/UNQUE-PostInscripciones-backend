@@ -1316,6 +1316,40 @@ internal class AlumnoServiceTest {
 
     }
 
+    @Test
+    fun `Un alumno puede borrar su formulario siempre que la fecha de inscripciones no haya finalizado`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.minusDays(5)
+        val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
+        alumnoService.borrarFormulario(jwt, fecha = fechaDeModificacion, cuatrimestre = cuatrimestre)
+        val exception = assertThrows<ExcepcionUNQUE> {
+            alumnoService.obtenerFormulario(jwt, cuatrimestre)
+        }
+
+        assertThat(exception.message).isEqualTo("No se encontró ningun formulario para el cuatrimestre dado")
+    }
+
+    @Test
+    fun `Un alumno no puede borrar su formulario cuando la fecha de inscripciones ha concluido`() {
+        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
+        val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
+        val exception = assertThrows<ExcepcionUNQUE> {
+            alumnoService.borrarFormulario(jwt, fecha = fechaDeModificacion, cuatrimestre = cuatrimestre)
+        }
+
+        assertThat(exception.message).isEqualTo("No se puede borrar el formulario, la fecha de inscripciones ha concluido o aun no a comenzado")
+    }
+
+    @Test
+    fun `Un alumno no puede borrar su formulario cuando la fecha de inscripciones no ha comenzado`() {
+        val fechaDeModificacion = cuatrimestre.inicioInscripciones.minusDays(5)
+        val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
+        val exception = assertThrows<ExcepcionUNQUE> {
+            alumnoService.borrarFormulario(jwt, fecha = fechaDeModificacion, cuatrimestre = cuatrimestre)
+        }
+
+        assertThat(exception.message).isEqualTo("No se puede borrar el formulario, la fecha de inscripciones ha concluido o aun no a comenzado")
+    }
+
 
     @AfterEach
     fun tearDown() {

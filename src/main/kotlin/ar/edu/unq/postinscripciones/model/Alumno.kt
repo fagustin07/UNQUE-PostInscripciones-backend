@@ -45,6 +45,10 @@ class Alumno(
         formularios.add(formulario)
     }
 
+    fun borrarFormulario(anio: Int, semestre: Semestre) {
+        formularios.removeIf { it.cuatrimestre.esElCuatrimestre(anio, semestre) }
+    }
+
     fun cargarHistoriaAcademica(materiaCursada: MateriaCursada) {
         historiaAcademica.add(materiaCursada)
         historiaAcademica.sortByDescending { it.fechaDeCarga }

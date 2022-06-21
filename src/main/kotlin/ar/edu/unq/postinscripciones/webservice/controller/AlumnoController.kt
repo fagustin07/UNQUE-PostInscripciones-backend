@@ -1,5 +1,7 @@
 package ar.edu.unq.postinscripciones.webservice.controller
 
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.CuatrimestreService
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearOActualizarFormulario
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 
 @ServiceREST
 @PreAuthorize("hasRole('ALUMNO')")
@@ -97,7 +100,7 @@ class AlumnoController {
         )
     }
 
-    @ApiOperation("El alumo obtiene el formulario de sobrecupos del cuatrimestre actual")
+    @ApiOperation("El alumno obtiene el formulario de sobrecupos del cuatrimestre actual")
     @ApiResponses(
             value = [
                 ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
@@ -120,6 +123,25 @@ class AlumnoController {
             HttpStatus.OK
         )
     }
+
+    @ApiOperation("Endpoint para borrar el formulario de un alumno dado un cuatrimestre")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 200, message = "OK"),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/formulario"], method = [RequestMethod.PATCH])
+    fun borrarFormulario(
+            @ApiParam(hidden=true)
+            @RequestHeader("Authorization") token: String
+
+    ): ResponseEntity<Void> {
+        alumnoService.borrarFormulario(jwt = token)
+        return ResponseEntity(HttpStatus.NO_CONTENT)
+    }
+
+
 
 }
 

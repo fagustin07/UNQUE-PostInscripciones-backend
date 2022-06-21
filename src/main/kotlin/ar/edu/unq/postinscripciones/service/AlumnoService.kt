@@ -329,6 +329,19 @@ class AlumnoService {
         }
     }
 
+    @Transactional
+    fun borrarFormulario(jwt: String, fecha: LocalDateTime = LocalDateTime.now(), cuatrimestre: Cuatrimestre = Cuatrimestre.actual()) {
+        val alumnoDni = jwtTokenUtil.obtenerDni(jwt)
+        val alumno = alumnoRepository.findById(alumnoDni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
+        val cuatrimestrePersistido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
+                .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+        if(cuatrimestrePersistido.finInscripciones < fecha || cuatrimestrePersistido.inicioInscripciones > fecha) {
+            throw ExcepcionUNQUE("No se puede borrar el formulario, la fecha de inscripciones ha concluido o aun no a comenzado")
+        }
+        alumno.borrarFormulario(cuatrimestrePersistido.anio, cuatrimestrePersistido.semestre)
+        alumnoRepository.save(alumno)
+    }
+
     fun crearFormulario(
         cuatrimestre: Cuatrimestre,
         alumno: Alumno,
