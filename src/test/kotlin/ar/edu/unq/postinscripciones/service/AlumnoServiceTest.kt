@@ -43,9 +43,6 @@ internal class AlumnoServiceTest {
     private lateinit var materiaService: MateriaService
 
     @Autowired
-    private lateinit var dataService: DataService
-
-    @Autowired
     private lateinit var autenticacionService: AutenticacionService
 
     private lateinit var alumno: Alumno
@@ -508,7 +505,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno tiene disponible materias solo de su carrera`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(), Carrera.LICENCIATURA)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(), Carrera.LI)
         val materiasdisponibles =
             alumnoService.materiasDisponibles(alumno.dni, cuatrimestre)
         assertThat(materiasdisponibles.map { it.codigo }).doesNotContain(logica.codigo)

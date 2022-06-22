@@ -97,24 +97,24 @@ class ComisionService {
         comisionesACrear: List<ComisionACrear>,
         cuatrimestre: Cuatrimestre,
     ): List<ConflictoComision> {
-        val comisionesConflictivas = mutableListOf<ConflictoComision>()
+        val conflictos: MutableList<ConflictoComision> = mutableListOf()
         comisionesACrear.forEach { comisionACrear ->
-            val materia = materiaRepository.findMateriaByCodigo(comisionACrear.codigoMateria)
-                .orElseThrow { MateriaNoEncontradaExcepcion() }
-            val existeComision = comisionRespository
-                .findByNumeroAndMateriaAndCuatrimestre(comisionACrear.numeroComision, materia, cuatrimestre)
-            if (existeComision.isPresent) {
-                comisionesConflictivas.add(
-                    ConflictoComision(
-                        ComisionDTO.desdeModelo(existeComision.get()),
-                        comisionACrear
-                    )
-                )
+            val materia = materiaRepository.findByNombreIgnoringCase(comisionACrear.nombreMateria)
+            if(!materia.isPresent) {
+                val mensaje = "No existe la materia ${comisionACrear.nombreMateria}"
+                conflictos.add(ConflictoComision(comisionACrear.nombreMateria, comisionACrear.numeroComision, mensaje))
             } else {
-                guardarComision(comisionACrear, materia, cuatrimestre)
+                val existeComision = comisionRespository
+                    .findByNumeroAndMateriaAndCuatrimestre(comisionACrear.numeroComision, materia.get(), cuatrimestre)
+                if (existeComision.isPresent) {
+                    val mensaje = "Ya existe esta comision"
+                    conflictos.add(ConflictoComision(comisionACrear.nombreMateria, comisionACrear.numeroComision, mensaje))
+                } else {
+                    guardarComision(comisionACrear, materia.get(), cuatrimestre)
+                }
             }
         }
-        return comisionesConflictivas
+        return conflictos
     }
 
     @Transactional

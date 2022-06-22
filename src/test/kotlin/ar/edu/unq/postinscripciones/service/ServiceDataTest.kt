@@ -82,7 +82,7 @@ internal class ServiceDataTest {
         val cargaDePrimeraPlanilla = alumnoService.registrarAlumnos(planillaAlumnos)
 
         assertThat(cargaDePrimeraPlanilla).hasSize(1)
-        assertThat(cargaDePrimeraPlanilla.first().formularioConflictivo).isEqualTo(planillaAlumnos.first())
+        assertThat(cargaDePrimeraPlanilla.first().dni).isEqualTo(planillaAlumnos.first().dni)
         assertThat(alumnoService.todos()).hasSize(planillaAlumnos.size - 1)
     }
 
@@ -96,13 +96,13 @@ internal class ServiceDataTest {
             listOf(
                 ComisionACrear(
                     1,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 ),
                 ComisionACrear(
                     2,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 )
@@ -123,7 +123,7 @@ internal class ServiceDataTest {
         val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
         val crearBdd = ComisionACrear(
             1,
-            bdd.codigo,
+            bdd.nombre,
             30,
             8
         )
@@ -132,7 +132,7 @@ internal class ServiceDataTest {
                 crearBdd,
                 ComisionACrear(
                     2,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 )
@@ -144,7 +144,7 @@ internal class ServiceDataTest {
             .actualizarOfertaAcademica(listOf(crearBdd), cuatrimestre = cuatri)
 
         assertThat(comisionesGuardadasConConflicto).hasSize(1)
-        assertThat(comisionesGuardadasConConflicto.first().formularioConflictivo).isEqualTo(crearBdd)
+        assertThat(comisionesGuardadasConConflicto.first().mensaje).isEqualTo("Ya existe esta comision")
     }
 
     @Test
@@ -155,7 +155,7 @@ internal class ServiceDataTest {
             listOf(
                 ComisionACrear(
                     1,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 ),

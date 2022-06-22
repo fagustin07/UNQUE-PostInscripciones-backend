@@ -140,21 +140,16 @@ internal class MateriaServiceTest {
     fun `Se puede crear una lista de materias`() {
         val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.SIMULTANEIDAD)
         val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
-        val materiasCreadas = materiaService.crear(listOf(intro, orga))
+        materiaService.crear(listOf(intro, orga))
 
-        assertThat(materiasCreadas.map{it.codigo}).containsAll(listOf(intro.codigo, orga.codigo))
+        assertThat(materiaService.todas().map { it.nombre }).containsAll(listOf(intro.nombre, orga.nombre))
     }
 
     @Test
     fun `no se puede crear una lista de materias que ya existen`() {
-        val excepcion = assertThrows<ExcepcionUNQUE> {
-            materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
-        }
-        assertThat(excepcion.message).isEqualTo(
-            "La materia que desea crear con nombre Base de datos " +
-                    "y codigo BD-096, " +
-                    "genera conflicto con la materia: ${bdd.nombre}, codigo: ${bdd.codigo}"
-        )
+        val listaConflictiva = materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
+
+        assertThat(listaConflictiva.first().mensaje).isEqualTo("Conflicto con la materia ${bdd.nombre} y codigo ${bdd.codigo}")
     }
 
     @Test
@@ -215,9 +210,9 @@ internal class MateriaServiceTest {
     @Test
     fun `Obtener comisiones ordenadas por cantidad de solicitudes pendientes`() {
         val alumno1 =
-            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LICENCIATURA, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LI, 0.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LICENCIATURA, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LI, 0.0))
 
         val formulario : FormularioDTO= alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
@@ -244,7 +239,7 @@ internal class MateriaServiceTest {
 
     @Test
     fun `se puede modificar una materia ya creada`() {
-        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.LICENCIATURA)
+        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.LI)
         val nuevaMateria = materiaService.modificar(formulario)
 
         val materiaPersistida = materiaService.obtener(algo.codigo)
@@ -253,15 +248,6 @@ internal class MateriaServiceTest {
         assertThat(nuevaMateria.nombre).isEqualTo(materiaPersistida.nombre)
         assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera)
     }
-
-//    @Test
-//    fun `se puede borrar una materia`() {
-//        materiaService.borrar(algo.codigo)
-//        val exception = assertThrows<ExcepcionUNQUE> { materiaService.obtener(algo.codigo) }
-//
-//        assertThat(exception.message).isEqualTo("No se encuentra la materia")
-//    }
-
 
     @AfterEach
     fun tearDown() {

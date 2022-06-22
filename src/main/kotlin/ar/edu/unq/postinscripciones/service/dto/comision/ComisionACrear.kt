@@ -6,7 +6,7 @@ data class ComisionACrear(
     @ApiModelProperty(example = "1", required = true)
     val numeroComision: Int,
     @ApiModelProperty(example = "01307", required = true)
-    val codigoMateria: String,
+    val nombreMateria: String,
     @ApiModelProperty(example = "30", required = true)
     val cuposTotales: Int,
     @ApiModelProperty(example = "8", required = true)

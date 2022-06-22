@@ -26,9 +26,6 @@ class MateriaService {
     @Autowired
     private lateinit var comisionRespository: ComisionRespository
 
-    @Autowired
-    private lateinit var alumnoRepository: AlumnoRepository
-
     @Transactional
     fun crear(nombre: String, codigo: String, correlativas : List<String>, carrera: Carrera): MateriaDTO {
         val existeConNombreOCodigo = materiaRepository.findByNombreIgnoringCaseOrCodigoIgnoringCase(nombre, codigo)
@@ -46,21 +43,20 @@ class MateriaService {
     }
 
     @Transactional
-    fun crear(formulariosMaterias: List<FormularioMateria>): List<MateriaDTO> {
-        val materias = formulariosMaterias.map { form ->
+    fun crear(formulariosMaterias: List<FormularioMateria>): MutableList<ConflictoMateria> {
+        val conflictos: MutableList<ConflictoMateria> = mutableListOf()
+        formulariosMaterias.map { form ->
             val existeConNombreOCodigo = materiaRepository.findByNombreIgnoringCaseOrCodigoIgnoringCase(form.nombre, form.codigo)
             if (existeConNombreOCodigo.isPresent) {
-                throw ExcepcionUNQUE(
-                    "La materia que desea crear con nombre ${form.nombre} " +
-                            "y codigo ${form.codigo}, genera conflicto con la materia: ${existeConNombreOCodigo.get().nombre}, codigo: ${existeConNombreOCodigo.get().codigo}"
-                )
+                val mensaje = "Conflicto con la materia ${existeConNombreOCodigo.get().nombre}" +
+                        " y codigo ${existeConNombreOCodigo.get().codigo}"
+                conflictos.add(ConflictoMateria(form.nombre,form.codigo, mensaje))
             }
-
-            Materia(form.codigo, form.nombre, mutableListOf(), form.carrera)
+            else {
+                materiaRepository.save(Materia(form.codigo, form.nombre, mutableListOf(), form.carrera))
+            }
         }
-
-        val materiasCreadas = materiaRepository.saveAll(materias)
-        return materiasCreadas.map { MateriaDTO.desdeModelo(it) }
+        return conflictos
     }
 
     @Transactional
@@ -141,3 +137,5 @@ class MateriaService {
     }
 
 }
+
+data class ConflictoMateria(val nombre: String, val codigo: String, val mensaje: String)

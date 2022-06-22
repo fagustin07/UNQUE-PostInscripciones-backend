@@ -45,18 +45,19 @@ class AlumnoService {
     lateinit var jwtTokenUtil: JWTTokenUtil
 
     @Transactional
-    fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumnoDTO> {
-        val alumnosConflictivos: MutableList<ConflictoAlumnoDTO> = mutableListOf()
-
+    fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumno> {
+        val conflictos: MutableList<ConflictoAlumno> = mutableListOf()
         planillaAlumnos.forEach { formulario ->
             val alumnoExistente = alumnoRepository.findByDniOrLegajo(formulario.dni, formulario.legajo)
             if (alumnoExistente.isPresent) {
-                alumnosConflictivos.add(ConflictoAlumnoDTO(AlumnoDTO.desdeModelo(alumnoExistente.get()), formulario))
+                val mensaje = "Conflicto con el alumno con dni ${alumnoExistente.get().dni} " +
+                        "y legajo ${alumnoExistente.get().legajo}"
+                conflictos.add(ConflictoAlumno(formulario.dni, formulario.legajo, mensaje))
             } else {
                 guardarAlumno(formulario)
             }
         }
-        return alumnosConflictivos.toList()
+        return conflictos
     }
 
     @Transactional
@@ -458,3 +459,5 @@ class AlumnoService {
         alumnoRepository.findAll().forEach { alumnoRepository.deleteById(it.dni) }
     }
 }
+
+data class ConflictoAlumno(val dni: Int, val legajo: Int, val mensaje: String)

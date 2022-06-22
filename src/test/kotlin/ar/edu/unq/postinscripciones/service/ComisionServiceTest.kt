@@ -50,9 +50,9 @@ internal class ComisionServiceTest {
     @BeforeEach
     fun setUp() {
         val alumno =
-            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.LICENCIATURA, 5.0))
+            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.LI, 5.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.LICENCIATURA, 5.0))
+            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.LI, 5.0))
 
         bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.SIMULTANEIDAD)
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
@@ -201,7 +201,7 @@ internal class ComisionServiceTest {
 
     @Test
     fun `obtener la oferta del cuatrimestre actual segun un patron de nombre de materia`() {
-        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.LICENCIATURA)
+        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.LI)
         val formulario = FormularioComision(
             1,
             algoritmos.codigo,

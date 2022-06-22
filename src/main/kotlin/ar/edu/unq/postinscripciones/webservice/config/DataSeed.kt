@@ -139,11 +139,11 @@ class DataSeed(
             )
             val tip = Materia("01060", "Trabajo de Inserción Profesional", mutableListOf(), Carrera.TPI)
 
-            val analisis = Materia("00054", "Análisis Matemático 1", mutableListOf(mate2), Carrera.LICENCIATURA)
-            val mate3 = Materia("00842", "Matemática 3", mutableListOf(analisis), Carrera.LICENCIATURA)
-            val proba = Materia("00604", "Probabilidad y Estadisticas", mutableListOf(mate3), Carrera.LICENCIATURA)
+            val analisis = Materia("00054", "Análisis Matemático 1", mutableListOf(mate2), Carrera.LI)
+            val mate3 = Materia("00842", "Matemática 3", mutableListOf(analisis), Carrera.LI)
+            val proba = Materia("00604", "Probabilidad y Estadisticas", mutableListOf(mate3), Carrera.LI)
             val logica = Materia("01302", "Lógica y Programación", mutableListOf(intro, mate1), Carrera.SIMULTANEIDAD)
-            val seguridad = Materia("01303", "Seguridad de la Información", mutableListOf(labo), Carrera.LICENCIATURA)
+            val seguridad = Materia("01303", "Seguridad de la Información", mutableListOf(labo), Carrera.LI)
             val requerimientos = Materia(
                 "01308",
                 "Ingenieria de Requerimientos",
@@ -163,14 +163,14 @@ class DataSeed(
                 Carrera.SIMULTANEIDAD
             )
             val lfa = Materia("01306", "Lenguajes Formales y Automatas", mutableListOf(logica), Carrera.SIMULTANEIDAD)
-            val algoritmos = Materia("01307", "Algoritmos", mutableListOf(funcional), Carrera.LICENCIATURA)
+            val algoritmos = Materia("01307", "Algoritmos", mutableListOf(funcional), Carrera.LI)
 
-            val teoria = Materia("01309", "Teoría de la Computación", mutableListOf(lfa), Carrera.LICENCIATURA)
+            val teoria = Materia("01309", "Teoría de la Computación", mutableListOf(lfa), Carrera.LI)
             val arquitectura1 = Materia(
                 "01310",
                 "Arquitectura de Software I",
                 mutableListOf(concurrente, seguridad, gestion),
-                Carrera.LICENCIATURA
+                Carrera.LI
             )
             val distribuidos =
                 Materia("01311", "Sistemas Distribuidos", mutableListOf(concurrente, labo), Carrera.SIMULTANEIDAD)
@@ -184,7 +184,7 @@ class DataSeed(
                 "01313",
                 "Arquitectura de Software II",
                 mutableListOf(arquitectura1, distribuidos),
-                Carrera.LICENCIATURA
+                Carrera.LI
             )
             val arquitecturaDeComputadoras =
                 Materia("01314", "Arquitectura de Computadoras", mutableListOf(labo), Carrera.SIMULTANEIDAD)
@@ -192,16 +192,16 @@ class DataSeed(
                 "01315",
                 "Parseo y Generación de Código",
                 mutableListOf(lfa, caracteristicas),
-                Carrera.LICENCIATURA
+                Carrera.LI
             )
             val aspectosLegales =
                 Materia("01316", "Aspectos Legales y Sociales", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val seminarioFinal = Materia("01317", "Seminario Final", mutableListOf(), Carrera.LICENCIATURA)
+            val seminarioFinal = Materia("01317", "Seminario Final", mutableListOf(), Carrera.LI)
             val seminarioCapacitacion = Materia(
                 "01719",
                 "Seminarios de Capacitación Profesional en Informática (SCPI)",
                 mutableListOf(),
-                Carrera.LICENCIATURA
+                Carrera.LI
             )
 
             val seguridadTec = Materia("00646", "Seguridad Informática", mutableListOf(), Carrera.TPI)
@@ -217,20 +217,20 @@ class DataSeed(
             )
             val bajo = Materia("01644", "Seminario : Programación a Bajo Nivel", mutableListOf(), Carrera.TPI)
             val semantica = Materia("01319", "Semántica de Lenguajes de Programación", mutableListOf(), Carrera.TPI)
-            val seminarios = Materia("01622", "Seminários", mutableListOf(), Carrera.LICENCIATURA)
-            val calidad = Materia("01707", "Calidad del Software", mutableListOf(), Carrera.LICENCIATURA)
+            val seminarios = Materia("01622", "Seminários", mutableListOf(), Carrera.LI)
+            val calidad = Materia("01707", "Calidad del Software", mutableListOf(), Carrera.LI)
             val funcionalAvanzada =
-                Materia("01708", "Programación Funcional Avanzada", mutableListOf(), Carrera.LICENCIATURA)
+                Materia("01708", "Programación Funcional Avanzada", mutableListOf(), Carrera.LI)
             val progCuantica =
-                Materia("01709", "Introducción a la Programación Cuántica", mutableListOf(), Carrera.LICENCIATURA)
+                Materia("01709", "Introducción a la Programación Cuántica", mutableListOf(), Carrera.LI)
             val ciudadana = Materia(
                 "01710",
                 "Ciencia Ciudadana y Colaboración Abierta y Distribuida",
                 mutableListOf(),
-                Carrera.LICENCIATURA
+                Carrera.LI
             )
-            val ludificacion = Materia("01711", "Ludificación", mutableListOf(), Carrera.LICENCIATURA)
-            val cdDatos = Materia("01745", "Ciencia de Datos", mutableListOf(), Carrera.LICENCIATURA)
+            val ludificacion = Materia("01711", "Ludificación", mutableListOf(), Carrera.LI)
+            val cdDatos = Materia("01745", "Ciencia de Datos", mutableListOf(), Carrera.LI)
 
             val bddhorariosc1 = listOf(
                 Horario(Dia.MARTES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),
