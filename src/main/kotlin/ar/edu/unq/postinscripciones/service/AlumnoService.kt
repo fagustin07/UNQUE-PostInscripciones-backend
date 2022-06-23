@@ -13,6 +13,7 @@ import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaResumenDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
+import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigInteger
@@ -363,8 +364,13 @@ class AlumnoService {
 
         val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
         val comisionesInscripto = comisionesInscriptoIds.map {
-            comisionRepository.findById(it).orElseThrow {
+            val comision = comisionRepository.findById(it).orElseThrow {
                 ExcepcionUNQUE("La comision no existe")
+            }
+            if (alumno.haAprobado(comision.materia)) {
+                throw ExcepcionUNQUE("Ya has aprobado ${comision.materia.nombre}")
+            }else {
+                comision
             }
         }
 
@@ -460,4 +466,11 @@ class AlumnoService {
     }
 }
 
-data class ConflictoAlumno(val dni: Int, val legajo: Int, val mensaje: String)
+data class ConflictoAlumno(
+    @ApiModelProperty(example = "12345678")
+    val dni: Int,
+    @ApiModelProperty(example = "45965")
+    val legajo: Int,
+    @ApiModelProperty(example = "hay conflicto con el alumno ... y legajo ...")
+    val mensaje: String
+)

@@ -1,3 +1,12 @@
 package ar.edu.unq.postinscripciones.service.dto.comision
 
-data class ConflictoComision(val nombreMateria: String, val comision: Int, val mensaje: String)
+import io.swagger.annotations.ApiModelProperty
+
+data class ConflictoComision(
+    @ApiModelProperty(example = "Algoritmos")
+    val nombreMateria: String,
+    @ApiModelProperty(example = "1")
+    val comision: Int,
+    @ApiModelProperty(example = "Ya existe la comision que se quiere cargar")
+    val mensaje: String
+)

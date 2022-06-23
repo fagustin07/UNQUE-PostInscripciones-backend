@@ -359,7 +359,7 @@ class DataSeed(
                     MateriaCursada(epyl, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
                     MateriaCursada(lea, EstadoMateria.DESAPROBADO, LocalDate.of(2021, 12, 20)),
                     MateriaCursada(bdd, EstadoMateria.DESAPROBADO, LocalDate.of(2021, 12, 20)),
-                    MateriaCursada(bdd, EstadoMateria.APROBADO)
+                    MateriaCursada(bdd, EstadoMateria.DESAPROBADO)
                 )
             )
             roberto.actualizarHistoriaAcademica(

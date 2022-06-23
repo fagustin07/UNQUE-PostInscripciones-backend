@@ -3,10 +3,7 @@ package ar.edu.unq.postinscripciones.webservice.controller
 import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.service.AlumnoService
-import ar.edu.unq.postinscripciones.service.ComisionService
-import ar.edu.unq.postinscripciones.service.CuatrimestreService
-import ar.edu.unq.postinscripciones.service.MateriaService
+import ar.edu.unq.postinscripciones.service.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionConHorarios
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
@@ -52,16 +49,20 @@ class DirectivoController {
     @ApiOperation("Registrar datos basicos de alumnos en el sistema")
     @ApiResponses(
         value = [
-            ApiResponse(code = 201, message = "OK", response = ConflictoAlumnoDTO::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
+            ApiResponse(code = 201, message = "Alumnos registrados"),
+            ApiResponse(code = 400, message = "Algo salio mal"),
+            ApiResponse(code = 409, message = "Conflictos con alumnos", response = ConflictoAlumno::class, responseContainer = "List"),
         ]
     )
     @RequestMapping(value = ["/alumnos"], method = [RequestMethod.POST])
     fun registrarAlumnos(@RequestBody planillaAlumnos: List<FormularioCrearAlumno>): ResponseEntity<*> {
-        return ResponseEntity(
-            alumnoService.registrarAlumnos(planillaAlumnos),
-            HttpStatus.CREATED
-        )
+        val conflictoAlumnos = alumnoService.registrarAlumnos(planillaAlumnos)
+
+        return if (conflictoAlumnos.isEmpty()) {
+            ResponseEntity(null, HttpStatus.CREATED)
+        } else {
+            ResponseEntity(conflictoAlumnos, HttpStatus.CONFLICT)
+        }
     }
 
     @ApiOperation("Actualizar la historia academica de alumnos existentes en el sistema")
@@ -235,22 +236,31 @@ class DirectivoController {
     @ApiOperation("Registra nuevas comisiones a la oferta academica y actualiza los plazos del periodo de inscripciones.")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = ConflictoComision::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
+            ApiResponse(code = 201, message = "Comisiones creadas"),
+            ApiResponse(code = 204, message = "Fechas actualizadas"),
+            ApiResponse(code = 400, message = "Algo salio mal"),
+            ApiResponse(code = 409, message = "Hubo conflicto de comisiones", response = ConflictoComision::class, responseContainer = "List")
         ]
     )
     @RequestMapping(value = ["/comisiones/oferta"], method = [RequestMethod.POST])
     fun actualizarOfertaAcademica(
         @RequestBody oferta: OfertaAcademicaDTO,
     ): ResponseEntity<*> {
-        return ResponseEntity(
-            comisionService.actualizarOfertaAcademica(
-                oferta.comisionesACargar ?: listOf(),
-                oferta.inicioInscripciones,
-                oferta.finInscripciones
-            ),
-            HttpStatus.OK
+        val conflictoComisiones = comisionService.actualizarOfertaAcademica(
+            oferta.comisionesACargar ?: listOf(),
+            oferta.inicioInscripciones,
+            oferta.finInscripciones
         )
+
+        return if (conflictoComisiones.isNotEmpty()) {
+            ResponseEntity(conflictoComisiones, HttpStatus.CONFLICT)
+        } else {
+            if (oferta.comisionesACargar != null && oferta.comisionesACargar.isNotEmpty()) {
+                ResponseEntity(null, HttpStatus.CREATED)
+            } else {
+                ResponseEntity(null, HttpStatus.NO_CONTENT)
+            }
+        }
     }
 
     @ApiOperation("Retorna los alumnos que solicitaron una comision")
@@ -335,21 +345,20 @@ class DirectivoController {
     @ApiOperation("Registra nuevas  materias en el sistema")
     @ApiResponses(
         value = [
-            ApiResponse(
-                code = 201,
-                message = "Materia creada",
-                response = MateriaDTO::class,
-                responseContainer = "List"
-            ),
-            ApiResponse(code = 400, message = "Algo salio mal")
+            ApiResponse(code = 201, message = "Materias creadas"),
+            ApiResponse(code = 400, message = "Algo salio mal"),
+            ApiResponse(code = 409, message = "Conflicto de materias", response = ConflictoMateria::class, responseContainer = "List")
         ]
     )
     @RequestMapping(value = ["/materias"], method = [RequestMethod.POST])
     fun registrarMaterias(@RequestBody formulariosMaterias: List<FormularioMateria>): ResponseEntity<*> {
-        return ResponseEntity(
-            materiaService.crear(formulariosMaterias),
-            HttpStatus.CREATED
-        )
+        val conflictoMaterias = materiaService.crear(formulariosMaterias)
+
+        return if (conflictoMaterias.isEmpty()) {
+            ResponseEntity(null, HttpStatus.CREATED)
+        } else {
+            ResponseEntity(conflictoMaterias, HttpStatus.CONFLICT)
+        }
     }
 
     @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")

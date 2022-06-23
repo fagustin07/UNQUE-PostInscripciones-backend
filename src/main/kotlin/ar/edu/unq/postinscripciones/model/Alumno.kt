@@ -130,6 +130,8 @@ class Alumno(
 
     fun cantidadAprobadas() = historiaAcademica.count { it.estado == EstadoMateria.APROBADO }
 
+    fun haAprobado(materia: Materia) = this.materiasAprobadas().any { it.esLaMateria(materia) }
+
     fun puedeCursar(solicitudes : List<Materia>, materiasDisponibles: List<String>) : Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
     }

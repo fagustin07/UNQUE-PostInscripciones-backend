@@ -11,6 +11,7 @@ import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioModificarMateria
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
+import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -138,4 +139,11 @@ class MateriaService {
 
 }
 
-data class ConflictoMateria(val nombre: String, val codigo: String, val mensaje: String)
+data class ConflictoMateria(
+    @ApiModelProperty(example = "Base de datos")
+    val nombre: String,
+    @ApiModelProperty(example = "01035")
+    val codigo: String,
+    @ApiModelProperty(example = "la materia ... genera conflicto con ...")
+    val mensaje: String
+)
