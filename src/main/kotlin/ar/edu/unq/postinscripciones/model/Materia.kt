@@ -21,7 +21,8 @@ class Materia(
     fun esLaMateria(materia: Materia) = this.codigo == materia.codigo
 
     fun actualizarCorrelativas(correlativasDadas: MutableList<Materia>) {
-        correlativas = correlativasDadas
+        correlativas.clear()
+        correlativas.addAll(correlativasDadas)
     }
 
     fun quitarCorrelativa(codigo: String) {

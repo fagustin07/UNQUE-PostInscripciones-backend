@@ -10,7 +10,7 @@ data class MateriaCursadaDTO(
     val codigoMateria: String,
     @ApiModelProperty(example = "DESAPROBADO", required = true)
     val estado: EstadoMateria,
-    @ApiModelProperty(example = "2022-02-30", required = true)
+    @ApiModelProperty(example = "2022-03-15", required = true)
     val fechaDeCarga: LocalDate
 ) {
     companion object {

@@ -72,20 +72,30 @@ class MateriaService {
     }
 
     @Transactional
-    fun actualizarCorrelativas(materiasConCorrelativas: List<MateriaConCorrelativas>): List<MateriaDTO> {
-        return materiasConCorrelativas.map {
-            val materia = materiaRepository.findByNombreIgnoringCase(it.nombre).orElseThrow{ MateriaNoEncontradaExcepcion() }
+    fun actualizarCorrelativas(materiasConCorrelativas: List<MateriaConCorrelativas>): MutableList<ConflictoCorrelativa> {
+        val conflictoCorrelativas = mutableListOf<ConflictoCorrelativa>()
+        materiasConCorrelativas.forEach {
+            val materiaExistente = materiaRepository.findMateriaByCodigo(it.codigoMateria)
+            if (materiaExistente.isPresent) {
+                val materia = materiaExistente.get()
+                val materiasCorrelativas = mutableListOf<Materia>()
+                    it.correlativas.forEach { correlativa ->
+                    val existeCorrelativa = materiaRepository.findMateriaByCodigo(correlativa.codigoCorrelativa)
+                    if (existeCorrelativa.isPresent) {
+                        materiasCorrelativas.add(existeCorrelativa.get())
+                    } else {
+                        conflictoCorrelativas.add(ConflictoCorrelativa(materia.codigo, correlativa.codigoCorrelativa, "No se encontró la correlativa"))
+                    }
+                }
 
-            val materiasCorrelativas = it.correlativas.map { correlativa ->
-                materiaRepository
-                    .findByNombreIgnoringCase(correlativa.nombre)
-                    .orElseThrow{ ExcepcionUNQUE("No existe la materia con nombre: ${correlativa.nombre}") }
+                materia.actualizarCorrelativas(materiasCorrelativas.toMutableList())
+                materiaRepository.save(materia)
+            } else {
+                conflictoCorrelativas.add(ConflictoCorrelativa(it.codigoMateria, "", "Materia no encontrada"))
             }
-
-            materia.actualizarCorrelativas(materiasCorrelativas.toMutableList())
-
-            MateriaDTO.desdeModelo(materiaRepository.save(materia))
         }
+
+        return conflictoCorrelativas
     }
 
     @Transactional
@@ -145,5 +155,14 @@ data class ConflictoMateria(
     @ApiModelProperty(example = "01035")
     val codigo: String,
     @ApiModelProperty(example = "la materia ... genera conflicto con ...")
+    val mensaje: String
+)
+
+data class ConflictoCorrelativa(
+    @ApiModelProperty(example = "01035")
+    val codigoMateria: String,
+    @ApiModelProperty(example = "0100000213")
+    val codigoCorrelativa: String,
+    @ApiModelProperty(example = "No se encontró la correlativa")
     val mensaje: String
 )

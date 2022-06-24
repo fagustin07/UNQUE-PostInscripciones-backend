@@ -11,6 +11,7 @@ import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
 import ar.edu.unq.postinscripciones.service.dto.comision.*
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
+import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -118,18 +119,28 @@ class ComisionService {
     }
 
     @Transactional
-    fun modificarHorarios(comisionesConHorarios: List<ComisionConHorarios>, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
-        return comisionesConHorarios.map { comisionConHorarios ->
-            val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { ExcepcionUNQUE("Cuatrimestre no encontrado") }
-            val materia = materiaRepository.findByNombreIgnoringCase(comisionConHorarios.materia).orElseThrow { MateriaNoEncontradaExcepcion() }
-            val comision = comisionRespository
-                .findByNumeroAndMateriaAndCuatrimestre(comisionConHorarios.comision, materia, cuatrimestreObtenido)
-                .orElseThrow { ExcepcionUNQUE("No se encontro la comision") }
+    fun modificarHorarios(comisionesConHorarios: List<ComisionConHorarios>, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): MutableList<ConflictoHorarios> {
+        val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { ExcepcionUNQUE("Cuatrimestre no encontrado") }
+        val conflictoHorarios = mutableListOf<ConflictoHorarios>()
 
-            comision.modificarHorarios(comisionConHorarios.horarios.map { HorarioDTO.aModelo(it) })
-
-            ComisionDTO.desdeModelo(comisionRespository.save(comision))
+        comisionesConHorarios.forEach { comisionConHorarios ->
+            val materia = materiaRepository.findMateriaByCodigo(comisionConHorarios.materia)
+            if (materia.isPresent) {
+                val comision = comisionRespository
+                    .findByNumeroAndMateriaAndCuatrimestre(comisionConHorarios.comision, materia.get(), cuatrimestreObtenido)
+                if (comision.isPresent) {
+                    val comisionObtenida = comision.get()
+                    comisionObtenida.modificarHorarios(comisionConHorarios.horarios.map { HorarioDTO.aModelo(it) })
+                    comisionRespository.save(comisionObtenida)
+                } else {
+                    conflictoHorarios.add(ConflictoHorarios(comisionConHorarios.comision, comisionConHorarios.materia, "No se encontró la comision"))
+                }
+            } else {
+                conflictoHorarios.add(ConflictoHorarios(comisionConHorarios.comision, comisionConHorarios.materia, "No se encontró la materia"))
+            }
         }
+
+        return conflictoHorarios
     }
 
     private fun actualizarCuatrimestre(
@@ -158,7 +169,7 @@ class ComisionService {
                 materia,
                 comisionACrear.numeroComision,
                 cuatrimestre,
-                listOf(),
+                mutableListOf(),
                 comisionACrear.cuposTotales,
                 comisionACrear.sobrecuposTotales
             )
@@ -175,7 +186,7 @@ class ComisionService {
                 materia,
                 formularioComision.numero,
                 cuatrimestre,
-                formularioComision.horarios.map { HorarioDTO.aModelo(it) },
+                formularioComision.horarios.map { HorarioDTO.aModelo(it) }.toMutableList(),
                 formularioComision.cuposTotales,
                 formularioComision.sobreCuposTotales,
                 formularioComision.modalidad
@@ -183,3 +194,12 @@ class ComisionService {
         )
     }
 }
+
+data class ConflictoHorarios(
+    @ApiModelProperty(example = "1")
+    val comision: Int,
+    @ApiModelProperty(example = "01035")
+    val materia: String,
+    @ApiModelProperty(example = "Comision no encontrada")
+    val mensaje: String
+)

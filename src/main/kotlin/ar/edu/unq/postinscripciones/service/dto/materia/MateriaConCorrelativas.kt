@@ -3,12 +3,12 @@ package ar.edu.unq.postinscripciones.service.dto.materia
 import io.swagger.annotations.ApiModelProperty
 
 data class MateriaConCorrelativas(
-    @ApiModelProperty(example = "bases de datos")
-    val nombre: String,
+    @ApiModelProperty(example = "01035")
+    val codigoMateria: String,
     val correlativas: List<Correlativa>
 )
 
 data class Correlativa(
-    @ApiModelProperty(example = "matemática 1")
-    val nombre: String
+    @ApiModelProperty(example = "01033")
+    val codigoCorrelativa: String
 )

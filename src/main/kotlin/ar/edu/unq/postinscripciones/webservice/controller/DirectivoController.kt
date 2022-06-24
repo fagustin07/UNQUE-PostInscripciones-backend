@@ -68,18 +68,21 @@ class DirectivoController {
     @ApiOperation("Actualizar la historia academica de alumnos existentes en el sistema")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = AlumnoDTO::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
+            ApiResponse(code = 200, message = "OK"),
+            ApiResponse(code = 400, message = "Algo salio mal"),
+            ApiResponse(code = 409, message = "Conflictos al actualizar historias academicas", response = ConflictoHistoriaAcademica::class, responseContainer = "List"),
         ]
     )
     @RequestMapping(value = ["/alumnos/historia-academica"], method = [RequestMethod.PATCH])
     fun actualizarHistoriaAcademica(
         @RequestBody alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>
     ): ResponseEntity<*> {
-        return ResponseEntity(
-            alumnoService.actualizarHistoriaAcademica(alumnosConHistoriaAcademica),
-            HttpStatus.OK
-        )
+        val conflictoHistoriaAcademicas = alumnoService.actualizarHistoriaAcademica(alumnosConHistoriaAcademica)
+        return if (conflictoHistoriaAcademicas.isEmpty()) {
+            ResponseEntity(null, HttpStatus.OK)
+        } else {
+            ResponseEntity(conflictoHistoriaAcademicas, HttpStatus.CONFLICT)
+        }
     }
 
     @ApiOperation("#### Retorna el formulario actual y un resumen de la historia academica del alumno dado ####")
@@ -320,13 +323,9 @@ class DirectivoController {
     @ApiOperation("Actualiza los horarios de comisiones existentes")
     @ApiResponses(
         value = [
-            ApiResponse(
-                code = 200,
-                message = "OK",
-                response = ComisionDTO::class,
-                responseContainer = "List"
-            ),
-            ApiResponse(code = 400, message = "Algo salio mal")
+            ApiResponse(code = 200, message = "OK"),
+            ApiResponse(code = 400, message = "Algo salio mal"),
+            ApiResponse(code = 409, message = "Conflicto al actualizar horarios", response = ConflictoHorarios::class, responseContainer = "List")
         ]
     )
     @RequestMapping(value = ["/comisiones/horarios"], method = [RequestMethod.PATCH])
@@ -334,10 +333,12 @@ class DirectivoController {
         @RequestBody
         comisionesConHorarios: List<ComisionConHorarios>
     ): ResponseEntity<*> {
-        return ResponseEntity(
-            comisionService.modificarHorarios(comisionesConHorarios),
-            HttpStatus.OK
-        )
+        val conflictoHorarios = comisionService.modificarHorarios(comisionesConHorarios)
+        return if(conflictoHorarios.isEmpty()) {
+            ResponseEntity(null, HttpStatus.OK)
+        } else {
+            ResponseEntity(conflictoHorarios, HttpStatus.CONFLICT)
+        }
     }
 
 //    CONTROLADOR MATERIAS
@@ -406,23 +407,27 @@ class DirectivoController {
     @ApiOperation(value = "Actualiza las materias correlativas de materias registradas")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = MateriaDTO::class, responseContainer = "List"),
-            ApiResponse(code = 400, message = "Algo salio mal")
+            ApiResponse(code = 200, message = "OK"),
+            ApiResponse(code = 400, message = "Algo salio mal"),
+            ApiResponse(code = 409, message = "Conflicto al actualizar correlativas", response = ConflictoCorrelativa::class, responseContainer = "List"),
+
         ]
     )
     @RequestMapping(value = ["/materias/correlativas"], method = [RequestMethod.PATCH])
     fun actualizarCorrelativas(
         @RequestBody
         @ApiParam(
-            value = "lista de tuplas de (nombre de la materia, lista de nombres de sus correlativas), case insensitive",
+            value = "lista de tuplas de (codigo materia, lista de codigo de sus correlativas)",
             required = true
         )
         materiasConCorrelativas: List<MateriaConCorrelativas>
     ): ResponseEntity<*> {
-        return ResponseEntity(
-            materiaService.actualizarCorrelativas(materiasConCorrelativas),
-            HttpStatus.OK
-        )
+        val conflictoCorrelativas = materiaService.actualizarCorrelativas(materiasConCorrelativas)
+        return if (conflictoCorrelativas.isEmpty()) {
+            ResponseEntity(null, HttpStatus.OK)
+        } else {
+            ResponseEntity(conflictoCorrelativas, HttpStatus.CONFLICT)
+        }
     }
 
     @ApiOperation(value = "Retorna todas las comisiones del cuatrimestre actual de una materia especifica")

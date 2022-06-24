@@ -232,41 +232,41 @@ class DataSeed(
             val ludificacion = Materia("01711", "Ludificación", mutableListOf(), Carrera.LI)
             val cdDatos = Materia("01745", "Ciencia de Datos", mutableListOf(), Carrera.LI)
 
-            val bddhorariosc1 = listOf(
+            val bddhorariosc1 = mutableListOf(
                 Horario(Dia.MARTES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),
                 Horario(Dia.JUEVES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
             )
 
-            val bddhorariosc2 = listOf(
+            val bddhorariosc2 = mutableListOf(
                 Horario(Dia.LUNES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),
                 Horario(Dia.MIERCOLES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
             )
 
-            val matehorarios = listOf(
+            val matehorarios = mutableListOf(
                 Horario(Dia.LUNES, LocalTime.of(10, 30, 0), LocalTime.of(12, 30, 0)),
                 Horario(Dia.JUEVES, LocalTime.of(10, 30, 0), LocalTime.of(12, 30, 0))
             )
 
-            val estrhorarios = listOf(
+            val estrhorarios = mutableListOf(
                 Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0)),
                 Horario(Dia.MIERCOLES, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0)),
                 Horario(Dia.VIERNES, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0))
             )
 
-            val introhorariosc1 = listOf(
+            val introhorariosc1 = mutableListOf(
                 Horario(Dia.MARTES, LocalTime.of(18, 0, 0), LocalTime.of(20, 0, 0)),
                 Horario(Dia.JUEVES, LocalTime.of(18, 0, 0), LocalTime.of(22, 0, 0))
             )
 
-            val introhorariosc2 = listOf(
+            val introhorariosc2 = mutableListOf(
                 Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(11, 0, 0)),
                 Horario(Dia.JUEVES, LocalTime.of(18, 0, 0), LocalTime.of(22, 0, 0))
             )
-            val orgahorariosc1 = listOf(
+            val orgahorariosc1 = mutableListOf(
                 Horario(Dia.LUNES, LocalTime.of(9, 0, 0), LocalTime.of(11, 0, 0)),
                 Horario(Dia.MIERCOLES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
             )
-            val ingles1horariosc1 = listOf(
+            val ingles1horariosc1 = mutableListOf(
                 Horario(Dia.MIERCOLES, LocalTime.of(14, 0, 0), LocalTime.of(18, 0, 0))
             )
             val cuatrimestre = Cuatrimestre.actual()

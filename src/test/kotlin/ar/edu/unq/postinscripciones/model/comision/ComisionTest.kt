@@ -22,7 +22,7 @@ internal class ComisionTest {
     fun `set up`() {
         val horarios: List<Horario> = horariosBdd()
         bdd = Materia()
-        comisionUnoBdd = Comision(bdd, 1, cuatrimestre, horarios, cuposTotales, sobrecuposTotales)
+        comisionUnoBdd = Comision(bdd, 1, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales)
     }
 
     @Test
@@ -72,7 +72,7 @@ internal class ComisionTest {
     @Test
     fun `Una comision sabe su modalidad`() {
         val horarios: List<Horario> = horariosBdd()
-        val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios, cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL)
+        val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL)
         assertThat(comisionDosBdd.modalidad).isEqualTo(Modalidad.VIRTUAL)
     }
 

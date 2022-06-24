@@ -21,7 +21,7 @@ class Comision(
     @Column(nullable = false)
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name ="comision_id")
-    var horarios: List<Horario> = listOf(),
+    var horarios: MutableList<Horario> = mutableListOf(),
     @Column(nullable = false)
     val cuposTotales: Int = 30,
     @Column(nullable = false)
@@ -38,7 +38,8 @@ class Comision(
     fun sobrecuposDisponibles() = sobrecuposTotales - sobrecuposOcupados
 
     fun modificarHorarios(nuevosHorarios: List<Horario>) {
-        horarios = nuevosHorarios
+        horarios.clear()
+        horarios.addAll(nuevosHorarios)
     }
 
     fun asignarSobrecupo() {

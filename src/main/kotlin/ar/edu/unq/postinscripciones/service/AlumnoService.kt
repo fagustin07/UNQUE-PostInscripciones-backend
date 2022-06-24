@@ -62,24 +62,37 @@ class AlumnoService {
     }
 
     @Transactional
-    fun actualizarHistoriaAcademica(alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>): List<AlumnoDTO> {
-        return alumnosConHistoriaAcademica.map { alumnoConHistoriaAcademica ->
-            val alumno = alumnoRepository.findById(alumnoConHistoriaAcademica.dni)
-                .orElseThrow { ExcepcionUNQUE("No se encontro al alumno") }
-
-            val historiaAcademica: List<MateriaCursada> = alumnoConHistoriaAcademica.materiasCursadas.map {
-                val materia = materiaRepository
-                    .findMateriaByCodigo(it.codigoMateria).orElseThrow { ExcepcionUNQUE("No existe la materia") }
-                val materiaCursada = MateriaCursada(materia)
-                materiaCursada.estado = it.estado
-                materiaCursada.fechaDeCarga = it.fechaDeCarga
-                materiaCursada
+    fun actualizarHistoriaAcademica(alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>): MutableList<ConflictoHistoriaAcademica> {
+        val conflictoHistoriaAcademicaAlumnos: MutableList<ConflictoHistoriaAcademica> = mutableListOf()
+        alumnosConHistoriaAcademica.forEach { alumnoConHistoriaAcademica ->
+            val existeAlumno = alumnoRepository.findById(alumnoConHistoriaAcademica.dni)
+            if (existeAlumno.isPresent) {
+                val alumno = existeAlumno.get()
+                val historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
+                    alumnoConHistoriaAcademica.materiasCursadas.forEach {
+                    val existeMateria = materiaRepository.findMateriaByCodigo(it.codigoMateria)
+                    if (existeMateria.isPresent) {
+                        historiaAcademica.add(MateriaCursada(existeMateria.get(), it.estado, it.fechaDeCarga))
+                    } else {
+                        conflictoHistoriaAcademicaAlumnos.add(ConflictoHistoriaAcademica(alumno.dni, it.codigoMateria, "No existe la materia"))
+                    }
+                }
+                if (historiaAcademica.isEmpty()) {
+                    conflictoHistoriaAcademicaAlumnos
+                        .add(ConflictoHistoriaAcademica(alumno.dni, "-", "No se modificó " +
+                                "la historia academica ya que se presentó una lista con materias inválidas que " +
+                                "hizo que quede vacía"))
+                } else {
+                    alumno.actualizarHistoriaAcademica(historiaAcademica)
+                    alumnoRepository.save(alumno)
+                }
+            } else {
+                conflictoHistoriaAcademicaAlumnos.add(ConflictoHistoriaAcademica(alumnoConHistoriaAcademica.dni, "-", "No existe el alumno"))
             }
 
-            alumno.actualizarHistoriaAcademica(historiaAcademica)
-
-            AlumnoDTO.desdeModelo(alumnoRepository.save(alumno))
         }
+
+        return conflictoHistoriaAcademicaAlumnos
     }
 
     @Transactional
@@ -472,5 +485,14 @@ data class ConflictoAlumno(
     @ApiModelProperty(example = "45965")
     val legajo: Int,
     @ApiModelProperty(example = "hay conflicto con el alumno ... y legajo ...")
+    val mensaje: String
+)
+
+data class ConflictoHistoriaAcademica(
+    @ApiModelProperty(example = "12345678")
+    val dni: Int,
+    @ApiModelProperty(example = "231321")
+    val materia: String,
+    @ApiModelProperty(example = "Materia no encontrada")
     val mensaje: String
 )

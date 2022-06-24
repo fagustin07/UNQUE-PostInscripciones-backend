@@ -486,8 +486,8 @@ internal class AlumnoServiceTest {
         val materiaCursada2 = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val segundoActualizarHistoria =
             listOf(AlumnoConHistoriaAcademica(otroAlumno.dni, listOf(materiaCursada, materiaCursada2)))
-        val dto = alumnoService.actualizarHistoriaAcademica(segundoActualizarHistoria)
-        val alumnoDespuesDeActualizar = alumnoService.buscarAlumno(dto.first().dni)
+        alumnoService.actualizarHistoriaAcademica(segundoActualizarHistoria)
+        val alumnoDespuesDeActualizar = alumnoService.buscarAlumno(otroAlumno.dni)
 
         assertThat(alumnoDespuesDeActualizar.historiaAcademica).isNotEmpty
         assertThat(alumnoDespuesDeActualizar.historiaAcademica.map { it.materia.codigo })
