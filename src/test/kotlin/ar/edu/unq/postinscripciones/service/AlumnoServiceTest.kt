@@ -19,6 +19,7 @@ import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestr
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Condition
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -1349,19 +1350,20 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Al cerrar un formulario se puede agregar comentarios adicionales`() {
-        val formularioAntesDeCerrar = alumnoService.guardarSolicitudPara(
+        val formularioAlumno = alumnoService.guardarSolicitudPara(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
         )
-        alumnoService.cerrarFormulario(formularioAntesDeCerrar.id, alumno.dni, "Te rechazo todo porque si")
-        val formularioDespuesDeCerrar = alumnoService.obtenerResumenAlumno(alumno.dni)
+        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Generales", "Una Descripcion")
+        val formularioDespuesDeComentar = alumnoService.obtenerResumenAlumno(alumno.dni).formulario
 
-        assertThat(formularioDespuesDeCerrar.formulario.comentarios).isEqualTo("Te rechazo todo porque si")
+        assertThat(formularioDespuesDeComentar.comentarios.first().titulo).isEqualTo("Generales")
+        assertThat(formularioDespuesDeComentar.comentarios.first().descrpcion).isEqualTo("Una Descripcion")
     }
 
     @Test
-    fun `Los comentarios de un formulario se ven una vez cerrado`() {
+    fun `Los comentarios de un formulario solo los ve un directivo`() {
         val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
         alumnoService.guardarSolicitudPara(
                 alumno.dni,
@@ -1369,41 +1371,44 @@ internal class AlumnoServiceTest {
                 cuatrimestre
         )
 
-        val formularioAntesDeCerrar = alumnoService.obtenerFormulario(jwt, cuatrimestre)
+        val formularioAlumno = alumnoService.obtenerFormulario(jwt, cuatrimestre)
+        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Generales", "Una Descripcion")
 
-        alumnoService.cerrarFormulario(formularioAntesDeCerrar.id, alumno.dni, "Te rechazo todo porque si")
+        val formularioAlumnoDespuesDeComentar = alumnoService.obtenerFormulario(jwt, cuatrimestre)
+        val formularioDirectivoDespuesDeComentar = alumnoService.obtenerResumenAlumno(alumno.dni).formulario
 
-        val formularioDespuesDeCerrar = alumnoService.obtenerFormulario(jwt, cuatrimestre)
-
-        assertThat(formularioAntesDeCerrar.comentarios).isEqualTo("En proceso de evaluacion")
-        assertThat(formularioDespuesDeCerrar.comentarios).isEqualTo("Te rechazo todo porque si")
-    }
-
-    @Test
-    fun `Se pueden agregar un comentario general al cerrar todos los formularios del cuatrimestre corriente`() {
-        val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
-        val fechaDeModificacion = cuatrimestre.finInscripciones.plusDays(5)
-        alumnoService.guardarSolicitudPara(
-                alumno.dni,
-                listOf(comision1Algoritmos.id!!),
-                cuatrimestre
-        )
-        alumnoService.guardarSolicitudPara(
-                fede.dni,
-                listOf(comision1Algoritmos.id!!),
-                cuatrimestre
-        )
-
-        alumnoService.cerrarFormularios(fechaDeModificacion, "No hay mas cupos")
-
-        val formularioDespuesDeCerrar = alumnoService.obtenerFormulario(jwt, cuatrimestre)
-        val formulario2DespuesDeCerrar = alumnoService.obtenerFormulario(jwt, cuatrimestre)
-
-        assertThat(listOf(formularioDespuesDeCerrar, formulario2DespuesDeCerrar).map { it.comentarios })
+        assertThat(formularioAlumnoDespuesDeComentar)
                 .usingRecursiveComparison()
-                .isEqualTo(listOf("No hay mas cupos", "No hay mas cupos"))
+                .ignoringFields("comentarios")
+                .isEqualTo(formularioDirectivoDespuesDeComentar)
     }
 
+    @Test
+    fun `Los comentarios de un formulario se ordenan por fecha de carga`() {
+        val jwt = autenticacionService.loguearse(alumno.dni, "contrasenia")
+        alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+        )
+
+        val formularioAlumno = alumnoService.obtenerFormulario(jwt, cuatrimestre)
+        alumnoService.agregarComentario(
+                formularioAlumno.id,
+                alumno.dni,
+                "Generales",
+                "Aprobado por este lado",
+                fechaCarga = LocalDateTime.now().minusHours(5)
+        )
+        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Generales", "Todo bien")
+
+        val formularioDirectivoDespuesDeComentar = alumnoService.obtenerResumenAlumno(alumno.dni).formulario
+
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().titulo).isEqualTo("Generales")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().descrpcion).isEqualTo("Todo bien")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].titulo).isEqualTo("Generales")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].descrpcion).isEqualTo("Aprobado por este lado")
+    }
 
     @AfterEach
     fun tearDown() {

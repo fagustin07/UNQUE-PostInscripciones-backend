@@ -2,8 +2,8 @@ package ar.edu.unq.postinscripciones.webservice.controller
 
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.CuatrimestreService
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioAlumnoDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearOActualizarFormulario
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import io.swagger.annotations.ApiOperation
@@ -36,7 +36,7 @@ class AlumnoController {
     @ApiOperation("Realiza carga de una solicitud de comisiones para el alumno.")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "Solicitudes cargadas correctamente", response = FormularioDTO::class),
+            ApiResponse(code = 200, message = "Solicitudes cargadas correctamente", response = FormularioAlumnoDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
@@ -58,7 +58,7 @@ class AlumnoController {
     @ApiOperation("Actualiza las comisiones que solicita el alumno.")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
+            ApiResponse(code = 200, message = "OK", response = FormularioAlumnoDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
@@ -100,7 +100,7 @@ class AlumnoController {
     @ApiOperation("El alumno obtiene el formulario de sobrecupos del cuatrimestre actual")
     @ApiResponses(
             value = [
-                ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
+                ApiResponse(code = 200, message = "OK", response = FormularioAlumnoDTO::class),
                 ApiResponse(code = 400, message = "Algo salio mal")
             ]
     )

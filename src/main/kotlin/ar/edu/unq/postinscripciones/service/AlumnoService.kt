@@ -7,9 +7,7 @@ import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDTO
-import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.*
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaResumenDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
@@ -102,13 +100,13 @@ class AlumnoService {
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
         fechaCarga: LocalDateTime = LocalDateTime.now(),
         comisionesInscriptoIds: List<Long> = listOf()
-    ): FormularioDTO {
+    ): FormularioAlumnoDTO {
         val alumno = alumnoRepository.findById(dni).get()
         val formulario = crearFormulario(cuatrimestre, alumno, idComisiones, comisionesInscriptoIds, fechaCarga)
         alumno.guardarFormulario(formulario)
         alumnoRepository.save(alumno)
 
-        return FormularioDTO.desdeModeloParaAlumno(formulario, alumno.dni)
+        return FormularioAlumnoDTO.desdeModeloCerrado(formulario, alumno.dni)
     }
 
     @Transactional
@@ -118,13 +116,13 @@ class AlumnoService {
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
         fechaCarga: LocalDateTime = LocalDateTime.now(),
         comisionesInscriptoIds: List<Long> = listOf()
-    ): FormularioDTO {
+    ): FormularioAlumnoDTO {
         val alumno = alumnoRepository.findById(dni).get()
         val formulario = crearFormulario(cuatrimestre, alumno, idComisiones, comisionesInscriptoIds, fechaCarga)
         alumno.cambiarFormulario(cuatrimestre.anio, cuatrimestre.semestre, formulario)
         alumnoRepository.save(alumno)
 
-        return FormularioDTO.desdeModeloParaAlumno(formulario, alumno.dni)
+        return FormularioAlumnoDTO.desdeModeloCerrado(formulario, alumno.dni)
     }
 
     @Transactional
@@ -138,7 +136,7 @@ class AlumnoService {
     }
 
     @Transactional
-    fun obtenerFormulario(token: String, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): FormularioDTO {
+    fun obtenerFormulario(token: String, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): FormularioAlumnoDTO {
         val cuatrimestreObtenido =
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
@@ -151,9 +149,9 @@ class AlumnoService {
         )
 
         return if (formulario.estado === EstadoFormulario.CERRADO) {
-            FormularioDTO.desdeModelo(formulario, dni)
+            FormularioAlumnoDTO.desdeModelo(formulario, dni)
         } else {
-            FormularioDTO.desdeModeloParaAlumno(formulario, dni)
+            FormularioAlumnoDTO.desdeModeloCerrado(formulario, dni)
         }
     }
 
@@ -183,16 +181,15 @@ class AlumnoService {
     }
 
     @Transactional
-    fun cerrarFormulario(formularioId: Long, alumnoDni: Int, comentarios: String = ""): FormularioDTO {
+    fun cerrarFormulario(formularioId: Long, alumnoDni: Int): FormularioDirectorDTO {
         val formulario =
             formularioRepository.findById(formularioId).orElseThrow { ExcepcionUNQUE("No existe el formulario") }
         formulario.cerrarFormulario()
-        formulario.agregarComentarios(comentarios)
-        return FormularioDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
+        return FormularioDirectorDTO.desdeModelo(formularioRepository.save(formulario), alumnoDni)
     }
 
     @Transactional
-    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now(), comentarioGeneral: String = "") {
+    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now()) {
         val cuatrimestreObtenido = Cuatrimestre.actual()
         val alumnos = alumnoRepository.findAll()
 
@@ -203,7 +200,6 @@ class AlumnoService {
         alumnos.forEach {
             val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
             chequearEstado(formulario, fecha)
-            formulario.agregarComentarios(comentarioGeneral)
             formulario.cerrarFormulario()
         }
     }
@@ -246,7 +242,7 @@ class AlumnoService {
             alumno.legajo,
             alumno.carrera,
             alumno.coeficiente,
-            FormularioDTO.desdeModelo(
+            FormularioDirectorDTO.desdeModelo(
                 alumno.obtenerFormulario(
                     cuatrimestreObtenido.anio,
                     cuatrimestreObtenido.semestre
@@ -296,7 +292,7 @@ class AlumnoService {
         idComision: Long,
         cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
         fechaCarga: LocalDateTime = LocalDateTime.now()
-    ): FormularioDTO {
+    ): FormularioDirectorDTO {
         val cuatrimestreObtenido =
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
@@ -306,7 +302,7 @@ class AlumnoService {
         val formulario = alumno.agregarSolicitud(comision, cuatrimestreObtenido)
 
         alumnoRepository.save(alumno)
-        return FormularioDTO.desdeModelo(formulario, alumno.dni)
+        return FormularioDirectorDTO.desdeModelo(formulario, alumno.dni)
 
     }
 
@@ -361,6 +357,21 @@ class AlumnoService {
         }
         alumno.borrarFormulario(cuatrimestrePersistido.anio, cuatrimestrePersistido.semestre)
         alumnoRepository.save(alumno)
+    }
+
+    @Transactional
+    fun agregarComentario(
+            formularioId: Long,
+            dni: Int,
+            titulo:String,
+            descripcion: String,
+            cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
+            fechaCarga: LocalDateTime = LocalDateTime.now()
+    ): FormularioDirectorDTO {
+        val formulario = formularioRepository.findById(formularioId).get()
+        formulario.agregarComentarios(descripcion, titulo, fechaCarga)
+
+        return FormularioDirectorDTO.desdeModelo(formularioRepository.save(formulario), dni)
     }
 
     fun crearFormulario(

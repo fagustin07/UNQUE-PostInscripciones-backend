@@ -10,7 +10,7 @@ import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.ConflictoComision
 import ar.edu.unq.postinscripciones.service.dto.cuatrimestre.OfertaAcademicaDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDirectorDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
@@ -107,7 +107,7 @@ class DirectivoController {
     @ApiOperation("Agrega una solicitud de comision  al  formulario de un alumno")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "OK", response = FormularioDTO::class),
+            ApiResponse(code = 200, message = "OK", response = FormularioDirectorDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
@@ -155,7 +155,7 @@ class DirectivoController {
     @ApiOperation("Cierra un formulario de sobrecupo")
     @ApiResponses(
         value = [
-            ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDTO::class),
+            ApiResponse(code = 200, message = "Formulario Cerrado", response = FormularioDirectorDTO::class),
             ApiResponse(code = 400, message = "Algo salio mal")
         ]
     )
@@ -166,13 +166,10 @@ class DirectivoController {
         id: Long,
         @ApiParam(value = "Dni del alumno", example = "12345677", required = true)
         @RequestParam
-        dni: Int,
-        @ApiParam(value = "Comentarios para el alumno", example = "Un comentario", required = false)
-        @RequestParam
-        comentarios: String
+        dni: Int
     ): ResponseEntity<*> {
         return ResponseEntity(
-            alumnoService.cerrarFormulario(id, dni, comentarios),
+            alumnoService.cerrarFormulario(id, dni),
             HttpStatus.OK
         )
     }
@@ -188,6 +185,34 @@ class DirectivoController {
     fun cerrarFormularios(): ResponseEntity<*> {
         alumnoService.cerrarFormularios()
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
+    }
+
+    @ApiOperation("Agrega comentarios al formulario")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 200, message = "OK", response = FormularioDirectorDTO::class),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/formulario/{id}/comentar"], method = [RequestMethod.PATCH])
+    fun agregarComentario(
+            @ApiParam(value = "Id del formulario", example = "1", required = true)
+            @PathVariable
+            id: Long,
+            @ApiParam(value = "Dni alumno", example = "12345677", required = true)
+            @RequestParam
+            dni: Int,
+            @ApiParam(value = "Titulo del comentario", example = "General", required = true)
+            @RequestParam
+            titulo: String,
+            @ApiParam(value = "Descripcion del comentario", example = "Una descripcion", required = true)
+            @RequestParam
+            descripcion: String
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+                alumnoService.agregarComentario(id, dni, titulo, descripcion),
+                HttpStatus.OK
+        )
     }
 
     @ApiOperation("Listado de alumnos con detalle de formulario filtrado por dni")

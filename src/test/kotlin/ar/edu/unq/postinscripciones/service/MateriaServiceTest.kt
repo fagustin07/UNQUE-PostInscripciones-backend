@@ -215,7 +215,7 @@ internal class MateriaServiceTest {
         val alumno2 =
             alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LI, 0.0))
 
-        val formulario : FormularioDTO= alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
+        val formulario = alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
 
         comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)

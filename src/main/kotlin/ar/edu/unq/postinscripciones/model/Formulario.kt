@@ -4,8 +4,10 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.formulario.ComentarioDTO
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -27,7 +29,8 @@ class Formulario(
     @Enumerated(EnumType.STRING)
     var estado = EstadoFormulario.ABIERTO
 
-    var comentarios: String = ""
+    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    var comentarios: MutableList<Comentario> = mutableListOf()
 
     init {
         checkNoHaySuperposiciones(solicitudes, comisionesInscripto)
@@ -37,8 +40,10 @@ class Formulario(
         solicitudes.add(solicitud)
     }
 
-    fun agregarComentarios(comentarios: String) {
-        this.comentarios = comentarios
+    fun agregarComentarios(descripcion: String, titulo: String, fechaDeCarga: LocalDateTime = LocalDateTime.now()) {
+        val comentario = Comentario(this, titulo, descripcion, fechaDeCarga)
+        comentarios.add(comentario)
+        comentarios.sortByDescending { it.fechaDeCarga }
     }
 
     fun cerrarFormulario() {
