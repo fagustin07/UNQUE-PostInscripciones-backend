@@ -202,15 +202,15 @@ class DirectivoController {
             @ApiParam(value = "Dni alumno", example = "12345677", required = true)
             @RequestParam
             dni: Int,
-            @ApiParam(value = "Titulo del comentario", example = "General", required = true)
+            @ApiParam(value = "Autor del comentario", example = "Gabi", required = true)
             @RequestParam
-            titulo: String,
+            autor: String,
             @ApiParam(value = "Descripcion del comentario", example = "Una descripcion", required = true)
             @RequestParam
             descripcion: String
     ): ResponseEntity<*> {
         return ResponseEntity(
-                alumnoService.agregarComentario(id, dni, titulo, descripcion),
+                alumnoService.agregarComentario(id, dni, autor, descripcion),
                 HttpStatus.OK
         )
     }

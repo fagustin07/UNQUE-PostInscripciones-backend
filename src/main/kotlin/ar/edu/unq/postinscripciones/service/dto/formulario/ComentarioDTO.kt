@@ -4,14 +4,14 @@ import ar.edu.unq.postinscripciones.model.Comentario
 import java.time.LocalDateTime
 
 data class ComentarioDTO(
-        val titulo: String,
-        val descrpcion: String,
+        val autor: String,
+        val descripcion: String,
         val fecha: LocalDateTime
 ){
     companion object {
         fun desdeModelo(comentario: Comentario): ComentarioDTO {
             return ComentarioDTO(
-                    comentario.titulo,
+                    comentario.autor,
                     comentario.descripcion,
                     comentario.fechaDeCarga
             )

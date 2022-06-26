@@ -363,13 +363,13 @@ class AlumnoService {
     fun agregarComentario(
             formularioId: Long,
             dni: Int,
-            titulo:String,
+            autor:String,
             descripcion: String,
             cuatrimestre: Cuatrimestre = Cuatrimestre.actual(),
             fechaCarga: LocalDateTime = LocalDateTime.now()
     ): FormularioDirectorDTO {
         val formulario = formularioRepository.findById(formularioId).get()
-        formulario.agregarComentarios(descripcion, titulo, fechaCarga)
+        formulario.agregarComentarios(descripcion, autor, fechaCarga)
 
         return FormularioDirectorDTO.desdeModelo(formularioRepository.save(formulario), dni)
     }

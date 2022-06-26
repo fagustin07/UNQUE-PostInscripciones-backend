@@ -19,7 +19,6 @@ import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestr
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Condition
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -1349,17 +1348,17 @@ internal class AlumnoServiceTest {
     }
 
     @Test
-    fun `Al cerrar un formulario se puede agregar comentarios adicionales`() {
+    fun `Se pueden agregar comentarios a un formulario`() {
         val formularioAlumno = alumnoService.guardarSolicitudPara(
                 alumno.dni,
                 listOf(comision1Algoritmos.id!!),
                 cuatrimestre
         )
-        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Generales", "Una Descripcion")
+        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Gabi", "Una Descripcion")
         val formularioDespuesDeComentar = alumnoService.obtenerResumenAlumno(alumno.dni).formulario
 
-        assertThat(formularioDespuesDeComentar.comentarios.first().titulo).isEqualTo("Generales")
-        assertThat(formularioDespuesDeComentar.comentarios.first().descrpcion).isEqualTo("Una Descripcion")
+        assertThat(formularioDespuesDeComentar.comentarios.first().autor).isEqualTo("Gabi")
+        assertThat(formularioDespuesDeComentar.comentarios.first().descripcion).isEqualTo("Una Descripcion")
     }
 
     @Test
@@ -1372,7 +1371,7 @@ internal class AlumnoServiceTest {
         )
 
         val formularioAlumno = alumnoService.obtenerFormulario(jwt, cuatrimestre)
-        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Generales", "Una Descripcion")
+        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Gabi", "Una Descripcion")
 
         val formularioAlumnoDespuesDeComentar = alumnoService.obtenerFormulario(jwt, cuatrimestre)
         val formularioDirectivoDespuesDeComentar = alumnoService.obtenerResumenAlumno(alumno.dni).formulario
@@ -1396,18 +1395,18 @@ internal class AlumnoServiceTest {
         alumnoService.agregarComentario(
                 formularioAlumno.id,
                 alumno.dni,
-                "Generales",
+                "Gabi",
                 "Aprobado por este lado",
                 fechaCarga = LocalDateTime.now().minusHours(5)
         )
-        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Generales", "Todo bien")
+        alumnoService.agregarComentario(formularioAlumno.id, alumno.dni, "Flavia", "Todo bien")
 
         val formularioDirectivoDespuesDeComentar = alumnoService.obtenerResumenAlumno(alumno.dni).formulario
 
-        assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().titulo).isEqualTo("Generales")
-        assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().descrpcion).isEqualTo("Todo bien")
-        assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].titulo).isEqualTo("Generales")
-        assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].descrpcion).isEqualTo("Aprobado por este lado")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().autor).isEqualTo("Flavia")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().descripcion).isEqualTo("Todo bien")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].autor).isEqualTo("Gabi")
+        assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].descripcion).isEqualTo("Aprobado por este lado")
     }
 
     @AfterEach

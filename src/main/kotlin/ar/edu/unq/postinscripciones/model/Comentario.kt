@@ -6,9 +6,9 @@ import javax.persistence.*
 
 @Entity
 class Comentario(
-        @ManyToOne(fetch = FetchType.EAGER, optional = false)
+        @ManyToOne(fetch = FetchType.EAGER)
         val formulario: Formulario = Formulario(Cuatrimestre.actual(), mutableListOf(), mutableListOf()),
-        val titulo: String = "",
+        val autor: String = "",
         val descripcion: String = "",
         val fechaDeCarga: LocalDateTime = LocalDateTime.now()
 ){

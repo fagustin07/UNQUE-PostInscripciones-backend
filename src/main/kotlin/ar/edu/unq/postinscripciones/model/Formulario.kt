@@ -4,7 +4,6 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.formulario.ComentarioDTO
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDateTime
@@ -40,8 +39,8 @@ class Formulario(
         solicitudes.add(solicitud)
     }
 
-    fun agregarComentarios(descripcion: String, titulo: String, fechaDeCarga: LocalDateTime = LocalDateTime.now()) {
-        val comentario = Comentario(this, titulo, descripcion, fechaDeCarga)
+    fun agregarComentarios(descripcion: String, autor: String, fechaDeCarga: LocalDateTime = LocalDateTime.now()) {
+        val comentario = Comentario(this, autor, descripcion, fechaDeCarga)
         comentarios.add(comentario)
         comentarios.sortByDescending { it.fechaDeCarga }
     }
