@@ -226,19 +226,15 @@ class DirectivoController {
     fun alumnosPorNombreOApellido(
         @ApiParam(value = "dni del alumno", example = "12345678", required = false)
         @RequestParam dni: Int?,
-        @ApiParam(value = "booleano para filtrar alumnos sin procesar", example = "true", required = false)
-        @RequestParam sinProcesar: Boolean?,
-        @ApiParam(
-            value = "booleano para filtrar alumnos con solicitudes pendientes",
-            example = "true",
-            required = false
-        )
-        @RequestParam pendiente: Boolean?
+        @ApiParam(value = "filtrar alumnos", example = "SIN_PROCESAR", required = false)
+        @RequestParam procesamiento: FiltroProcesamiento? = FiltroProcesamiento.NO_FILTRAR,
     ): ResponseEntity<*> {
-        return ResponseEntity(
-            alumnoService.alumnosPorDni(dni, sinProcesar, pendiente),
-            HttpStatus.OK
-        )
+        return when (procesamiento) {
+            FiltroProcesamiento.SIN_PROCESAR -> ResponseEntity(alumnoService.alumnosPorDni(dni,sinProcesar = true), HttpStatus.OK)
+            FiltroProcesamiento.FALTA_PROCESAR -> ResponseEntity(alumnoService.alumnosPorDni(dni, pendiente = true), HttpStatus.OK)
+            FiltroProcesamiento.PROCESADO -> ResponseEntity(alumnoService.alumnosPorDni(dni, pendiente = false), HttpStatus.OK)
+            else -> ResponseEntity(alumnoService.alumnosPorDni(dni), HttpStatus.OK)
+        }
     }
 
     @ApiOperation("Listado de alumnos con datos basicos, filtrarlos por comienzo de dni, ordenados por coeficiente")
@@ -387,7 +383,7 @@ class DirectivoController {
         }
     }
 
-    @ApiOperation(value = "##### Lista todas las materias de un cuatrimestre ordenadas por cantidad de solicitudes #####")
+    @ApiOperation(value = "##### Lista todas las materias de que se dictan en el cuatrimestre actual,  ordenadas por cantidad de solicitudes #####")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -401,15 +397,12 @@ class DirectivoController {
     )
     @RequestMapping(value = ["/materias/solicitudes"], method = [RequestMethod.GET])
     fun materiaSolicitudes(
-        @ApiParam(value = "Anio del cuatrimestre", example = "2022", required = true)
+        @ApiParam(value = "Patron de nombre de la materia", example = "tOs", required = false)
         @RequestParam
-        anio: Int,
-        @ApiParam(value = "Semestre del cuatrimestre", example = "S1", required = true)
-        @RequestParam
-        semestre: Semestre
+        nombre: String?
     ): ResponseEntity<*> {
         return ResponseEntity(
-            materiaService.materiasPorSolicitudes(),
+            materiaService.materiasPorSolicitudes(nombre = nombre ?: ""),
             HttpStatus.OK
         )
     }
@@ -570,4 +563,8 @@ class DirectivoController {
         comisionService.borrarComision(id)
         return ResponseEntity(null, HttpStatus.NO_CONTENT)
     }
+}
+
+enum class FiltroProcesamiento {
+    SIN_PROCESAR, FALTA_PROCESAR, PROCESADO, NO_FILTRAR;
 }

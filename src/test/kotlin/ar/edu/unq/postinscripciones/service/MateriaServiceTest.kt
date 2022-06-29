@@ -229,7 +229,7 @@ internal class MateriaServiceTest {
             EstadoSolicitud.APROBADO,
             formulario.id
         )
-        val materiasObtenidas = materiaService.materiasPorSolicitudes(cuatrimestre)
+        val materiasObtenidas = materiaService.materiasPorSolicitudes(cuatrimestre, "")
 
         assertThat(materiasObtenidas.maxOf { it.cantidadSolicitudesPendientes }).isEqualTo(materiasObtenidas.first().cantidadSolicitudesPendientes)
         assertThat(materiasObtenidas.minOf { it.cantidadSolicitudesPendientes }).isEqualTo(materiasObtenidas.last().cantidadSolicitudesPendientes)

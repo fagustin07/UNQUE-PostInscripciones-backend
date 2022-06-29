@@ -117,11 +117,12 @@ class MateriaService {
     }
 
     @Transactional
-    fun materiasPorSolicitudes(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<MateriaPorSolicitudes> {
+    fun materiasPorSolicitudes(cuatrimestre: Cuatrimestre = Cuatrimestre.actual(), nombre: String = ""): List<MateriaPorSolicitudes> {
         return materiaRepository
             .findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(
                 cuatrimestre.anio,
-                cuatrimestre.semestre
+                cuatrimestre.semestre,
+                nombre = nombre.uppercase()
             )
             .map { MateriaPorSolicitudes.desdeTupla(it) }
     }

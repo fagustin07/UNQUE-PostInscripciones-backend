@@ -39,10 +39,16 @@ interface MateriaRepository: CrudRepository<Materia, String> {
                 "ON s_pendientes.id = s.id AND s_pendientes.estado = ?3 " +
         "WHERE c.cuatrimestre.anio = ?1 " +
             "AND c.cuatrimestre.semestre = ?2 " +
+            "AND UPPER(m.nombre) LIKE %?4% " +
         "GROUP BY m.codigo " +
         "ORDER BY total_pendientes DESC"
     )
-    fun findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(anio: Int, semestre: Semestre, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
+    fun findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(
+        anio: Int,
+        semestre: Semestre,
+        estado: EstadoSolicitud = EstadoSolicitud.PENDIENTE,
+        nombre: String
+    ): List<Tuple>
     fun findByCorrelativasCodigo(codigo: String): List<Materia>
 
 }
