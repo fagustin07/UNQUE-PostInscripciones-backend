@@ -177,6 +177,7 @@ class AlumnoService {
             throw ExcepcionUNQUE("El alumno ya tiene una comision aprobada de la materia ${materia.nombre}")
         }
         solicitud.cambiarEstado(estado)
+        comisionRepository.save(solicitud.comision)
         return SolicitudSobrecupoDTO.desdeModelo(solicitudSobrecupoRepository.save(solicitud))
     }
 

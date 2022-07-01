@@ -87,7 +87,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
         "WHERE (?1 IS NULL OR concat(a.dni, '') LIKE %?1% ) " +
         "GROUP BY a.dni, a.nombre, a.apellido, a.correo, a.legajo, f.id " +
         "HAVING (?4 IS NULL OR (?4 IS TRUE AND f.solicitudes.size = count(solicitudes_pendientes)) OR (?4 IS FALSE AND NOT f.solicitudes.size = count(solicitudes_pendientes))) " +
-            "AND (?5 IS NULL OR (?5 IS TRUE AND count(solicitudes_pendientes) > 0)) " +
+            "AND (?5 IS NULL OR (?5 IS TRUE AND count(solicitudes_pendientes) > 0) OR (?5 IS FALSE AND count(solicitudes_pendientes) = 0)) " +
         "ORDER BY a.coeficiente DESC"
     )
     fun findAllByDni(dni: String?, semestre: Semestre, anio: Int, sinProcesar: Boolean? = null, pendiente: Boolean? = null, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE, estadoAprobado : EstadoSolicitud = EstadoSolicitud.APROBADO): List<Tuple>
