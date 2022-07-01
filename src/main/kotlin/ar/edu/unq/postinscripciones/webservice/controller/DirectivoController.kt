@@ -184,7 +184,7 @@ class DirectivoController {
     @RequestMapping(value = ["/formulario/cerrar"], method = [RequestMethod.PATCH])
     fun cerrarFormularios(): ResponseEntity<*> {
         alumnoService.cerrarFormularios()
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
+        return ResponseEntity.status(HttpStatus.OK).body(null)
     }
 
     @ApiOperation("Agrega comentarios al formulario")

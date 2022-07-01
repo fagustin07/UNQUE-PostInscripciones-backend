@@ -190,7 +190,8 @@ class AlumnoService {
 
     @Transactional
     fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now()) {
-        val cuatrimestreObtenido = Cuatrimestre.actual()
+        val cuatrimestre = Cuatrimestre.actual()
+        val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         val alumnos = alumnoRepository.findAll()
 
         if (cuatrimestreObtenido.finInscripciones > fecha) {
@@ -198,9 +199,11 @@ class AlumnoService {
         }
 
         alumnos.forEach {
-            val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
-            chequearEstado(formulario, fecha)
-            formulario.cerrarFormulario()
+            if(it.yaGuardoUnFormulario(cuatrimestreObtenido)) {
+                val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
+                chequearEstado(formulario, fecha)
+                formulario.cerrarFormulario()
+            }
         }
     }
 
