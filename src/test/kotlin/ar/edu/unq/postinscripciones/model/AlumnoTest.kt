@@ -1,6 +1,7 @@
 package ar.edu.unq.postinscripciones.model
 
 import ar.edu.unq.postinscripciones.model.comision.Comision
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -157,5 +158,46 @@ internal class AlumnoTest {
 
         assertThat(alumno.coeficiente).isEqualTo(7.0)
         assertThat(alumno.coeficiente).isNotEqualTo(coeficienteAntes)
+    }
+
+    @Test
+    fun `un alumno no puede agregar solicitudes de materias que ya ha aprobado`() {
+        val intro = Materia("int-102", "Intro", mutableListOf())
+        val materiaCursada1 = MateriaCursada(intro, EstadoMateria.APROBADO)
+        val cuatrimestre = Cuatrimestre()
+        val comision = Comision(intro, 1, cuatrimestre)
+        val formulario = Formulario(cuatrimestre)
+        alumno.cargarHistoriaAcademica(materiaCursada1)
+        alumno.guardarFormulario(formulario)
+
+        val excepcion = assertThrows<ExcepcionUNQUE> { alumno.agregarSolicitud(comision, cuatrimestre) }
+
+        assertThat(excepcion.message).isEqualTo("El alumno ya ha aprobado la materia ${intro.nombre}")
+    }
+
+    @Test
+    fun `un alumno no puede agregar solicitudes de materias que se encuentra inscripto por Guarani`() {
+        val intro = Materia("int-102", "Intro", mutableListOf())
+        val cuatrimestre = Cuatrimestre()
+        val comision = Comision(intro, 1, cuatrimestre)
+        val formulario = Formulario(cuatrimestre, comisionesInscripto = mutableListOf(comision))
+        alumno.guardarFormulario(formulario)
+
+        val excepcion = assertThrows<ExcepcionUNQUE> { alumno.agregarSolicitud(comision, cuatrimestre) }
+
+        assertThat(excepcion.message).isEqualTo("El alumno ya se encuentra inscripto por Guaraní a la materia ${intro.nombre} este cuatrimestre")
+    }
+
+    @Test
+    fun `un alumno no puede agregar solicitudes de comisiones que ya ha solicitado`() {
+        val intro = Materia("int-102", "Intro", mutableListOf())
+        val cuatrimestre = Cuatrimestre()
+        val comision = Comision(intro, 1, cuatrimestre)
+        val formulario = Formulario(cuatrimestre, solicitudes = mutableListOf(SolicitudSobrecupo(comision)))
+        alumno.guardarFormulario(formulario)
+
+        val excepcion = assertThrows<ExcepcionUNQUE> { alumno.agregarSolicitud(comision, cuatrimestre) }
+
+        assertThat(excepcion.message).isEqualTo("El alumno ya ha solicitado la comision ${comision.numero} de la materia ${intro.nombre} este cuatrimestre")
     }
 }

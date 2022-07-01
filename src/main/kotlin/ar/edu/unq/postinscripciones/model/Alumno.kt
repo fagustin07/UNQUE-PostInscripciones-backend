@@ -38,11 +38,16 @@ class Alumno(
     private val formularios: MutableList<Formulario> = mutableListOf()
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name="alumno_dni")
     var historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
 
     fun guardarFormulario(formulario: Formulario) {
         chequearSiExiste(formulario)
         formularios.add(formulario)
+    }
+
+    fun borrarFormulario(anio: Int, semestre: Semestre) {
+        formularios.removeIf { it.cuatrimestre.esElCuatrimestre(anio, semestre) }
     }
 
     fun cargarHistoriaAcademica(materiaCursada: MateriaCursada) {
@@ -51,7 +56,7 @@ class Alumno(
     }
 
     fun cambiarFormulario(anio: Int, semestre: Semestre, formulario: Formulario) {
-        formularios.removeIf { it.cuatrimestre.esElCuatrimestre(anio,semestre) }
+        borrarFormulario(anio, semestre)
         formularios.add(formulario)
     }
 
@@ -66,6 +71,26 @@ class Alumno(
         return formulario ?: throw ExcepcionUNQUE("No se encontró ningun formulario para el cuatrimestre dado")
     }
 
+    fun agregarSolicitud(comision: Comision, cuatrimestre: Cuatrimestre): Formulario {
+        if (tieneAprobado(comision.materia)) {
+            throw ExcepcionUNQUE("El alumno ya ha aprobado la materia ${comision.materia.nombre}")
+        }
+
+        val formulario = this.obtenerFormulario(cuatrimestre.anio, cuatrimestre.semestre)
+        if (formulario.comisionesInscripto.any { it.materia.esLaMateria(comision.materia) }) {
+            throw ExcepcionUNQUE("El alumno ya se encuentra inscripto por Guaraní a la materia ${comision.materia.nombre} este cuatrimestre")
+        }
+
+        if (formulario.solicitudes.any { it.solicitaLaComision(comision) }) {
+            throw ExcepcionUNQUE("El alumno ya ha solicitado la comision ${comision.numero} de la materia ${comision.materia.nombre} este cuatrimestre")
+        }
+
+        val solicitud = SolicitudSobrecupo(comision)
+        formulario.agregarSolicitud(solicitud)
+
+        return formulario
+    }
+
     fun haSolicitado(unaComision: Comision): Boolean {
         return formularios.any { formulario -> formulario.tieneLaComision(unaComision) }
     }
@@ -74,10 +99,9 @@ class Alumno(
         return formularios.any { formulario -> formulario.cuatrimestre.esElCuatrimestre(cuatrimestre) }
     }
 
-    fun actualizarCodigoYContrasenia(codigo: Int, contrasenia: String, confirmarContrasenia: String, horaDeCarga: LocalDateTime) {
+    fun actualizarCodigoYContrasenia(codigo: Int, contrasenia: String, horaDeCarga: LocalDateTime) {
         checkEstadoCuenta()
         checkTiempoDeCodigo(horaDeCarga)
-        if (contrasenia != confirmarContrasenia) throw ExcepcionUNQUE("La contrasenia no coincide.")
 
         this.cargaDeCodigo = horaDeCarga
         this.codigo = codigo
@@ -101,10 +125,12 @@ class Alumno(
     }
 
     fun materiasAprobadas(): List<Materia> {
-        return materiasCursadasPorEstadoDeMateria(EstadoMateria.APROBADO).map { it.materia }
+        return materiasCursadasPorEstadoDeMateria(EstadoMateria.APROBADO).map { it.materia } + materiasCursadasPorEstadoDeMateria(EstadoMateria.PA).map { it.materia }
     }
 
     fun cantidadAprobadas() = historiaAcademica.count { it.estado == EstadoMateria.APROBADO }
+
+    fun haAprobado(materia: Materia) = this.materiasAprobadas().any { it.esLaMateria(materia) }
 
     fun puedeCursar(solicitudes : List<Materia>, materiasDisponibles: List<String>) : Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
@@ -132,10 +158,13 @@ class Alumno(
     }
 
     private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
-        if (this.cargaDeCodigo!= null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(30))) {
+        if (this.cargaDeCodigo!= null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
             throw ExcepcionUNQUE("Su codigo ha expirado. Cree su cuenta nuevamente")
         }
     }
+
+    private fun tieneAprobado(materia: Materia) =
+        this.historiaAcademica.any { it.materia.esLaMateria(materia) && it.estado == EstadoMateria.APROBADO }
 }
 
 enum class EstadoCuenta {

@@ -4,7 +4,9 @@ import ar.edu.unq.postinscripciones.model.Carrera
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.service.dto.comision.ComisionACrear
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -39,13 +41,12 @@ internal class ServiceDataTest {
 
         alumnoService.registrarAlumnos(planillaAlumnos)
 
-        val alumnosRegistrados = alumnoService.todos().map {AlumnoDTO.desdeModelo(it)}
+        val alumnosRegistrados = alumnoService.todos()
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
         assertThat(alumnosRegistrados)
             .usingRecursiveComparison()
             .ignoringFields("formularios", "contrasenia", "coeficiente")
             .isEqualTo(planillaAlumnos)
-
     }
 
     @Test
@@ -81,7 +82,7 @@ internal class ServiceDataTest {
         val cargaDePrimeraPlanilla = alumnoService.registrarAlumnos(planillaAlumnos)
 
         assertThat(cargaDePrimeraPlanilla).hasSize(1)
-        assertThat(cargaDePrimeraPlanilla.first().formularioConflictivo).isEqualTo(planillaAlumnos.first())
+        assertThat(cargaDePrimeraPlanilla.first().dni).isEqualTo(planillaAlumnos.first().dni)
         assertThat(alumnoService.todos()).hasSize(planillaAlumnos.size - 1)
     }
 
@@ -95,13 +96,13 @@ internal class ServiceDataTest {
             listOf(
                 ComisionACrear(
                     1,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 ),
                 ComisionACrear(
                     2,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 )
@@ -122,7 +123,7 @@ internal class ServiceDataTest {
         val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
         val crearBdd = ComisionACrear(
             1,
-            bdd.codigo,
+            bdd.nombre,
             30,
             8
         )
@@ -131,7 +132,7 @@ internal class ServiceDataTest {
                 crearBdd,
                 ComisionACrear(
                     2,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 )
@@ -143,7 +144,7 @@ internal class ServiceDataTest {
             .actualizarOfertaAcademica(listOf(crearBdd), cuatrimestre = cuatri)
 
         assertThat(comisionesGuardadasConConflicto).hasSize(1)
-        assertThat(comisionesGuardadasConConflicto.first().formularioConflictivo).isEqualTo(crearBdd)
+        assertThat(comisionesGuardadasConConflicto.first().mensaje).isEqualTo("Ya existe esta comision")
     }
 
     @Test
@@ -154,7 +155,7 @@ internal class ServiceDataTest {
             listOf(
                 ComisionACrear(
                     1,
-                    bdd.codigo,
+                    bdd.nombre,
                     30,
                     8
                 ),

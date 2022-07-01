@@ -1,6 +1,7 @@
 package ar.edu.unq.postinscripciones.persistence
 
 import ar.edu.unq.postinscripciones.model.Carrera
+import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import org.springframework.data.jpa.repository.Query
@@ -28,17 +29,26 @@ interface MateriaRepository: CrudRepository<Materia, String> {
     fun findMateriasDisponibles(materiasAprobadas : List<Materia>, carreraAlumno: Carrera, anio: Int, semestre: Semestre) : List<Tuple>
 
     @Query(
-        "SELECT m.codigo, m.nombre, count(s) as total_solicitudes " +
+        "SELECT m.codigo, m.nombre, count(s) as total_solicitudes, count(s_pendientes) as total_pendientes " +
         "FROM Materia as m " +
             "JOIN Comision as c " +
                 "ON c.materia.codigo = m.codigo " +
             "LEFT JOIN SolicitudSobrecupo as s " +
                 "ON s.comision.id = c.id " +
+            "LEFT JOIN SolicitudSobrecupo as s_pendientes " +
+                "ON s_pendientes.id = s.id AND s_pendientes.estado = ?3 " +
         "WHERE c.cuatrimestre.anio = ?1 " +
             "AND c.cuatrimestre.semestre = ?2 " +
+            "AND UPPER(m.nombre) LIKE %?4% " +
         "GROUP BY m.codigo " +
-        "ORDER BY total_solicitudes DESC"
+        "ORDER BY total_pendientes DESC"
     )
-    fun findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudes(anio: Int, semestre: Semestre): List<Tuple>
+    fun findByCuatrimestreAnioAndCuatrimestreSemestreOrderByCountSolicitudesPendientes(
+        anio: Int,
+        semestre: Semestre,
+        estado: EstadoSolicitud = EstadoSolicitud.PENDIENTE,
+        nombre: String
+    ): List<Tuple>
+    fun findByCorrelativasCodigo(codigo: String): List<Materia>
 
 }

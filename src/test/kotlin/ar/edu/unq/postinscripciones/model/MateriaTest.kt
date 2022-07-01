@@ -11,7 +11,7 @@ internal class MateriaTest {
     @BeforeEach
     fun `set up`() {
         correlativa = Materia("80005","Elementos de Programación y lógica")
-        bdd = Materia("PW-1050", "Bases de Datos", mutableListOf(correlativa), Carrera.LICENCIATURA)
+        bdd = Materia("PW-1050", "Bases de Datos", mutableListOf(correlativa), Carrera.LI)
     }
 
     @Test
@@ -40,6 +40,6 @@ internal class MateriaTest {
 
     @Test
     fun `una materia tiene carrera`() {
-        assertThat(bdd.carrera).isEqualTo(Carrera.LICENCIATURA)
+        assertThat(bdd.carrera).isEqualTo(Carrera.LI)
     }
 }

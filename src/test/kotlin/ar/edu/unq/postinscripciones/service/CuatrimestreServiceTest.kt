@@ -3,7 +3,7 @@ package ar.edu.unq.postinscripciones.service
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.FormularioCuatrimestre
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

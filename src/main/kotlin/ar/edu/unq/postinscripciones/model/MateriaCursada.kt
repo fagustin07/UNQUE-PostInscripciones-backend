@@ -1,11 +1,14 @@
 package ar.edu.unq.postinscripciones.model
 
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
 class MateriaCursada(
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val materia: Materia,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

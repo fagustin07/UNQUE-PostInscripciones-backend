@@ -1,19 +1,25 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
+import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.*
+import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.*
+import ar.edu.unq.postinscripciones.service.dto.materia.Correlativa
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 
 @IntegrationTest
 internal class MateriaServiceTest {
@@ -134,42 +140,39 @@ internal class MateriaServiceTest {
     fun `Se puede crear una lista de materias`() {
         val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.SIMULTANEIDAD)
         val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
-        val materiasCreadas = materiaService.crear(listOf(intro, orga))
+        materiaService.crear(listOf(intro, orga))
 
-        assertThat(materiasCreadas.map{it.codigo}).containsAll(listOf(intro.codigo, orga.codigo))
+        assertThat(materiaService.todas().map { it.nombre }).containsAll(listOf(intro.nombre, orga.nombre))
     }
 
     @Test
     fun `no se puede crear una lista de materias que ya existen`() {
-        val excepcion = assertThrows<ExcepcionUNQUE> {
-            materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
-        }
-        assertThat(excepcion.message).isEqualTo(
-            "La materia que desea crear con nombre Base de datos " +
-                    "y codigo BD-096, " +
-                    "genera conflicto con la materia: ${bdd.nombre}, codigo: ${bdd.codigo}"
-        )
+        val listaConflictiva = materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
+
+        assertThat(listaConflictiva.first().mensaje).isEqualTo("Conflicto con la materia ${bdd.nombre} y codigo ${bdd.codigo}")
     }
 
     @Test
     fun `se puede crear una lista de materias con una correlativa`() {
         val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
         materiaService.crear(listOf(orga))
-        val materiasParaActualizar = listOf(MateriaConCorrelativas(orga.nombre, listOf(Correlativa(bdd.nombre))))
-        val materiasDTO = materiaService.actualizarCorrelativas(materiasParaActualizar)
+        val materiasParaActualizar = listOf(MateriaConCorrelativas(orga.codigo, listOf(Correlativa(bdd.codigo))))
+        materiaService.actualizarCorrelativas(materiasParaActualizar)
 
-        assertThat(materiasDTO.first().correlativas.first()).isEqualTo(bdd.nombre)
+        val materia = materiaService.obtener(orga.codigo)
+        assertThat(materia.correlativas.first().nombre).isEqualTo(bdd.nombre)
     }
 
     @Test
-    fun `no se puede las correlativas de una materia con un nombre inexistente`() {
+    fun `no se puede las correlativas de una materia con un codigo inexistente`() {
         val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
         materiaService.crear(listOf(orga))
-        val excepcion = assertThrows<ExcepcionUNQUE> {
-            materiaService.actualizarCorrelativas(listOf(MateriaConCorrelativas(orga.nombre, listOf(Correlativa("NO EXISTE")))))
-        }
 
-        assertThat(excepcion.message).isEqualTo("No existe la materia con nombre: NO EXISTE")
+        val resultado = materiaService
+            .actualizarCorrelativas(listOf(
+                MateriaConCorrelativas(orga.codigo, listOf(Correlativa("NO EXISTE")))))
+
+        assertThat(resultado.first().mensaje).isEqualTo("No se encontró la correlativa")
     }
 
     @Test
@@ -196,33 +199,55 @@ internal class MateriaServiceTest {
     @Test
     fun `Se puede actualizar las materias correlativas de una materia`() {
         val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.SIMULTANEIDAD)
-        val correlativasAntes = materia.correlativas
-        val materiasParaActualizar = listOf(MateriaConCorrelativas(materia.nombre, listOf(Correlativa(algo.nombre))))
-        val materiasDespuesDeActualizarCorrelativas =
-                materiaService.actualizarCorrelativas(materiasParaActualizar)
+        val materiasParaActualizar = listOf(MateriaConCorrelativas(materia.codigo, listOf(Correlativa(algo.codigo))))
+        materiaService.actualizarCorrelativas(materiasParaActualizar)
 
-        assertThat(correlativasAntes).isNotEqualTo(materiasDespuesDeActualizarCorrelativas.first().correlativas)
-        assertThat(materiasDespuesDeActualizarCorrelativas.first().correlativas.first()).isEqualTo(algo.nombre)
+        val materiaActualizada = materiaService.obtener(materia.codigo)
 
+        assertThat(materiaActualizada.correlativas.first().nombre).isEqualTo(algo.nombre)
+        assertThat(materiaActualizada.correlativas).hasSize(1)
     }
 
     @Test
-    fun `Obtener comisiones ordenadas por cantidad de solicitudes`() {
+    fun `Obtener comisiones ordenadas por cantidad de solicitudes pendientes`() {
         val alumno1 =
-            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LICENCIATURA, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LI, 0.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LICENCIATURA, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LI, 0.0))
 
-        alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
+        val formulario = alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
 
-        val materiasObtenidas = materiaService.materiasPorSolicitudes(cuatrimestre)
+        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)
+        alumnoService.cambiarEstadoSolicitud(
+            formulario.solicitudes.first().id,
+            EstadoSolicitud.APROBADO,
+            formulario.id
+        )
+        alumnoService.cambiarEstadoSolicitud(
+            formulario.solicitudes.last().id,
+            EstadoSolicitud.APROBADO,
+            formulario.id
+        )
+        val materiasObtenidas = materiaService.materiasPorSolicitudes(cuatrimestre, "")
 
-        assertThat(materiasObtenidas.maxOf { it.cantidadSolicitudes }).isEqualTo(materiasObtenidas.first().cantidadSolicitudes)
-        assertThat(materiasObtenidas.minOf { it.cantidadSolicitudes }).isEqualTo(materiasObtenidas.last().cantidadSolicitudes)
-        assertThat(materiasObtenidas.first().cantidadSolicitudes).isEqualTo(2)
-        assertThat(materiasObtenidas.first().codigo).isEqualTo(bdd.codigo)
-        assertThat(materiasObtenidas.last().cantidadSolicitudes).isEqualTo(1)
+        assertThat(materiasObtenidas.maxOf { it.cantidadSolicitudesPendientes }).isEqualTo(materiasObtenidas.first().cantidadSolicitudesPendientes)
+        assertThat(materiasObtenidas.minOf { it.cantidadSolicitudesPendientes }).isEqualTo(materiasObtenidas.last().cantidadSolicitudesPendientes)
+        assertThat(materiasObtenidas.first().cantidadSolicitudesPendientes).isEqualTo(1)
+        assertThat(materiasObtenidas.first().codigo).isEqualTo(comision.materia.codigo)
+        assertThat(materiasObtenidas.last().cantidadSolicitudesPendientes).isEqualTo(0)
+    }
+
+    @Test
+    fun `se puede modificar una materia ya creada`() {
+        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.LI)
+        val nuevaMateria = materiaService.modificar(formulario)
+
+        val materiaPersistida = materiaService.obtener(algo.codigo)
+
+        assertThat(nuevaMateria).usingRecursiveComparison().isNotEqualTo(algo)
+        assertThat(nuevaMateria.nombre).isEqualTo(materiaPersistida.nombre)
+        assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera)
     }
 
     @AfterEach

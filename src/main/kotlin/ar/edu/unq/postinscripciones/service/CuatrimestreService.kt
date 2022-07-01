@@ -3,7 +3,7 @@ package ar.edu.unq.postinscripciones.service
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
-import ar.edu.unq.postinscripciones.service.dto.FormularioCuatrimestre
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -36,5 +36,10 @@ class CuatrimestreService {
     fun obtener(cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): Cuatrimestre {
         return cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
             .orElseThrow { ExcepcionUNQUE("No se ha encontrado el cuatrimestre") }
+    }
+
+    @Transactional
+    fun borrarTodos() {
+        cuatrimestreRepository.deleteAll()
     }
 }
