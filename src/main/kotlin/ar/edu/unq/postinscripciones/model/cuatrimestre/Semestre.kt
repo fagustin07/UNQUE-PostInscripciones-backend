@@ -6,7 +6,7 @@ enum class Semestre {
     S1, S2;
 
     companion object {
-        fun actual() = if (LocalDate.now().monthValue <= 6) {
+        fun actual() = if (LocalDate.now().monthValue <= 7) {
             S1
         } else {
             S2

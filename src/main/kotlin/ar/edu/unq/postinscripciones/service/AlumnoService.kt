@@ -353,7 +353,7 @@ class AlumnoService {
         val cuatrimestrePersistido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         if(cuatrimestrePersistido.finInscripciones < fecha || cuatrimestrePersistido.inicioInscripciones > fecha) {
-            throw ExcepcionUNQUE("No se puede borrar el formulario, la fecha de inscripciones ha concluido o aun no a comenzado")
+            throw ExcepcionUNQUE("No se puede borrar el formulario, la fecha de inscripcion ha concluido o aun no ha comenzado")
         }
         alumno.borrarFormulario(cuatrimestrePersistido.anio, cuatrimestrePersistido.semestre)
         alumnoRepository.save(alumno)

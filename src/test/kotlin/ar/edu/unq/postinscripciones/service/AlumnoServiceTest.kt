@@ -1333,7 +1333,7 @@ internal class AlumnoServiceTest {
             alumnoService.borrarFormulario(jwt, fecha = fechaDeModificacion, cuatrimestre = cuatrimestre)
         }
 
-        assertThat(exception.message).isEqualTo("No se puede borrar el formulario, la fecha de inscripciones ha concluido o aun no a comenzado")
+        assertThat(exception.message).isEqualTo("No se puede borrar el formulario, la fecha de inscripcion ha concluido o aun no ha comenzado")
     }
 
     @Test
@@ -1344,7 +1344,7 @@ internal class AlumnoServiceTest {
             alumnoService.borrarFormulario(jwt, fecha = fechaDeModificacion, cuatrimestre = cuatrimestre)
         }
 
-        assertThat(exception.message).isEqualTo("No se puede borrar el formulario, la fecha de inscripciones ha concluido o aun no a comenzado")
+        assertThat(exception.message).isEqualTo("No se puede borrar el formulario, la fecha de inscripcion ha concluido o aun no ha comenzado")
     }
 
     @Test
