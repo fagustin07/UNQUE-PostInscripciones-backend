@@ -23,7 +23,7 @@ class Alumno(
     var contrasenia: String = "",
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val carrera: Carrera = Carrera.SIMULTANEIDAD,
+    val carrera: Carrera = Carrera.PW,
     @Column(nullable = false)
     var coeficiente: Double = 3.0
 ) {
@@ -165,6 +165,20 @@ class Alumno(
 
     private fun tieneAprobado(materia: Materia) =
         this.historiaAcademica.any { it.materia.esLaMateria(materia) && it.estado == EstadoMateria.APROBADO }
+
+    fun aproboTodas(correlativas: List<Materia>): Boolean {
+        val materiasAprobadas = this.materiasAprobadas()
+
+        return correlativas.all { correlativa -> materiasAprobadas.any { it.esLaMateria(correlativa) } }
+    }
+
+    fun creditosParaCicloDeTPI(cicloTPI: CicloTPI): Int {
+        return this.materiasAprobadas().filter { it.tpi == cicloTPI }.sumOf { it.creditos }
+    }
+
+    fun creditosParaCicloDeLI(cicloLI: CicloLI): Int {
+        return this.materiasAprobadas().filter { it.li == cicloLI }.sumOf { it.creditos }
+    }
 }
 
 enum class EstadoCuenta {

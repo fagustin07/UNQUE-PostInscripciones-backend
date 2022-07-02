@@ -18,7 +18,7 @@ internal class AlumnoTest {
     fun `set up`() {
         comisionBdd = Comision()
         otraComision = Comision(numero = 5)
-        alumno = Alumno(carrera = Carrera.TPI)
+        alumno = Alumno(carrera = Carrera.P)
     }
 
     @Test
@@ -102,9 +102,9 @@ internal class AlumnoTest {
 
     @Test
     fun `Un alumno conoce la carrera en la que se encuentra inscripto`() {
-        alumno = Alumno(carrera = Carrera.TPI)
+        alumno = Alumno(carrera = Carrera.P)
 
-        assertThat(alumno.carrera).isEqualTo(Carrera.TPI)
+        assertThat(alumno.carrera).isEqualTo(Carrera.P)
     }
 
     @Test

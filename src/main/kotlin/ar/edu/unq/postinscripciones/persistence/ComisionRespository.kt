@@ -24,5 +24,6 @@ interface ComisionRespository : CrudRepository<Comision, Long> {
 
     fun findByMateriaCodigo(codigo: String): List<Comision>
     fun deleteByMateriaCodigo(codigo: String)
+    fun findByCuatrimestre(cuatrimestreObtenido: Cuatrimestre): List<Comision>
 
 }

@@ -45,8 +45,8 @@ internal class MateriaServiceTest {
 
     @BeforeEach
     fun setUp() {
-        bdd = materiaService.crear("Base de datos", "BD-096", mutableListOf(), Carrera.SIMULTANEIDAD)
-        algo = materiaService.crear("Algoritmos", "AA-208", mutableListOf(), Carrera.SIMULTANEIDAD)
+        bdd = materiaService.crear("Base de datos", "BD-096", mutableListOf(), Carrera.PW)
+        algo = materiaService.crear("Algoritmos", "AA-208", mutableListOf(), Carrera.PW)
 
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
@@ -85,19 +85,19 @@ internal class MateriaServiceTest {
 
     @Test
     fun `Se puede crear una materia`() {
-        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.PW)
         assertThat(materia).isNotNull
     }
 
     @Test
     fun `no se puede crear una materia con un nombre existente`() {
-        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.PW)
         assertThat(materia).isNotNull
     }
 
     @Test
     fun `no se puede crear una materia con un codigo o nombre existente`() {
-        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.PW)
         val nombreConflictivo = materia.nombre.lowercase()
         val codigoConflictivo = materia.codigo.lowercase()
         val excepcion = assertThrows<ExcepcionUNQUE> {
@@ -105,7 +105,7 @@ internal class MateriaServiceTest {
                 nombreConflictivo,
                 codigoConflictivo,
                 mutableListOf(),
-                Carrera.SIMULTANEIDAD
+                Carrera.PW
             )
         }
 
@@ -118,7 +118,7 @@ internal class MateriaServiceTest {
 
     @Test
     fun `se puede crear una materia con una correlativa`() {
-        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.PW)
         assertThat(materia.correlativas.first()).isEqualTo(bdd.nombre)
     }
 
@@ -129,7 +129,7 @@ internal class MateriaServiceTest {
                 "Orga",
                 "ORGA-101",
                 mutableListOf("EPYL-103"),
-                Carrera.SIMULTANEIDAD
+                Carrera.PW
             )
         }
 
@@ -138,8 +138,8 @@ internal class MateriaServiceTest {
 
     @Test
     fun `Se puede crear una lista de materias`() {
-        val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.SIMULTANEIDAD)
-        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.PW)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.PW)
         materiaService.crear(listOf(intro, orga))
 
         assertThat(materiaService.todas().map { it.nombre }).containsAll(listOf(intro.nombre, orga.nombre))
@@ -147,14 +147,14 @@ internal class MateriaServiceTest {
 
     @Test
     fun `no se puede crear una lista de materias que ya existen`() {
-        val listaConflictiva = materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
+        val listaConflictiva = materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.PW)))
 
         assertThat(listaConflictiva.first().mensaje).isEqualTo("Conflicto con la materia ${bdd.nombre} y codigo ${bdd.codigo}")
     }
 
     @Test
     fun `se puede crear una lista de materias con una correlativa`() {
-        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.PW)
         materiaService.crear(listOf(orga))
         val materiasParaActualizar = listOf(MateriaConCorrelativas(orga.codigo, listOf(Correlativa(bdd.codigo))))
         materiaService.actualizarCorrelativas(materiasParaActualizar)
@@ -165,7 +165,7 @@ internal class MateriaServiceTest {
 
     @Test
     fun `no se puede las correlativas de una materia con un codigo inexistente`() {
-        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.PW)
         materiaService.crear(listOf(orga))
 
         val resultado = materiaService
@@ -185,8 +185,8 @@ internal class MateriaServiceTest {
     @Test
     fun `Se puede obtener una materia especifica`() {
         val materiaEncontrada = materiaService.obtener(bdd.codigo)
-        bdd.correlativas.size
-        assertThat(materiaEncontrada).usingRecursiveComparison().isEqualTo(bdd)
+
+        assertThat(materiaEncontrada.nombre).isEqualTo(bdd.nombre)
     }
 
     @Test
@@ -198,7 +198,7 @@ internal class MateriaServiceTest {
 
     @Test
     fun `Se puede actualizar las materias correlativas de una materia`() {
-        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.PW)
         val materiasParaActualizar = listOf(MateriaConCorrelativas(materia.codigo, listOf(Correlativa(algo.codigo))))
         materiaService.actualizarCorrelativas(materiasParaActualizar)
 
@@ -211,9 +211,9 @@ internal class MateriaServiceTest {
     @Test
     fun `Obtener comisiones ordenadas por cantidad de solicitudes pendientes`() {
         val alumno1 =
-            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LI, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.W, 0.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LI, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.W, 0.0))
 
         val formulario = alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
@@ -240,14 +240,14 @@ internal class MateriaServiceTest {
 
     @Test
     fun `se puede modificar una materia ya creada`() {
-        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.LI)
+        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.W)
         val nuevaMateria = materiaService.modificar(formulario)
 
         val materiaPersistida = materiaService.obtener(algo.codigo)
 
         assertThat(nuevaMateria).usingRecursiveComparison().isNotEqualTo(algo)
         assertThat(nuevaMateria.nombre).isEqualTo(materiaPersistida.nombre)
-        assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera)
+        assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera())
     }
 
     @AfterEach

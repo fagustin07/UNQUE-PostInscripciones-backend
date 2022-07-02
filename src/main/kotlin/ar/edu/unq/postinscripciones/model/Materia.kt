@@ -1,7 +1,5 @@
 package ar.edu.unq.postinscripciones.model
 
-import org.hibernate.annotations.OnDelete
-import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
 
 @Entity
@@ -11,11 +9,17 @@ class Materia(
     @Column(unique=true, nullable = false)
     val nombre: String = "",
     @ManyToMany(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
     var correlativas: MutableList<Materia> = mutableListOf(),
     @Column(nullable = false)
+    val creditos: Int = 8,
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val carrera: Carrera = Carrera.SIMULTANEIDAD
+    var tpi: CicloTPI = CicloTPI.CO,
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    var li: CicloLI = CicloLI.CA,
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    val requisitosCiclo: MutableList<RequisitoCiclo> = mutableListOf()
 ) {
 
     fun esLaMateria(materia: Materia) = this.codigo == materia.codigo
@@ -28,4 +32,33 @@ class Materia(
     fun quitarCorrelativa(codigo: String) {
         correlativas.removeIf { it.codigo == codigo }
     }
+
+    fun requisitosCicloTPI(): List<RequisitoCiclo> {
+        return requisitosCiclo.filter { it.carrera == Carrera.P }
+    }
+
+    fun cumpleCorrelativas(alumno: Alumno): Boolean {
+        return alumno.aproboTodas(this.correlativas)
+    }
+
+    fun requisitosCicloLI(): List<RequisitoCiclo> {
+        return requisitosCiclo.filter { it.carrera == Carrera.W }
+    }
+
+    fun carrera(): Carrera {
+        return if (tpi != CicloTPI.NO_PERTENECE && li != CicloLI.NO_PERTENECE) {
+            Carrera.PW
+        } else if (tpi == CicloTPI.NO_PERTENECE) {
+            Carrera.W
+        } else {
+            Carrera.P
+        }
+    }
+
+//            TODO: Ponerlo cuando se refactorice el seeder
+//    init {
+//        if (li == CicloLI.NO_PERTENECE && tpi == CicloTPI.NO_PERTENECE) {
+//            throw ExcepcionUNQUE("Una materia debe pertenecer a una carrera")
+//        }
+//    }
 }

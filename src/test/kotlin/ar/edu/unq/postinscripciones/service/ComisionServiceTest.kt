@@ -50,11 +50,11 @@ internal class ComisionServiceTest {
     @BeforeEach
     fun setUp() {
         val alumno =
-            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.LI, 5.0))
+            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.W, 5.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.LI, 5.0))
+            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.W, 5.0))
 
-        bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.SIMULTANEIDAD)
+        bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.PW)
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
 
@@ -139,7 +139,7 @@ internal class ComisionServiceTest {
 
     @Test
     fun `se puede guardar una oferta academica con un inicio y un fin para registrar formularios`() {
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
         val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
         val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
@@ -201,7 +201,7 @@ internal class ComisionServiceTest {
 
     @Test
     fun `obtener la oferta del cuatrimestre actual segun un patron de nombre de materia`() {
-        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.LI)
+        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.W)
         val formulario = FormularioComision(
             1,
             algoritmos.codigo,

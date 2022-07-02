@@ -49,188 +49,170 @@ class DataSeed(
     private fun loadData() {
 
         if (emptyData()) {
-            val epyl = Materia("80005", "Elementos de Programación y Lógica", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val lea = Materia("80000", "Lectura y Escritura Académica", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val matematica = Materia("8003N", "Matemática", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val ingles1 = Materia("90000", "Inglés 1", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val ingles2 = Materia("90028", "Inglés 2", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val ttu = Materia("00752", "Taller de Trabajo Universitario", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val tti = Materia("751N", "Taller de Trabajo Intelectual", mutableListOf(), Carrera.SIMULTANEIDAD)
+            val epyl = Materia("80005", "Elementos de Programación y Lógica", mutableListOf())
+            val lea = Materia("80000", "Lectura y Escritura Académica", mutableListOf())
+            val matematica = Materia("8003N", "Matemática", mutableListOf())
+            val ingles1 = Materia("90000", "Inglés 1", mutableListOf())
+            val ingles2 = Materia("90028", "Inglés 2", mutableListOf())
+            val ttu = Materia("00752", "Taller de Trabajo Universitario", mutableListOf())
+            val tti = Materia("751N", "Taller de Trabajo Intelectual", mutableListOf())
 
-            val intro = Materia("00487", "Introducción a la Programación", mutableListOf(epyl), Carrera.SIMULTANEIDAD)
-            val orga = Materia("01032", "Organización de las Computadoras", mutableListOf(epyl), Carrera.SIMULTANEIDAD)
-            val mate1 = Materia("01033", "Matemática 1", mutableListOf(matematica), Carrera.SIMULTANEIDAD)
-            val objetos1 = Materia("01034", "Programación con Objetos 1", mutableListOf(intro), Carrera.SIMULTANEIDAD)
-            val bdd = Materia("01035", "Bases de Datos", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val estructura = Materia("01036", "Estructura de Datos", mutableListOf(intro), Carrera.SIMULTANEIDAD)
+            val intro = Materia("00487", "Introducción a la Programación", mutableListOf(epyl))
+            val orga = Materia("01032", "Organización de las Computadoras", mutableListOf(epyl))
+            val mate1 = Materia("01033", "Matemática 1", mutableListOf(matematica))
+            val objetos1 = Materia("01034", "Programación con Objetos 1", mutableListOf(intro))
+            val bdd = Materia("01035", "Bases de Datos", mutableListOf())
+            val estructura = Materia("01036", "Estructura de Datos", mutableListOf(intro))
             val objetos2 =
-                Materia("01037", "Programación con Objetos 2", mutableListOf(objetos1), Carrera.SIMULTANEIDAD)
-            val redes = Materia("01038", "Redes de Computadoras", mutableListOf(orga), Carrera.SIMULTANEIDAD)
+                Materia("01037", "Programación con Objetos 2", mutableListOf(objetos1))
+            val redes = Materia("01038", "Redes de Computadoras", mutableListOf(orga))
             val sistemasoperativos =
-                Materia("01039", "Sistemas Operativos", mutableListOf(intro, orga), Carrera.SIMULTANEIDAD)
+                Materia("01039", "Sistemas Operativos", mutableListOf(intro, orga))
             val concurrente =
-                Materia("01040", "Programación Concurrente", mutableListOf(estructura), Carrera.SIMULTANEIDAD)
-            val mate2 = Materia("01041", "Matemática 2", mutableListOf(mate1), Carrera.SIMULTANEIDAD)
+                Materia("01040", "Programación Concurrente", mutableListOf(estructura))
+            val mate2 = Materia("01041", "Matemática 2", mutableListOf(mate1))
             val elementosdeingeneria =
-                Materia("01042", "Elementos de Ingenieria de Software", mutableListOf(objetos2), Carrera.SIMULTANEIDAD)
+                Materia("01042", "Elementos de Ingenieria de Software", mutableListOf(objetos2))
             val interfaces = Materia(
                 "01043",
                 "Construcción de Interfaces de Usuario",
                 mutableListOf(objetos2),
-                Carrera.SIMULTANEIDAD
             )
             val persistencia =
-                Materia("01044", "Estrategias de Persistencia", mutableListOf(bdd, objetos2), Carrera.SIMULTANEIDAD)
-            val funcional = Materia("01045", "Programación Funcional", mutableListOf(estructura), Carrera.SIMULTANEIDAD)
+                Materia("01044", "Estrategias de Persistencia", mutableListOf(bdd, objetos2))
+            val funcional = Materia("01045", "Programación Funcional", mutableListOf(estructura))
             val desarrollo = Materia(
                 "01046",
                 "Desarrollo de Aplicaciones",
-                mutableListOf(elementosdeingeneria, persistencia, interfaces),
-                Carrera.TPI
+                mutableListOf(elementosdeingeneria, persistencia, interfaces)
             )
             val labo = Materia(
                 "01047",
                 "Laboratiorio de Sistemas Operativos y Redes",
                 mutableListOf(redes, sistemasoperativos),
-                Carrera.SIMULTANEIDAD
             )
-            val bdd2 = Materia("01048", "Bases de Datos II", mutableListOf(), Carrera.SIMULTANEIDAD)
+            val bdd2 = Materia("01048", "Bases de Datos II", mutableListOf())
             val softwareLibre = Materia(
                 "01049",
                 "Participación y Gestión en Proyectos de Software Libre",
                 mutableListOf(),
-                Carrera.SIMULTANEIDAD
             )
             val introArquitectura =
-                Materia("01050", "Introducción a las Arquitecturas de Software", mutableListOf(), Carrera.SIMULTANEIDAD)
+                Materia("01050", "Introducción a las Arquitecturas de Software", mutableListOf())
             val objetos3 =
-                Materia("01051", "Programación con Objetos 3", mutableListOf(objetos2), Carrera.SIMULTANEIDAD)
+                Materia("01051", "Programación con Objetos 3", mutableListOf(objetos2))
             val bioinformatica =
-                Materia("01052", "Introducción a la Bioinformática", mutableListOf(), Carrera.SIMULTANEIDAD)
+                Materia("01052", "Introducción a la Bioinformática", mutableListOf())
             val politica = Materia(
                 "01053",
                 "Politicas Públicas en la Sociedad de la Información y la Era Digital",
                 mutableListOf(),
-                Carrera.SIMULTANEIDAD
             )
             val geografica =
-                Materia("01054", "Sistemas de Información Geográfica", mutableListOf(), Carrera.SIMULTANEIDAD)
+                Materia("01054", "Sistemas de Información Geográfica", mutableListOf())
             val declarativas =
-                Materia("01055", "Herramientas declarativas en Programación", mutableListOf(), Carrera.SIMULTANEIDAD)
+                Materia("01055", "Herramientas declarativas en Programación", mutableListOf())
             val videojuegos =
-                Materia("01056", "Introducción al Desarrollo de Videojuegos", mutableListOf(), Carrera.SIMULTANEIDAD)
+                Materia("01056", "Introducción al Desarrollo de Videojuegos", mutableListOf())
             val derechos = Materia(
                 "01057",
                 "Derechos de Autor y Derecho de Copia en la Era Digita",
                 mutableListOf(),
-                Carrera.SIMULTANEIDAD
             )
             val arduino = Materia(
                 "01058",
                 "Seminarios: Introducción a la Electrónica y Programación de Controladores con Arduino",
-                mutableListOf(),
-                Carrera.TPI
+                mutableListOf()
             )
             val tecnicas = Materia(
                 "01059",
                 "Seminarios sobre Herramientas ó Tecnicas Puntuales: Tecnología y Sociedad",
-                mutableListOf(),
-                Carrera.TPI
+                mutableListOf()
             )
-            val tip = Materia("01060", "Trabajo de Inserción Profesional", mutableListOf(), Carrera.TPI)
+            val tip = Materia("01060", "Trabajo de Inserción Profesional", mutableListOf())
 
-            val analisis = Materia("00054", "Análisis Matemático 1", mutableListOf(mate2), Carrera.LI)
-            val mate3 = Materia("00842", "Matemática 3", mutableListOf(analisis), Carrera.LI)
-            val proba = Materia("00604", "Probabilidad y Estadisticas", mutableListOf(mate3), Carrera.LI)
-            val logica = Materia("01302", "Lógica y Programación", mutableListOf(intro, mate1), Carrera.SIMULTANEIDAD)
-            val seguridad = Materia("01303", "Seguridad de la Información", mutableListOf(labo), Carrera.LI)
+            val analisis = Materia("00054", "Análisis Matemático 1", mutableListOf(mate2))
+            val mate3 = Materia("00842", "Matemática 3", mutableListOf(analisis))
+            val proba = Materia("00604", "Probabilidad y Estadisticas", mutableListOf(mate3))
+            val logica = Materia("01302", "Lógica y Programación", mutableListOf(intro, mate1))
+            val seguridad = Materia("01303", "Seguridad de la Información", mutableListOf(labo))
             val requerimientos = Materia(
                 "01308",
                 "Ingenieria de Requerimientos",
                 mutableListOf(elementosdeingeneria),
-                Carrera.SIMULTANEIDAD
             )
             val gestion = Materia(
                 "01304",
                 "Gestión de Proyectos de Desarrollo de Software",
                 mutableListOf(requerimientos),
-                Carrera.SIMULTANEIDAD
             )
             val practicaDeDesarrollo = Materia(
                 "01305",
                 "Prácticas de Desarrollo de Software",
                 mutableListOf(elementosdeingeneria, interfaces, persistencia),
-                Carrera.SIMULTANEIDAD
             )
-            val lfa = Materia("01306", "Lenguajes Formales y Automatas", mutableListOf(logica), Carrera.SIMULTANEIDAD)
-            val algoritmos = Materia("01307", "Algoritmos", mutableListOf(funcional), Carrera.LI)
+            val lfa = Materia("01306", "Lenguajes Formales y Automatas", mutableListOf(logica))
+            val algoritmos = Materia("01307", "Algoritmos", mutableListOf(funcional))
 
-            val teoria = Materia("01309", "Teoría de la Computación", mutableListOf(lfa), Carrera.LI)
+            val teoria = Materia("01309", "Teoría de la Computación", mutableListOf(lfa))
             val arquitectura1 = Materia(
                 "01310",
                 "Arquitectura de Software I",
-                mutableListOf(concurrente, seguridad, gestion),
-                Carrera.LI
+                mutableListOf(concurrente, seguridad, gestion)
             )
             val distribuidos =
-                Materia("01311", "Sistemas Distribuidos", mutableListOf(concurrente, labo), Carrera.SIMULTANEIDAD)
+                Materia("01311", "Sistemas Distribuidos", mutableListOf(concurrente, labo))
             val caracteristicas = Materia(
                 "01312",
                 "Caracteristicas de Lenguajes de Programación",
                 mutableListOf(logica),
-                Carrera.SIMULTANEIDAD
             )
             val arquitectura2 = Materia(
                 "01313",
                 "Arquitectura de Software II",
-                mutableListOf(arquitectura1, distribuidos),
-                Carrera.LI
+                mutableListOf(arquitectura1, distribuidos)
             )
             val arquitecturaDeComputadoras =
-                Materia("01314", "Arquitectura de Computadoras", mutableListOf(labo), Carrera.SIMULTANEIDAD)
+                Materia("01314", "Arquitectura de Computadoras", mutableListOf(labo))
             val parseo = Materia(
                 "01315",
                 "Parseo y Generación de Código",
-                mutableListOf(lfa, caracteristicas),
-                Carrera.LI
+                mutableListOf(lfa, caracteristicas)
             )
             val aspectosLegales =
-                Materia("01316", "Aspectos Legales y Sociales", mutableListOf(), Carrera.SIMULTANEIDAD)
-            val seminarioFinal = Materia("01317", "Seminario Final", mutableListOf(), Carrera.LI)
+                Materia("01316", "Aspectos Legales y Sociales", mutableListOf())
+            val seminarioFinal = Materia("01317", "Seminario Final", mutableListOf())
             val seminarioCapacitacion = Materia(
                 "01719",
                 "Seminarios de Capacitación Profesional en Informática (SCPI)",
-                mutableListOf(),
-                Carrera.LI
+                mutableListOf()
             )
 
-            val seguridadTec = Materia("00646", "Seguridad Informática", mutableListOf(), Carrera.TPI)
+            val seguridadTec = Materia("00646", "Seguridad Informática", mutableListOf())
 
-            val tv = Materia("01328", "Seminario : Televisión Digital", mutableListOf(), Carrera.TPI)
+            val tv = Materia("01328", "Seminario : Televisión Digital", mutableListOf())
             val streaming =
-                Materia("01632", "Seminario : Tecnología de Streaming sobre Internet", mutableListOf(), Carrera.TPI)
+                Materia("01632", "Seminario : Tecnología de Streaming sobre Internet", mutableListOf())
             val cloud = Materia(
                 "01643",
                 "Seminario : Taller de Desarrollos de Servicios Web / Cloud Modernos",
-                mutableListOf(),
-                Carrera.TPI
+                mutableListOf()
             )
-            val bajo = Materia("01644", "Seminario : Programación a Bajo Nivel", mutableListOf(), Carrera.TPI)
-            val semantica = Materia("01319", "Semántica de Lenguajes de Programación", mutableListOf(), Carrera.TPI)
-            val seminarios = Materia("01622", "Seminários", mutableListOf(), Carrera.LI)
-            val calidad = Materia("01707", "Calidad del Software", mutableListOf(), Carrera.LI)
+            val bajo = Materia("01644", "Seminario : Programación a Bajo Nivel", mutableListOf())
+            val semantica = Materia("01319", "Semántica de Lenguajes de Programación", mutableListOf())
+            val seminarios = Materia("01622", "Seminários", mutableListOf())
+            val calidad = Materia("01707", "Calidad del Software", mutableListOf())
             val funcionalAvanzada =
-                Materia("01708", "Programación Funcional Avanzada", mutableListOf(), Carrera.LI)
+                Materia("01708", "Programación Funcional Avanzada", mutableListOf())
             val progCuantica =
-                Materia("01709", "Introducción a la Programación Cuántica", mutableListOf(), Carrera.LI)
+                Materia("01709", "Introducción a la Programación Cuántica", mutableListOf())
             val ciudadana = Materia(
                 "01710",
                 "Ciencia Ciudadana y Colaboración Abierta y Distribuida",
-                mutableListOf(),
-                Carrera.LI
+                mutableListOf()
             )
-            val ludificacion = Materia("01711", "Ludificación", mutableListOf(), Carrera.LI)
-            val cdDatos = Materia("01745", "Ciencia de Datos", mutableListOf(), Carrera.LI)
+            val ludificacion = Materia("01711", "Ludificación", mutableListOf())
+            val cdDatos = Materia("01745", "Ciencia de Datos", mutableListOf())
 
             val bddhorariosc1 = mutableListOf(
                 Horario(Dia.MARTES, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),
@@ -289,7 +271,7 @@ class DataSeed(
                 "jorge.arenales20@alu.edu.ar",
                 12345,
                 contrasenia,
-                Carrera.SIMULTANEIDAD,
+                Carrera.PW,
                 8.7
 
             )
@@ -300,7 +282,7 @@ class DataSeed(
                 "bartolito@alu.edu.ar",
                 45555,
                 contrasenia,
-                Carrera.SIMULTANEIDAD,
+                Carrera.PW,
                 7.24
             )
             val maria = Alumno(
@@ -310,7 +292,7 @@ class DataSeed(
                 "mjimenez@alu.edu.ar",
                 45557,
                 contrasenia,
-                Carrera.SIMULTANEIDAD,
+                Carrera.PW,
                 8.21
             )
             val roberto = Alumno(
@@ -320,7 +302,7 @@ class DataSeed(
                 "rsanchez@alu.edu.ar",
                 45556,
                 contrasenia,
-                Carrera.TPI,
+                Carrera.P,
                 6.10
             )
 
@@ -331,7 +313,7 @@ class DataSeed(
                 "ftercero@alu.edu.ar",
                 45559,
                 contrasenia,
-                Carrera.TPI,
+                Carrera.P,
                 5.34
             )
 
@@ -342,7 +324,7 @@ class DataSeed(
                 "ssofia@alu.edu.ar",
                 45560,
                 contrasenia,
-                Carrera.TPI,
+                Carrera.P,
                 9.15
             )
             cuatrimestreRepository.save(cuatrimestre)
@@ -413,7 +395,7 @@ class DataSeed(
                         45678900,
                         "Jaime",
                         "Lopes",
-                        "unque.nocontestar@gmail.com", 5555, Carrera.SIMULTANEIDAD, 4.21
+                        "unque.nocontestar@gmail.com", 5555, Carrera.PW, 4.21
                     )
                 )
             )

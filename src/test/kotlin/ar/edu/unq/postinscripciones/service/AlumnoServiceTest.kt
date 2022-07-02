@@ -61,7 +61,7 @@ internal class AlumnoServiceTest {
             "Martinez",
             "nicolas.martinez@unq.edu.ar",
             42256394,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
 
@@ -71,14 +71,14 @@ internal class AlumnoServiceTest {
             "Sandoval",
             "fede.sando@unq.edu.ar",
             11223344,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
 
         alumno = alumnoService.crear(nicoFormularioCrear)
         fede = alumnoService.crear(fedeFormularioCrear)
-        algo = materiaService.crear("Algoritmos", "ALG-208", mutableListOf(), Carrera.SIMULTANEIDAD)
-        funcional = materiaService.crear("Funcional", "FUN-205", mutableListOf(), Carrera.SIMULTANEIDAD)
+        algo = materiaService.crear("Algoritmos", "ALG-208", mutableListOf(), Carrera.PW)
+        funcional = materiaService.crear("Funcional", "FUN-205", mutableListOf(), Carrera.PW)
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
         val horarios = listOf(
@@ -155,7 +155,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Un alumno no puede registrar un formulario para una materia que no tiene disponible`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.P)
         val formularioComision = FormularioComision(
             1,
             logica.codigo,
@@ -449,7 +449,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
@@ -477,7 +477,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
@@ -505,7 +505,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno tiene disponible materias solo de su carrera`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(), Carrera.LI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(), Carrera.W)
         val materiasdisponibles =
             alumnoService.materiasDisponibles(alumno.dni, cuatrimestre)
         assertThat(materiasdisponibles.map { it.codigo }).doesNotContain(logica.codigo)
@@ -513,7 +513,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno no tiene disponible materias de las cuales no cumple los requisitos`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf("ALG-208"), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf("ALG-208"), Carrera.P)
         val materiasdisponibles =
             alumnoService.materiasDisponibles(alumno.dni, cuatrimestre)
         assertThat(materiasdisponibles).hasSize(1)
@@ -529,13 +529,13 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
         alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.P)
         val formularioComision = FormularioComision(
             1,
             logica.codigo,
@@ -569,13 +569,13 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
         alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.P)
         val formularioComision = FormularioComision(
             1,
             logica.codigo,
@@ -609,7 +609,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
@@ -656,7 +656,7 @@ internal class AlumnoServiceTest {
         val materiaCursada = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val materiaCursada2 = MateriaCursadaDTO(funcional.codigo, EstadoMateria.DESAPROBADO, LocalDate.of(2020, 12, 20))
         val materiaCursada3 = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 7, 20))
-        val intro = materiaService.crear("Intro", "INT-205", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val intro = materiaService.crear("Intro", "INT-205", mutableListOf(), Carrera.PW)
 
         val formularioComision2 = FormularioComision(
             1,
@@ -675,7 +675,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.SIMULTANEIDAD,
+            Carrera.PW,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
@@ -743,7 +743,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
@@ -927,7 +927,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             8.21
         )
         var nacho = alumnoService.crear(formularioNuevoAlumno)
