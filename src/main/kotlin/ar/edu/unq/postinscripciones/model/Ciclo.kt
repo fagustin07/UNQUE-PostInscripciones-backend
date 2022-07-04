@@ -29,19 +29,17 @@ class RequisitoCiclo(
     val carrera: Carrera = Carrera.P,
     val cicloTPI: CicloTPI = CicloTPI.NO_PERTENECE,
     val cicloLI: CicloLI = CicloLI.CA,
-    val cantidad: Int = 30,
+    val creditos: Int = 30,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
     fun cumpleRequisito(alumno: Alumno, carrera: Carrera): Boolean {
-        if (carrera == Carrera.PW) throw ExcepcionUNQUE("Invalido")
-
         return if (carrera == this.carrera && carrera == Carrera.P) {
-            alumno.creditosParaCicloDeTPI(cicloTPI) >= cantidad
+            alumno.creditosParaCicloDeTPI(cicloTPI) >= creditos
         } else if (carrera == this.carrera && carrera == Carrera.W) {
-            alumno.creditosParaCicloDeLI(cicloLI) >= cantidad
+            alumno.creditosParaCicloDeLI(cicloLI) >= creditos
         } else {
             throw ExcepcionUNQUE("Invalido")
         }
@@ -49,12 +47,16 @@ class RequisitoCiclo(
 
 
     init {
-        if (carrera == Carrera.PW ||  (cicloLI != CicloLI.NO_PERTENECE && cicloTPI != CicloTPI.NO_PERTENECE)){
+        if (carrera == Carrera.PW){
             throw ExcepcionUNQUE("Un requisito debe pertenecer solo a una carrera")
         }
 
         if (cicloLI == CicloLI.NO_PERTENECE && cicloTPI == CicloTPI.NO_PERTENECE) {
-            throw ExcepcionUNQUE("Un requisito debe pertenecer a una carrera")
+            throw ExcepcionUNQUE("Un requisito debe pertenecer a un ciclo")
+        }
+
+        if (cicloLI != CicloLI.NO_PERTENECE && cicloTPI != CicloTPI.NO_PERTENECE) {
+            throw ExcepcionUNQUE("Un requisito solo puede pertenecer a un ciclo")
         }
     }
 }

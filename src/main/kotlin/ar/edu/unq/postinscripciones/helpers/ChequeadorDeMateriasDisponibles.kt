@@ -12,14 +12,6 @@ class ChequeadorDeMateriasDisponibles {
 
     private fun cumpleRequisitosDeMateria(alumno: Alumno, materia: Materia): Boolean {
         return when (alumno.carrera) {
-            Carrera.P -> materia.tpi != CicloTPI.NO_PERTENECE && cumpleRequerimientos(alumno, materia)
-            Carrera.W -> materia.li != CicloLI.NO_PERTENECE && cumpleRequerimientos(alumno, materia)
-            Carrera.PW -> cumpleRequerimientos(alumno, materia) || cumpleRequerimientos(alumno, materia)
-        }
-    }
-
-    private fun cumpleRequerimientos(alumno: Alumno, materia: Materia): Boolean {
-        return when (alumno.carrera) {
             Carrera.P -> cumpleTPI(materia, alumno)
             Carrera.W -> cumpleLI(materia, alumno)
             Carrera.PW -> cumpleTPI(materia, alumno) || cumpleLI(materia, alumno)
@@ -27,12 +19,14 @@ class ChequeadorDeMateriasDisponibles {
     }
 
     private fun cumpleLI(materia: Materia, alumno: Alumno): Boolean {
-        return materia.requisitosCicloLI().all { it.cumpleRequisito(alumno, Carrera.W) } &&
+        return materia.li != CicloLI.NO_PERTENECE &&
+                materia.requisitosCicloLI().all { it.cumpleRequisito(alumno, Carrera.W) } &&
                 (materia.li == CicloLI.CO || materia.cumpleCorrelativas(alumno))
     }
 
     private fun cumpleTPI(materia: Materia, alumno: Alumno): Boolean {
-        return materia.requisitosCicloTPI().all { it.cumpleRequisito(alumno, Carrera.W) } &&
+        return materia.tpi != CicloTPI.NO_PERTENECE &&
+                materia.requisitosCicloTPI().all { it.cumpleRequisito(alumno, Carrera.P) } &&
                 (materia.tpi == CicloTPI.CC || materia.cumpleCorrelativas(alumno))
     }
 }
