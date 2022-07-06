@@ -25,8 +25,14 @@ class ChequeadorDeMateriasDisponibles {
     }
 
     private fun cumpleTPI(materia: Materia, alumno: Alumno): Boolean {
-        return materia.tpi != CicloTPI.NO_PERTENECE &&
-                materia.requisitosCicloTPI().all { it.cumpleRequisito(alumno, Carrera.P) } &&
-                (materia.tpi == CicloTPI.CC || materia.cumpleCorrelativas(alumno))
+        return (!alumno.cursaTPI2010 &&  cumpleTPI2015(materia, alumno)) ||
+                (alumno.cursaTPI2010 &&  cumpleTPI2010(materia, alumno))
     }
+
+    private fun cumpleTPI2015(materia: Materia, alumno: Alumno) = materia.tpi2015 != CicloTPI.NO_PERTENECE &&
+            materia.requisitosCicloTPI().all { it.cumpleRequisito(alumno, Carrera.P) } &&
+            (materia.tpi2015 == CicloTPI.CC || materia.cumpleCorrelativas(alumno))
+
+    private fun cumpleTPI2010(materia: Materia, alumno: Alumno) = materia.tpi2010 != CicloTPI.NO_PERTENECE &&
+            materia.requisitosCicloTPI2010().all { it.cumpleRequisito(alumno, Carrera.P) }
 }

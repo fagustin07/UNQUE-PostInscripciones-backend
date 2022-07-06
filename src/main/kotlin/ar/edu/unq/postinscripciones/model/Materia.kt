@@ -14,12 +14,14 @@ class Materia(
     val creditos: Int = 8,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var tpi: CicloTPI = CicloTPI.CO,
+    var tpi2015: CicloTPI = CicloTPI.CO,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var li: CicloLI = CicloLI.CA,
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val requisitosCiclo: MutableList<RequisitoCiclo> = mutableListOf()
+    val requisitosCiclo: MutableList<RequisitoCiclo> = mutableListOf(),
+    @Column(nullable = false)
+    val tpi2010: CicloTPI = CicloTPI.NO_PERTENECE
 ) {
 
     fun esLaMateria(materia: Materia) = this.codigo == materia.codigo
@@ -34,7 +36,11 @@ class Materia(
     }
 
     fun requisitosCicloTPI(): List<RequisitoCiclo> {
-        return requisitosCiclo.filter { it.carrera == Carrera.P }
+        return requisitosCiclo.filter { !it.esTPI2010 && it.carrera == Carrera.P }
+    }
+
+    fun requisitosCicloTPI2010(): List<RequisitoCiclo> {
+        return requisitosCiclo.filter { it.esTPI2010 && it.carrera == Carrera.P }
     }
 
     fun cumpleCorrelativas(alumno: Alumno): Boolean {
@@ -46,9 +52,9 @@ class Materia(
     }
 
     fun carrera(): Carrera {
-        return if (tpi != CicloTPI.NO_PERTENECE && li != CicloLI.NO_PERTENECE) {
+        return if (tpi2015 != CicloTPI.NO_PERTENECE && li != CicloLI.NO_PERTENECE) {
             Carrera.PW
-        } else if (tpi == CicloTPI.NO_PERTENECE) {
+        } else if (tpi2015 == CicloTPI.NO_PERTENECE) {
             Carrera.W
         } else {
             Carrera.P

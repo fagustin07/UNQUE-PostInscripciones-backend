@@ -11,7 +11,7 @@ internal class MateriaTest {
     @BeforeEach
     fun `set up`() {
         correlativa = Materia("80005","Elementos de Programación y lógica")
-        bdd = Materia("PW-1050", "Bases de Datos", mutableListOf(correlativa), li = CicloLI.CA, tpi = CicloTPI.NO_PERTENECE)
+        bdd = Materia("PW-1050", "Bases de Datos", mutableListOf(correlativa), li = CicloLI.CA, tpi2015 = CicloTPI.NO_PERTENECE)
     }
 
     @Test

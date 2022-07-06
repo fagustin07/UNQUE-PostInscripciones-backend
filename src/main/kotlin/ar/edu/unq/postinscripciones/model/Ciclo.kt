@@ -29,6 +29,7 @@ class RequisitoCiclo(
     val carrera: Carrera = Carrera.P,
     val cicloTPI: CicloTPI = CicloTPI.NO_PERTENECE,
     val cicloLI: CicloLI = CicloLI.CA,
+    val esTPI2010: Boolean = false,
     val creditos: Int = 30,
 ) {
     @Id
@@ -36,7 +37,9 @@ class RequisitoCiclo(
     var id: Long? = null
 
     fun cumpleRequisito(alumno: Alumno, carrera: Carrera): Boolean {
-        return if (carrera == this.carrera && carrera == Carrera.P) {
+        return if (carrera == this.carrera && carrera == Carrera.P && alumno.cursaTPI2010 && esTPI2010) {
+            alumno.creditosParaCicloDeTPI2010(cicloTPI) >= creditos
+        } else if (carrera == this.carrera && carrera == Carrera.P && !alumno.cursaTPI2010 && !esTPI2010) {
             alumno.creditosParaCicloDeTPI(cicloTPI) >= creditos
         } else if (carrera == this.carrera && carrera == Carrera.W) {
             alumno.creditosParaCicloDeLI(cicloLI) >= creditos
@@ -45,10 +48,13 @@ class RequisitoCiclo(
         }
     }
 
-
     init {
         if (carrera == Carrera.PW){
             throw ExcepcionUNQUE("Un requisito debe pertenecer solo a una carrera")
+        }
+
+        if (esTPI2010 && cicloTPI == CicloTPI.CI){
+            throw ExcepcionUNQUE("No existe el ciclo introductorio en el plan 2010")
         }
 
         if (cicloLI == CicloLI.NO_PERTENECE && cicloTPI == CicloTPI.NO_PERTENECE) {

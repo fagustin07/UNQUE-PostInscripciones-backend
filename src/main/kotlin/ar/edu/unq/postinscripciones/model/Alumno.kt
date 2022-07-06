@@ -25,7 +25,9 @@ class Alumno(
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.PW,
     @Column(nullable = false)
-    var coeficiente: Double = 3.0
+    var coeficiente: Double = 3.0,
+    @Column(nullable = false)
+    var cursaTPI2010: Boolean = false
 ) {
     var codigo: Int? = null
     var cargaDeCodigo: LocalDateTime? = null
@@ -173,11 +175,23 @@ class Alumno(
     }
 
     fun creditosParaCicloDeTPI(cicloTPI: CicloTPI): Int {
-        return this.materiasAprobadas().filter { it.tpi == cicloTPI }.sumOf { it.creditos }
+        return if (!this.cursaTPI2010) {
+            this.materiasAprobadas().filter { it.tpi2015 == cicloTPI }.sumOf { it.creditos }
+        } else {
+            0
+        }
     }
 
     fun creditosParaCicloDeLI(cicloLI: CicloLI): Int {
         return this.materiasAprobadas().filter { it.li == cicloLI }.sumOf { it.creditos }
+    }
+
+    fun creditosParaCicloDeTPI2010(cicloTPI: CicloTPI): Int {
+        return if (this.cursaTPI2010) {
+            this.materiasAprobadas().filter { it.tpi2010 == cicloTPI }.sumOf { it.creditos }
+        } else {
+            0
+        }
     }
 }
 
