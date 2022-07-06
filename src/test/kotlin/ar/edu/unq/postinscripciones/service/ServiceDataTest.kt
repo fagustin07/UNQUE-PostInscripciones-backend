@@ -90,7 +90,7 @@ internal class ServiceDataTest {
     fun `se puede guardar una planilla de oferta de comisiones para un cuatrimestre`() {
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         val cuatri = cuatrimestreService.crear(formularioCuatrimestre)
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
 
         comisionService.actualizarOfertaAcademica(
             listOf(
@@ -120,7 +120,7 @@ internal class ServiceDataTest {
     fun `se puede guardar una planilla y se obtienen las comisiones conflictivas por cuatrimestre, materia y numero`() {
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         val cuatri = cuatrimestreService.crear(formularioCuatrimestre)
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
         val crearBdd = ComisionACrear(
             1,
             bdd.nombre,
@@ -149,7 +149,7 @@ internal class ServiceDataTest {
 
     @Test
     fun `si no se aclara un cuatrimestre al subir la oferta academica, se crearan en el cuatrimestre actual`() {
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
 
         comisionService.actualizarOfertaAcademica(
             listOf(
@@ -182,7 +182,7 @@ internal class ServiceDataTest {
             planilla.add(
                 FormularioCrearAlumno(
                         prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
-                        prefijo + planilla.size, Carrera.TPI, 0.0
+                        prefijo + planilla.size, Carrera.P, 0.0
                 )
             )
         }

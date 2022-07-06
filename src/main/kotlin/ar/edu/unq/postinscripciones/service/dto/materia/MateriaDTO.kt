@@ -16,7 +16,7 @@ data class MateriaDTO(
 ) {
     companion object {
         fun desdeModelo(materia: Materia): MateriaDTO {
-            return MateriaDTO(materia.codigo, materia.nombre, materia.carrera, materia.correlativas.map { it.nombre })
+            return MateriaDTO(materia.codigo, materia.nombre, materia.carrera(), materia.correlativas.map { it.nombre })
         }
     }
 }

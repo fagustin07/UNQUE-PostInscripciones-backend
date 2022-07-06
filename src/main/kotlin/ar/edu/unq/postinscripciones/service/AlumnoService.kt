@@ -1,13 +1,16 @@
 package ar.edu.unq.postinscripciones.service
 
+import ar.edu.unq.postinscripciones.helpers.ChequeadorDeMateriasDisponibles
 import ar.edu.unq.postinscripciones.model.*
-import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
-import ar.edu.unq.postinscripciones.service.dto.formulario.*
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioAlumnoDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
+import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDirectorDTO
+import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaResumenDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
@@ -41,7 +44,10 @@ class AlumnoService {
     private lateinit var solicitudSobrecupoRepository: SolicitudSobrecupoRepository
 
     @Autowired
-    lateinit var jwtTokenUtil: JWTTokenUtil
+    private lateinit var jwtTokenUtil: JWTTokenUtil
+
+    @Autowired
+    private lateinit var chequeadorDeMateriaDisponible: ChequeadorDeMateriasDisponibles
 
     @Transactional
     fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumno> {
@@ -215,14 +221,22 @@ class AlumnoService {
                 .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
         val alumno =
             alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
-        val materiasDisponibles = materiaRepository.findMateriasDisponibles(
-            alumno.materiasAprobadas(),
-            alumno.carrera,
-            cuatrimestreObtenido.anio,
-            cuatrimestreObtenido.semestre
-        )
 
-        return this.mapToMateriaComision(materiasDisponibles)
+        val comisionesOfertadas = comisionRepository.findByCuatrimestre(cuatrimestreObtenido)
+        val codigos: List<String> = comisionesOfertadas.map { it.materia }.groupBy { it.codigo }.map { it.key }
+        val materiasOfertadas: List<Materia> = materiaRepository.findAllByCodigoIn(codigos)
+
+        val materiasQuePuedeCursar = chequeadorDeMateriaDisponible.materiasQuePuedeCursar(alumno, materiasOfertadas)
+
+        return materiasQuePuedeCursar.map { materia ->
+            val comisiones = comisionesOfertadas.filter { it.materia.esLaMateria(materia) }
+
+            MateriaComision(
+                materia.codigo,
+                materia.nombre,
+                comisiones.map { ComisionParaAlumno.desdeModelo(it) }.toMutableList()
+            )
+        }
     }
 
     @Transactional
@@ -418,22 +432,6 @@ class AlumnoService {
         )
 
         return alumnoRepository.save(alumno)
-    }
-
-    private fun mapToMateriaComision(materiasDisponibles: List<Tuple>): List<MateriaComision> {
-        val materias = mutableListOf<MateriaComision>()
-        materiasDisponibles.map {
-            val materiaActual = materias.find { mat -> mat.codigo == (it.get(0) as String) }
-            materiaActual?.comisiones?.add(ComisionParaAlumno.desdeModelo(it.get(2) as Comision))
-                ?: materias.add(
-                    MateriaComision(
-                        it.get(0) as String,
-                        it.get(1) as String,
-                        mutableListOf(ComisionParaAlumno.desdeModelo(it.get(2) as Comision))
-                    )
-                )
-        }
-        return materias
     }
 
     private fun chequearSiPuedeCursarYObtenerSolicitudes(

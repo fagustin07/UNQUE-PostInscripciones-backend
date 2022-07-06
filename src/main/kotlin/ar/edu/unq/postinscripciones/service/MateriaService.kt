@@ -37,7 +37,7 @@ class MateriaService {
             val materiasCorrelativas = materiaRepository.findAllByCodigoIn(correlativas)
             val materiaInexistente = correlativas.find { !materiasCorrelativas.map { c -> c.codigo }.contains(it) }
             if (materiaInexistente != null) throw ExcepcionUNQUE("No existe la materia con codigo: $materiaInexistente")
-            val materia = materiaRepository.save(Materia(codigo, nombre, materiasCorrelativas.toMutableList(), carrera))
+            val materia = materiaRepository.save(Materia(codigo, nombre, materiasCorrelativas.toMutableList()))
 
             return MateriaDTO.desdeModelo(materia)
         }
@@ -54,7 +54,7 @@ class MateriaService {
                 conflictos.add(ConflictoMateria(form.nombre,form.codigo, mensaje))
             }
             else {
-                materiaRepository.save(Materia(form.codigo, form.nombre, mutableListOf(), form.carrera))
+                materiaRepository.save(Materia(form.codigo, form.nombre, mutableListOf()))
             }
         }
         return conflictos
@@ -110,7 +110,7 @@ class MateriaService {
         val materia = materiaRepository.findMateriaByCodigo(formularioMateria.codigo).orElseThrow {
             ExcepcionUNQUE("No existe la materia con codigo: ${formularioMateria.codigo}")
         }
-        val materiaActualizada = Materia(formularioMateria.codigo, formularioMateria.nombre, materia.correlativas, formularioMateria.carrera)
+        val materiaActualizada = Materia(formularioMateria.codigo, formularioMateria.nombre, materia.correlativas)
         materiaRepository.save(materiaActualizada)
 
         return MateriaDTO.desdeModelo(materiaRepository.save(materiaActualizada))
