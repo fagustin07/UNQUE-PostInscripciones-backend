@@ -1142,6 +1142,27 @@ internal class AlumnoServiceTest {
     }
 
     @Test
+    fun `obtener listado de alumnos ordenado por cantidad de aprobadas`() {
+        val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val formularioAlumno = FormularioCrearAlumno(
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.P,
+                5.0
+        )
+
+        val nacho = alumnoService.crear(formularioAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
+        alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!, comision2Algoritmos.id!!), cuatrimestre)
+        alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!), cuatrimestre)
+        val alumnos = alumnoService.alumnosPorDni()
+        assertThat(alumnos.first().alumno.dni).isEqualTo(nacho.dni)
+    }
+    @Test
     fun `no se pueden pedir materias en las que declara ya estar inscripto por guarani`() {
         val excepcion = assertThrows<ExcepcionUNQUE> {
             alumnoService.guardarSolicitudPara(
@@ -1408,7 +1429,25 @@ internal class AlumnoServiceTest {
         assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].autor).isEqualTo("Gabi")
         assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].descripcion).isEqualTo("Aprobado por este lado")
     }
+    @Test
+    fun `EL listado de alumnos esta ordenado por cantidad de materias aprobadas`() {
+        val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val formularioAlumno = FormularioCrearAlumno(
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.P,
+                5.0
+        )
+        val nacho = alumnoService.crear(formularioAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
 
+        val alumnos = alumnoService.todos()
+        assertThat(alumnos.first().dni).isEqualTo(nacho.dni)
+    }
     @AfterEach
     fun tearDown() {
         materiaService.borrarTodos()

@@ -15,11 +15,17 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findByDniOrLegajo(dni: Int, legajo: Int): Optional<Alumno>
 
     @Query(
-        "FROM Alumno " +
-        "WHERE CAST(dni as string) LIKE concat(:dniString, '%') " +
-        "ORDER BY coeficiente DESC"
+        "SELECT a " +
+        "FROM Alumno as a " +
+        "LEFT JOIN MateriaCursada as m " +
+            "ON m.id IN ( " +
+            "SELECT m2.id FROM a.historiaAcademica as m2 WHERE m2.estado = ?2 " +
+        ") " +
+        "WHERE CAST(dni as string) LIKE concat(?1, '%') " +
+        "GROUP BY a.dni " +
+        "ORDER BY count(m) DESC"
     )
-    fun findByDniStartsWithOrderByCoeficienteDesc(dniString: String): List<Alumno>
+    fun findByDniStartsWithOrderByCantAprobadasDesc(dniString: String, estadoMateria: EstadoMateria = EstadoMateria.APROBADO ): List<Alumno>
 
     @Query(
         "SELECT alu.dni, afs.formulario_id, afs.solicitud_id, count(mc.id) AS aprobadas\n" +
@@ -84,11 +90,15 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
                 "ON solicitudes_aprobadas.id IN ( " +
                     "SELECT solicitudes.id FROM f.solicitudes as solicitudes WHERE solicitudes.estado = ?7 " +
                 ") " +
+            "LEFT JOIN MateriaCursada as m " +
+                "ON m.id IN ( " +
+                    "SELECT m2.id FROM a.historiaAcademica as m2 WHERE m2.estado = ?7 " +
+                ") " +
         "WHERE (?1 IS NULL OR concat(a.dni, '') LIKE %?1% ) " +
         "GROUP BY a.dni, a.nombre, a.apellido, a.correo, a.legajo, f.id " +
         "HAVING (?4 IS NULL OR (?4 IS TRUE AND f.solicitudes.size = count(solicitudes_pendientes)) OR (?4 IS FALSE AND NOT f.solicitudes.size = count(solicitudes_pendientes))) " +
             "AND (?5 IS NULL OR (?5 IS TRUE AND count(solicitudes_pendientes) > 0) OR (?5 IS FALSE AND count(solicitudes_pendientes) = 0)) " +
-        "ORDER BY a.coeficiente DESC"
+        "ORDER BY count(m) DESC"
     )
     fun findAllByDni(dni: String?, semestre: Semestre, anio: Int, sinProcesar: Boolean? = null, pendiente: Boolean? = null, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE, estadoAprobado : EstadoSolicitud = EstadoSolicitud.APROBADO): List<Tuple>
 }
