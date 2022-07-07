@@ -26,7 +26,7 @@ class ChequeadorRequisitosTest {
         val materiaDeseada = Materia(
             codigo = "123",
             nombre = "materia2",
-            requisitosCiclo = mutableListOf(requisitoCiclo),
+            requisitosCiclo = mutableSetOf(requisitoCiclo),
             tpi2015 = CicloTPI.CO,
             li = CicloLI.NO_PERTENECE
         )
@@ -91,7 +91,7 @@ class ChequeadorRequisitosTest {
             Materia(
                 codigo = "tip",
                 nombre = "TIP",
-                requisitosCiclo = mutableListOf(requisitoCicloCA, requisitoCicloCO, requisitoCicloCC),
+                requisitosCiclo = mutableSetOf(requisitoCicloCA, requisitoCicloCO, requisitoCicloCC),
                 tpi2015 = CicloTPI.OR,
                 li = CicloLI.NO_PERTENECE
             )
@@ -126,7 +126,7 @@ class ChequeadorRequisitosTest {
                 codigo = "distr",
                 nombre = "sd",
                 correlativas = mutableListOf(materia2),
-                requisitosCiclo = mutableListOf(requisitoCicloLI, requisitoCicloTPI),
+                requisitosCiclo = mutableSetOf(requisitoCicloLI, requisitoCicloTPI),
                 tpi2015 = CicloTPI.CC,
                 li = CicloLI.CA
             )
@@ -184,7 +184,7 @@ class ChequeadorRequisitosTest {
                 codigo = "distr",
                 nombre = "sd",
                 correlativas = mutableListOf(materia2),
-                requisitosCiclo = mutableListOf(requisitoCicloTPI2015, requisitoCicloTPI2010),
+                requisitosCiclo = mutableSetOf(requisitoCicloTPI2015, requisitoCicloTPI2010),
                 tpi2015 = CicloTPI.CA,
                 tpi2010 = CicloTPI.CA,
                 li = CicloLI.CA
