@@ -1,16 +1,13 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionACrear
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 
 @IntegrationTest
@@ -166,14 +163,6 @@ internal class ServiceDataTest {
 
         assertThat(ofertaDelCuatrimestre).hasSize(1)
         assertThat(ofertaDelCuatrimestre).allMatch { it.materia == bdd.nombre }
-    }
-
-    @Test
-    fun `si al pedir la oferta de un cuatrimestre no tiene al menos una oferta se levanta una excepcion`() {
-        val excepcion = assertThrows<ExcepcionUNQUE> { comisionService.ofertaDelCuatrimestre() }
-        val cuatrimestre = Cuatrimestre.actual()
-        assertThat(excepcion.message)
-            .isEqualTo("No hay oferta registrada para el cuatrimestre ${cuatrimestre.anio}, ${cuatrimestre.semestre}")
     }
 
     private fun generarAlumnos(prefijo: Int = 1): List<FormularioCrearAlumno> {

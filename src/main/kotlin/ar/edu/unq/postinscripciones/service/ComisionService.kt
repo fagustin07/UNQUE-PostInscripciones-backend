@@ -59,7 +59,6 @@ class ComisionService {
             cuatrimestre.semestre,
             patronNombre
         )
-        chequearSiHayOferta(oferta, cuatrimestre)
         return oferta.map { ComisionDTO.desdeModelo(it) }
     }
 
@@ -151,14 +150,6 @@ class ComisionService {
         cuatrimestre.actualizarFechas(inicioInscripciones, finInscripciones)
         return cuatrimestreRepository.save(cuatrimestre)
     }
-
-    private fun chequearSiHayOferta(
-        oferta: List<Comision>,
-        cuatrimestre: Cuatrimestre
-    ) {
-        if (oferta.isEmpty()) throw ExcepcionUNQUE("No hay oferta registrada para el cuatrimestre ${cuatrimestre.anio}, ${cuatrimestre.semestre}")
-    }
-
     private fun guardarComision(
         comisionACrear: ComisionACrear,
         materia: Materia,
