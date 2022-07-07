@@ -5,6 +5,7 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionConHorarios
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.ConflictoComision
@@ -43,6 +44,24 @@ class DirectivoController {
 
     @Autowired
     private lateinit var materiaService: MateriaService
+
+    @Autowired
+    private lateinit var cargaMateriaService: CargaMateriaService
+
+//    CARGA DE DATOS
+    @RequestMapping(value = ["/materias/carga"], method = [RequestMethod.POST])
+    fun cargarMaterias(@RequestBody planillaMaterias: PlanillaMaterias): ResponseEntity<*> {
+        cargaMateriaService.cargarMaterias(planillaMaterias)
+        return ResponseEntity(null, HttpStatus.CREATED)
+    }
+
+    @RequestMapping(value = ["/materias/{codigo}"], method = [RequestMethod.GET])
+    fun buscarMateria(
+        @ApiParam(value = "codigo de la materia deseada", example = "01035", required = true)
+        @PathVariable
+        codigo: String): ResponseEntity<*> {
+        return ResponseEntity(materiaService.detalle(codigo), HttpStatus.OK)
+    }
 
     //   CONTROLADOR ALUMNOS
 

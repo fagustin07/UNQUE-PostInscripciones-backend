@@ -18,10 +18,11 @@ class Materia(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var li: CicloLI = CicloLI.CA,
-    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    val requisitosCiclo: MutableList<RequisitoCiclo> = mutableListOf(),
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name="materia_id")
+    val requisitosCiclo: MutableSet<RequisitoCiclo> = mutableSetOf(),
     @Column(nullable = false)
-    val tpi2010: CicloTPI = CicloTPI.NO_PERTENECE
+    var tpi2010: CicloTPI = CicloTPI.NO_PERTENECE
 ) {
 
     fun esLaMateria(materia: Materia) = this.codigo == materia.codigo
@@ -61,10 +62,33 @@ class Materia(
         }
     }
 
-//            TODO: Ponerlo cuando se refactorice el seeder
-//    init {
-//        if (li == CicloLI.NO_PERTENECE && tpi == CicloTPI.NO_PERTENECE) {
-//            throw ExcepcionUNQUE("Una materia debe pertenecer a una carrera")
-//        }
-//    }
+    fun actualizarRequisitos(correlativasNuevas: MutableList<Materia>, requisitosCiclo: MutableList<RequisitoCiclo>) {
+        agregarNuevasCorrelativas(correlativasNuevas)
+        agregarNuevosRequisitosCiclo(requisitosCiclo)
+        this.requisitosCiclo.addAll(requisitosCiclo)
+    }
+
+    private fun agregarNuevosRequisitosCiclo(requisitosCiclo: MutableList<RequisitoCiclo>) {
+        requisitosCiclo.forEach { nuevoRequisitoCiclo ->
+            this.requisitosCiclo.removeIf { it.esElRequisito(nuevoRequisitoCiclo) }
+            this.requisitosCiclo.add(nuevoRequisitoCiclo)
+        }
+    }
+
+    private fun agregarNuevasCorrelativas(correlativasNuevas: MutableList<Materia>) {
+        correlativasNuevas.forEach { nuevaCorrelativa ->
+            if (!this.tieneComoCorrelativa(nuevaCorrelativa)) {
+                this.correlativas.add(nuevaCorrelativa)
+            }
+        }
+    }
+
+    private fun tieneComoCorrelativa(materia: Materia) =
+        this.correlativas.any { it.esLaMateria(materia) }
+
+    fun pertenecerALI(ciclo: CicloLI) { this.li = ciclo }
+    fun pertenecerATPI2010(ciclo: CicloTPI) { this.tpi2010 = ciclo }
+    fun pertenecerATPI2015(ciclo: CicloTPI) { this.tpi2015 = ciclo }
+
+
 }

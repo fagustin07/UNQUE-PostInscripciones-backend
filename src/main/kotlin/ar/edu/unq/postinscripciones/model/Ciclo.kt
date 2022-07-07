@@ -48,6 +48,11 @@ class RequisitoCiclo(
         }
     }
 
+    fun esElRequisito(requisitoCiclo: RequisitoCiclo): Boolean {
+        return this.carrera == requisitoCiclo.carrera && this.cicloTPI == requisitoCiclo.cicloTPI &&
+                cicloLI == requisitoCiclo.cicloLI && this.esTPI2010 == requisitoCiclo.esTPI2010
+    }
+
     init {
         if (carrera == Carrera.PW){
             throw ExcepcionUNQUE("Un requisito debe pertenecer solo a una carrera")

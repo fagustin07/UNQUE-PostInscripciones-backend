@@ -1,16 +1,18 @@
 package ar.edu.unq.postinscripciones.service
 
-import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.Materia
+import ar.edu.unq.postinscripciones.model.*
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
-import ar.edu.unq.postinscripciones.persistence.*
-import ar.edu.unq.postinscripciones.service.dto.materia.MateriaPorSolicitudes
+import ar.edu.unq.postinscripciones.persistence.ComisionRespository
+import ar.edu.unq.postinscripciones.persistence.FormularioRepository
+import ar.edu.unq.postinscripciones.persistence.MateriaRepository
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Plan
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioModificarMateria
-import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaPorSolicitudes
 import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -63,6 +65,11 @@ class MateriaService {
     @Transactional
     fun borrarMateria(codigo: String) {
         eliminarMateria(codigo)
+    }
+
+    @Transactional
+    fun detalle(codigo: String): MateriaDetalle {
+        return MateriaDetalle.desdeModelo(materiaRepository.findMateriaByCodigo(codigo).get())
     }
 
     @Transactional
@@ -167,3 +174,56 @@ data class ConflictoCorrelativa(
     @ApiModelProperty(example = "No se encontró la correlativa")
     val mensaje: String
 )
+
+
+data class MateriaDetalle(
+    val codigo: String,
+    val nombre: String,
+    var correlativas: List<String>,
+    val creditos: Int,
+    var tpi2015: CicloTPI,
+    var li: CicloLI,
+    val requisitosCiclo: List<RequisitoCicloDTO>,
+    var tpi2010: CicloTPI
+) {
+    companion object {
+        fun desdeModelo(materia: Materia): MateriaDetalle {
+            return MateriaDetalle(
+                materia.codigo,
+                materia.nombre,
+                materia.correlativas.map { it.nombre },
+                materia.creditos,
+                materia.tpi2015,
+                materia.li,
+                materia.requisitosCiclo.map { RequisitoCicloDTO.desdeModelo(it)  },
+                materia.tpi2010
+            )
+        }
+    }
+}
+
+data class RequisitoCicloDTO(
+    val ciclo: String,
+    val carrera: Plan,
+    val creditos: Int
+) {
+    companion object {
+        fun desdeModelo(requisitoCiclo: RequisitoCiclo): RequisitoCicloDTO {
+            val ciclo = if (requisitoCiclo.cicloLI != CicloLI.NO_PERTENECE) {
+                requisitoCiclo.cicloLI.toString()
+            } else {
+                requisitoCiclo.cicloTPI.toString()
+            }
+
+            val carrera = if (requisitoCiclo.cicloLI != CicloLI.NO_PERTENECE) {
+                Plan.LI
+            } else if (requisitoCiclo.esTPI2010) {
+                Plan.TPI2010
+            } else {
+                Plan.TPI2015
+            }
+
+            return RequisitoCicloDTO(ciclo, carrera, requisitoCiclo.creditos)
+        }
+    }
+}
