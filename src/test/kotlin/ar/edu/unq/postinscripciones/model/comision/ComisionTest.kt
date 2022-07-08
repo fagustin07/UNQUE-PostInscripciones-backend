@@ -53,8 +53,8 @@ internal class ComisionTest {
     @Test
     fun `una comision sabe modificar sus horarios`() {
         val nuevosHorarios = listOf(
-                Horario(Dia.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0)),
-                Horario(Dia.JUEVES, LocalTime.of(10, 0), LocalTime.of(12, 0)))
+                Horario(Dia.Mar, LocalTime.of(10, 0), LocalTime.of(12, 0)),
+                Horario(Dia.Jue, LocalTime.of(10, 0), LocalTime.of(12, 0)))
         comisionUnoBdd.modificarHorarios(nuevosHorarios)
 
         assertThat(comisionUnoBdd.horarios).usingRecursiveComparison().isEqualTo(nuevosHorarios)
@@ -72,8 +72,8 @@ internal class ComisionTest {
     @Test
     fun `Una comision sabe su modalidad`() {
         val horarios: List<Horario> = horariosBdd()
-        val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL)
-        assertThat(comisionDosBdd.modalidad).isEqualTo(Modalidad.VIRTUAL)
+        val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL_SINCRONICA)
+        assertThat(comisionDosBdd.modalidad).isEqualTo(Modalidad.VIRTUAL_SINCRONICA)
     }
 
     @Test
@@ -112,8 +112,8 @@ internal class ComisionTest {
 
     fun horariosBdd(): List<Horario> {
         return listOf(
-            Horario(Dia.LUNES, LocalTime.of(18, 0), LocalTime.of(21, 0)),
-            Horario(Dia.MIERCOLES, LocalTime.of(12, 0), LocalTime.of(15, 0))
+            Horario(Dia.Lun, LocalTime.of(18, 0), LocalTime.of(21, 0)),
+            Horario(Dia.Mie, LocalTime.of(12, 0), LocalTime.of(15, 0))
         )
     }
 }

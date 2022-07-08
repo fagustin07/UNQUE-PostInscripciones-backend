@@ -22,6 +22,7 @@ class Materia(
     @JoinColumn(name="materia_id")
     val requisitosCiclo: MutableSet<RequisitoCiclo> = mutableSetOf(),
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     var tpi2010: CicloTPI = CicloTPI.NO_PERTENECE
 ) {
 

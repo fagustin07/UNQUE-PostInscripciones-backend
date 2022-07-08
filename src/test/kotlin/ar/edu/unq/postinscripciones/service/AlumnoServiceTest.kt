@@ -82,8 +82,8 @@ internal class AlumnoServiceTest {
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
         val horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
 
         val formularioComision1 = FormularioComision(
@@ -164,8 +164,8 @@ internal class AlumnoServiceTest {
             35,
             5,
             listOf(
-                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
-                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+                HorarioDTO(Dia.Lun, "18:00", "20:00"),
+                HorarioDTO(Dia.Jue, "09:00", "11:00")
             ),
             Modalidad.PRESENCIAL
         )
@@ -544,8 +544,8 @@ internal class AlumnoServiceTest {
             35,
             5,
             listOf(
-                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
-                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+                HorarioDTO(Dia.Lun, "18:00", "20:00"),
+                HorarioDTO(Dia.Jue, "09:00", "11:00")
             ),
             Modalidad.PRESENCIAL
         )
@@ -584,8 +584,8 @@ internal class AlumnoServiceTest {
             35,
             5,
             listOf(
-                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
-                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+                HorarioDTO(Dia.Lun, "18:00", "20:00"),
+                HorarioDTO(Dia.Jue, "09:00", "11:00")
             ),
             Modalidad.PRESENCIAL
         )
@@ -881,8 +881,8 @@ internal class AlumnoServiceTest {
     fun `se pueden obtener los alumnos que pidieron una materia con una comision especifica`() {
         val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         val horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
 
         val formularioComision = FormularioComision(
@@ -1182,8 +1182,8 @@ internal class AlumnoServiceTest {
     @Test
     fun `no se pueden pedir comisiones que se superpongan en horarios con las que declara estar inscripto en guarani`() {
         val horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formularioComision = FormularioComision(
             1,
@@ -1214,7 +1214,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `se pueden pedir comisiones superpuestas en horarios pero de distintos dias`() {
         val horarios = listOf(
-            HorarioDTO(Dia.MARTES, "18:30", "21:30"),
+            HorarioDTO(Dia.Mar, "18:30", "21:30"),
         )
         val formularioComision = FormularioComision(
             1,

@@ -52,8 +52,8 @@ internal class MateriaServiceTest {
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
 
         var horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formulario = FormularioComision(
             1,
@@ -67,8 +67,8 @@ internal class MateriaServiceTest {
         )
         comision = comisionService.crear(formulario)
         horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formulario2 = FormularioComision(
             2,

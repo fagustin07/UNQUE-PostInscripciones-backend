@@ -26,8 +26,11 @@ enum class CicloLI {
 
 @Entity
 class RequisitoCiclo(
+    @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.P,
+    @Enumerated(EnumType.STRING)
     val cicloTPI: CicloTPI = CicloTPI.NO_PERTENECE,
+    @Enumerated(EnumType.STRING)
     val cicloLI: CicloLI = CicloLI.CA,
     val esTPI2010: Boolean = false,
     val creditos: Int = 30,
