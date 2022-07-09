@@ -3,7 +3,7 @@ package ar.edu.unq.postinscripciones.model.comision
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
@@ -46,7 +46,7 @@ class Comision(
         if(sobrecuposDisponibles() > 0) {
             sobrecuposOcupados ++
         } else {
-            throw ExcepcionUNQUE("No hay sobrecupos disponibles")
+            throw ErrorDeNegocio("No hay sobrecupos disponibles")
         }
 
     }
@@ -55,7 +55,7 @@ class Comision(
         if(sobrecuposOcupados > 0) {
             sobrecuposOcupados --
         } else {
-            throw ExcepcionUNQUE("No hay sobrecupos ocupados")
+            throw ErrorDeNegocio("No hay sobrecupos ocupados")
         }
 
     }

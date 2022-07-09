@@ -2,8 +2,9 @@ package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.*
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
+import ar.edu.unq.postinscripciones.model.exception.ConflictoConExistente
+import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontrada
+import ar.edu.unq.postinscripciones.model.exception.RecursoNoEncontrado
 import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
@@ -33,12 +34,12 @@ class MateriaService {
     fun crear(nombre: String, codigo: String, correlativas : List<String>, carrera: Carrera): MateriaDTO {
         val existeConNombreOCodigo = materiaRepository.findByNombreIgnoringCaseOrCodigoIgnoringCase(nombre, codigo)
         if (existeConNombreOCodigo.isPresent) {
-            throw ExcepcionUNQUE("La materia que desea crear con nombre $nombre " +
+            throw ConflictoConExistente("La materia que desea crear con nombre $nombre " +
                     "y codigo $codigo, genera conflicto con la materia: ${existeConNombreOCodigo.get().nombre}, codigo: ${existeConNombreOCodigo.get().codigo}")
         } else {
             val materiasCorrelativas = materiaRepository.findAllByCodigoIn(correlativas)
             val materiaInexistente = correlativas.find { !materiasCorrelativas.map { c -> c.codigo }.contains(it) }
-            if (materiaInexistente != null) throw ExcepcionUNQUE("No existe la materia con codigo: $materiaInexistente")
+            if (materiaInexistente != null) throw RecursoNoEncontrado("No existe la materia con codigo: $materiaInexistente")
             val materia = materiaRepository.save(Materia(codigo, nombre, materiasCorrelativas.toMutableList()))
 
             return MateriaDTO.desdeModelo(materia)
@@ -69,7 +70,7 @@ class MateriaService {
 
     @Transactional
     fun detalle(codigo: String): MateriaDetalle {
-        return MateriaDetalle.desdeModelo(materiaRepository.findMateriaByCodigo(codigo).get())
+        return MateriaDetalle.desdeModelo(materiaRepository.findMateriaByCodigo(codigo).orElseThrow { MateriaNoEncontrada(codigo) })
     }
 
     @Transactional
@@ -107,7 +108,7 @@ class MateriaService {
 
     @Transactional
     fun obtener(codigo: String): Materia {
-        val materia = materiaRepository.findMateriaByCodigo(codigo).orElseThrow{ MateriaNoEncontradaExcepcion() }
+        val materia = materiaRepository.findMateriaByCodigo(codigo).orElseThrow{ MateriaNoEncontrada(codigo) }
         materia.correlativas.size
         return materia
     }
@@ -115,7 +116,7 @@ class MateriaService {
     @Transactional
     fun modificar(formularioMateria: FormularioModificarMateria): MateriaDTO {
         val materia = materiaRepository.findMateriaByCodigo(formularioMateria.codigo).orElseThrow {
-            ExcepcionUNQUE("No existe la materia con codigo: ${formularioMateria.codigo}")
+            MateriaNoEncontrada(formularioMateria.codigo)
         }
         val materiaActualizada = Materia(formularioMateria.codigo, formularioMateria.nombre, materia.correlativas)
         materiaRepository.save(materiaActualizada)
@@ -140,19 +141,24 @@ class MateriaService {
     }
 
     private fun eliminarMateria(codigo: String) {
-        comisionRespository.findByMateriaCodigo(codigo).forEach { comision ->
-            formularioRepository.findByComisionesInscriptoId(comision.id!!).forEach {
-                it.quitarInscripcionDe(comision.id!!)
-                formularioRepository.save(it)
+        try{
+            comisionRespository.findByMateriaCodigo(codigo).forEach { comision ->
+                formularioRepository.findByComisionesInscriptoId(comision.id!!).forEach {
+                    it.quitarInscripcionDe(comision.id!!)
+                    formularioRepository.save(it)
+                }
             }
+
+            comisionRespository.deleteByMateriaCodigo(codigo)
+            val materias: List<Materia> = materiaRepository.findByCorrelativasCodigo(codigo)
+            materias.forEach {
+                it.quitarCorrelativa(codigo)
+                materiaRepository.save(it)
+            }
+            materiaRepository.deleteById(codigo)
+        } catch (excepcion: RuntimeException) {
+            throw MateriaNoEncontrada(codigo)
         }
-        comisionRespository.deleteByMateriaCodigo(codigo)
-        val materias: List<Materia> = materiaRepository.findByCorrelativasCodigo(codigo)
-        materias.forEach {
-            it.quitarCorrelativa(codigo)
-            materiaRepository.save(it)
-        }
-        materiaRepository.deleteById(codigo)
     }
 
 }

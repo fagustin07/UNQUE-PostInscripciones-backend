@@ -1,6 +1,6 @@
 package ar.edu.unq.postinscripciones.model.cuatrimestre
 
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -60,7 +60,7 @@ class Cuatrimestre(
         }
 
         private fun checkFechas(inicio: LocalDateTime, fin: LocalDateTime) {
-            if (inicio > fin) throw  ExcepcionUNQUE(mensajeInicioMayorAFin())
+            if (inicio > fin) throw  ErrorDeNegocio(mensajeInicioMayorAFin())
         }
 
         private fun mensajeInicioMayorAFin() = "La fecha de inicio no puede ser mayor que la de fin"
@@ -88,12 +88,12 @@ class Cuatrimestre(
     ) {
         if ((posibleFechaFin != null && fechaInicioDeseada > posibleFechaFin) ||
             (posibleFechaFin == null && fechaInicioDeseada > this.finInscripciones)
-        ) throw ExcepcionUNQUE(mensajeInicioMayorAFin())
+        ) throw ErrorDeNegocio(mensajeInicioMayorAFin())
     }
 
     private fun chequearSiPuedeCambiarFechaFin(fechaFinDeseada: LocalDateTime) {
         if (fechaFinDeseada < this.inicioInscripciones) {
-            throw ExcepcionUNQUE("La fecha de fin no puede ser menor a la de inicio")
+            throw ErrorDeNegocio("La fecha de fin no puede ser menor a la de inicio")
         }
     }
 }

@@ -3,7 +3,7 @@ package ar.edu.unq.postinscripciones.model
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDateTime
@@ -71,7 +71,7 @@ class Formulario(
                 }
             }
         if (materiasSuperpuestas.isNotEmpty()) {
-            throw ExcepcionUNQUE("No podes solicitar comisiones de materias " +
+            throw ErrorDeNegocio("No podes solicitar comisiones de materias " +
                     "en las que ya estas inscripto por Guaraní")
         }
 
@@ -83,7 +83,7 @@ class Formulario(
             }
 
         if(horariosSuperpuestosGuarani.isNotEmpty()) {
-            throw ExcepcionUNQUE("Tenes solicitudes de sobrecupos de " +
+            throw ErrorDeNegocio("Tenes solicitudes de sobrecupos de " +
                     "comisiones que se superponen con las que estas inscripto en guaraní")
         }
 

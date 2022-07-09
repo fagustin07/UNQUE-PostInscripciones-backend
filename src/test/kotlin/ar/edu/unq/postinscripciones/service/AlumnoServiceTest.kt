@@ -1473,7 +1473,7 @@ internal class AlumnoServiceTest {
         val conflictivos = alumnoService.modificarCoeficienteAlumno(coeficientes)
 
         assertThat(conflictivos.first().dni).isEqualTo(dniInexistente)
-        assertThat(conflictivos.first().mensaje).isEqualTo("No se encontro el alumno con dni ${dniInexistente}")
+        assertThat(conflictivos.first().mensaje).isEqualTo("El alumno con dni ${dniInexistente} no existe")
     }
 
 

@@ -2,7 +2,7 @@ package ar.edu.unq.postinscripciones.service.dto.carga.datos
 
 import ar.edu.unq.postinscripciones.model.CicloLI
 import ar.edu.unq.postinscripciones.model.CicloTPI
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import io.swagger.annotations.ApiModelProperty
 
 data class PlanillaMaterias(
@@ -12,11 +12,11 @@ data class PlanillaMaterias(
 ) {
     init {
         if ((plan==Plan.TPI2010 || plan==Plan.TPI2015) && materias.any { it.cicloTPI == CicloTPI.NO_PERTENECE } ) {
-            throw ExcepcionUNQUE("Hay materias que no poseen un ciclo para la tpi")
+            throw ErrorDeNegocio("Hay materias que no poseen un ciclo para la tpi")
         }
 
         if (plan==Plan.LI && materias.any { it.cicloLI == CicloLI.NO_PERTENECE } ) {
-            throw ExcepcionUNQUE("Hay materias que no poseen un ciclo para la li")
+            throw ErrorDeNegocio("Hay materias que no poseen un ciclo para la li")
         }
     }
 }
@@ -54,7 +54,7 @@ data class MateriaParaCargar(
 ) {
     init {
         if (cicloTPI == CicloTPI.NO_PERTENECE && cicloLI == CicloLI.NO_PERTENECE) {
-            throw ExcepcionUNQUE("La materia $codigo debe pertenecer a un ciclo")
+            throw ErrorDeNegocio("La materia $codigo debe pertenecer a un ciclo")
         }
     }
 }

@@ -57,7 +57,7 @@ class DirectivoController {
 
     @RequestMapping(value = ["/materias/{codigo}"], method = [RequestMethod.GET])
     fun buscarMateria(
-        @ApiParam(value = "codigo de la materia deseada", example = "01035", required = true)
+        @ApiParam(value = "Codigo de la materia deseada", example = "01035", required = true)
         @PathVariable
         codigo: String): ResponseEntity<*> {
         return ResponseEntity(materiaService.detalle(codigo), HttpStatus.OK)
@@ -362,13 +362,13 @@ class DirectivoController {
     )
     @RequestMapping(value = ["/materias/{codigo}/solicitantes"], method = [RequestMethod.GET])
     fun alumnosQueSolicitaronMateria(
-        @ApiParam(value = "codigo de la materia", example = "01035", required = true)
+        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
         @PathVariable
         codigo: String,
-        @ApiParam(value = "numero de la comision para filtrar", example = "1", required = false)
+        @ApiParam(value = "Numero de la comision para filtrar", example = "1", required = false)
         @RequestParam
         numero: Int?,
-        @ApiParam(value = "estado de la solicitud para filtrar", example = "true", required = false)
+        @ApiParam(value = "Estado de la solicitud para filtrar", example = "true", required = false)
         @RequestParam
         pendiente: Boolean?
     ): ResponseEntity<*> {

@@ -1,6 +1,6 @@
 package ar.edu.unq.postinscripciones.model
 
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import javax.persistence.*
 
 enum class CicloTPI {
@@ -47,7 +47,7 @@ class RequisitoCiclo(
         } else if (carrera == this.carrera && carrera == Carrera.W) {
             alumno.creditosParaCicloDeLI(cicloLI) >= creditos
         } else {
-            throw ExcepcionUNQUE("Invalido")
+            throw ErrorDeNegocio("Invalido")
         }
     }
 
@@ -58,19 +58,19 @@ class RequisitoCiclo(
 
     init {
         if (carrera == Carrera.PW){
-            throw ExcepcionUNQUE("Un requisito debe pertenecer solo a una carrera")
+            throw ErrorDeNegocio("Un requisito debe pertenecer solo a una carrera")
         }
 
         if (esTPI2010 && cicloTPI == CicloTPI.CI){
-            throw ExcepcionUNQUE("No existe el ciclo introductorio en el plan 2010")
+            throw ErrorDeNegocio("No existe el ciclo introductorio en el plan 2010")
         }
 
         if (cicloLI == CicloLI.NO_PERTENECE && cicloTPI == CicloTPI.NO_PERTENECE) {
-            throw ExcepcionUNQUE("Un requisito debe pertenecer a un ciclo")
+            throw ErrorDeNegocio("Un requisito debe pertenecer a un ciclo")
         }
 
         if (cicloLI != CicloLI.NO_PERTENECE && cicloTPI != CicloTPI.NO_PERTENECE) {
-            throw ExcepcionUNQUE("Un requisito solo puede pertenecer a un ciclo")
+            throw ErrorDeNegocio("Un requisito solo puede pertenecer a un ciclo")
         }
     }
 }

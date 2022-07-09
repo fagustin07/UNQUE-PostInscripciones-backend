@@ -191,9 +191,10 @@ internal class MateriaServiceTest {
 
     @Test
     fun `No se puede obtener una materia que no existe`() {
-        val exception = assertThrows<ExcepcionUNQUE> { materiaService.obtener("AA-207") }
+        val codigoInexistente = "AA-207"
+        val exception = assertThrows<ExcepcionUNQUE> { materiaService.obtener(codigoInexistente) }
 
-        assertThat(exception.message).isEqualTo("No se encuentra la materia")
+        assertThat(exception.message).isEqualTo("La materia con codigo $codigoInexistente no se encuentra registrada en el sistema")
     }
 
     @Test

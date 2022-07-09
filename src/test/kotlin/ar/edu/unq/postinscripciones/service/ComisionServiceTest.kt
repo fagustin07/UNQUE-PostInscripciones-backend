@@ -125,16 +125,18 @@ internal class ComisionServiceTest {
 
     @Test
     fun `No se puede obtener una comision que no existe`() {
-        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtener(99999) }
+        val idInexistente: Long = 99999
+        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtener(idInexistente) }
 
-        assertThat(exception.message).isEqualTo("No se encuentra la comision")
+        assertThat(exception.message).isEqualTo("La comision con id $idInexistente no existe")
     }
 
     @Test
     fun `No se pueden obtener las comisiones de una materia que no existe`() {
-        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtenerComisionesMateria("AA-209") }
+        val codigoInexistente = "AA-209"
+        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtenerComisionesMateria(codigoInexistente) }
 
-        assertThat(exception.message).isEqualTo("No se encuentra la materia")
+        assertThat(exception.message).isEqualTo("La materia con codigo $codigoInexistente no se encuentra registrada en el sistema")
     }
 
     @Test

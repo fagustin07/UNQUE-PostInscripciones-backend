@@ -3,8 +3,10 @@ package ar.edu.unq.postinscripciones.service
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontradaExcepcion
+import ar.edu.unq.postinscripciones.model.exception.ComisionNoEncontrada
+import ar.edu.unq.postinscripciones.model.exception.CuatrimestreNoEncontrado
+import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontrada
+import ar.edu.unq.postinscripciones.model.exception.RecursoNoEncontrado
 import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
 import ar.edu.unq.postinscripciones.persistence.FormularioRepository
@@ -69,25 +71,30 @@ class ComisionService {
 
     @Transactional
     fun obtener(id: Long): ComisionDTO {
-        val comision = comisionRespository.findById(id).orElseThrow { ExcepcionUNQUE("No se encuentra la comision") }
+        val comision = comisionRespository.findById(id).orElseThrow { ComisionNoEncontrada(id) }
         return ComisionDTO.desdeModelo(comision)
     }
 
     @Transactional
     fun borrarComision(id: Long) {
-        formularioRepository.findByComisionesInscriptoId(id).forEach {
-            it.quitarInscripcionDe(id)
-            formularioRepository.save(it)
+        try{
+            formularioRepository.findByComisionesInscriptoId(id).forEach {
+                it.quitarInscripcionDe(id)
+                formularioRepository.save(it)
+            }
+            comisionRespository.deleteById(id)
+        } catch (excepcion: RuntimeException) {
+            throw ComisionNoEncontrada(id)
         }
-        comisionRespository.deleteById(id)
+
     }
 
     @Transactional
     fun obtenerComisionesMateria(codigoMateria: String, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): List<ComisionDTO> {
         val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
-            .orElseThrow { ExcepcionUNQUE("No existe el cuatrimestre") }
+            .orElseThrow { CuatrimestreNoEncontrado() }
         val materia = materiaRepository.findById(codigoMateria)
-            .orElseThrow { ExcepcionUNQUE("No se encuentra la materia") }
+            .orElseThrow { MateriaNoEncontrada(codigoMateria) }
         val comisiones = comisionRespository.findAllByMateriaAndCuatrimestreAnioAndCuatrimestreSemestre(materia, cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
 
         return comisiones.map { ComisionDTO.desdeModelo(it) }
@@ -119,7 +126,7 @@ class ComisionService {
 
     @Transactional
     fun modificarHorarios(comisionesConHorarios: List<ComisionConHorarios>, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): MutableList<ConflictoHorarios> {
-        val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { ExcepcionUNQUE("Cuatrimestre no encontrado") }
+        val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { RecursoNoEncontrado("Cuatrimestre no encontrado") }
         val conflictoHorarios = mutableListOf<ConflictoHorarios>()
 
         comisionesConHorarios.forEach { comisionConHorarios ->
@@ -169,7 +176,7 @@ class ComisionService {
 
     private fun guardarComision(formularioComision: FormularioComision): Comision {
         val materia = materiaRepository.findById(formularioComision.codigoMateria)
-            .orElseThrow { MateriaNoEncontradaExcepcion() }
+            .orElseThrow { MateriaNoEncontrada(formularioComision.codigoMateria) }
         val cuatrimestre =
             cuatrimestreRepository.findByAnioAndSemestre(formularioComision.anio, formularioComision.semestre).get()
         return comisionRespository.save(

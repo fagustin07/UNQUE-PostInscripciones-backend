@@ -3,7 +3,7 @@ package ar.edu.unq.postinscripciones.model
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -73,21 +73,21 @@ class Alumno(
 
     fun obtenerFormulario(anio: Int, semestre: Semestre): Formulario {
         val formulario = formularios.find { it.cuatrimestre.esElCuatrimestre(anio, semestre) }
-        return formulario ?: throw ExcepcionUNQUE("No se encontró ningun formulario para el cuatrimestre dado")
+        return formulario ?: throw ErrorDeNegocio("No se encontró ningun formulario para el cuatrimestre dado")
     }
 
     fun agregarSolicitud(comision: Comision, cuatrimestre: Cuatrimestre): Formulario {
         if (tieneAprobado(comision.materia)) {
-            throw ExcepcionUNQUE("El alumno ya ha aprobado la materia ${comision.materia.nombre}")
+            throw ErrorDeNegocio("El alumno ya ha aprobado la materia ${comision.materia.nombre}")
         }
 
         val formulario = this.obtenerFormulario(cuatrimestre.anio, cuatrimestre.semestre)
         if (formulario.comisionesInscripto.any { it.materia.esLaMateria(comision.materia) }) {
-            throw ExcepcionUNQUE("El alumno ya se encuentra inscripto por Guaraní a la materia ${comision.materia.nombre} este cuatrimestre")
+            throw ErrorDeNegocio("El alumno ya se encuentra inscripto por Guaraní a la materia ${comision.materia.nombre} este cuatrimestre")
         }
 
         if (formulario.solicitudes.any { it.solicitaLaComision(comision) }) {
-            throw ExcepcionUNQUE("El alumno ya ha solicitado la comision ${comision.numero} de la materia ${comision.materia.nombre} este cuatrimestre")
+            throw ErrorDeNegocio("El alumno ya ha solicitado la comision ${comision.numero} de la materia ${comision.materia.nombre} este cuatrimestre")
         }
 
         val solicitud = SolicitudSobrecupo(comision)
@@ -114,14 +114,14 @@ class Alumno(
     }
 
     fun confirmarCuenta(codigo: Int, carga: LocalDateTime) {
-        if (cargaDeCodigo == null) throw ExcepcionUNQUE("Cree su cuenta. Si el problema persiste, comuniquese con el equipo directivo")
+        if (cargaDeCodigo == null) throw ErrorDeNegocio("Cree su cuenta. Si el problema persiste, comuniquese con el equipo directivo")
         this.checkEstadoCuenta()
         this.checkTiempoConfirmacionCodigo(carga)
 
         if (codigo == this.codigo) {
             this.estadoCuenta = EstadoCuenta.CONFIRMADA
         } else {
-            throw ExcepcionUNQUE("Codigo incorrecto. Intente nuevamente")
+            throw ErrorDeNegocio("Codigo incorrecto. Intente nuevamente")
         }
     }
 
@@ -149,17 +149,17 @@ class Alumno(
 
     private fun chequearSiExiste(formulario: Formulario) {
         if (yaGuardoUnFormulario(formulario.cuatrimestre)) {
-            throw ExcepcionUNQUE("Ya has guardado un formulario para este cuatrimestre")
+            throw ErrorDeNegocio("Ya has guardado un formulario para este cuatrimestre")
         }
     }
 
     private fun checkEstadoCuenta() {
-        if (this.estadoCuenta == EstadoCuenta.CONFIRMADA) throw ExcepcionUNQUE("Ya posees una cuenta")
+        if (this.estadoCuenta == EstadoCuenta.CONFIRMADA) throw ErrorDeNegocio("Ya posees una cuenta")
     }
 
     private fun checkTiempoDeCodigo(horaDeCarga: LocalDateTime) {
         if (this.cargaDeCodigo != null && horaDeCarga.isBefore(this.cargaDeCodigo!!.plusMinutes(30))) {
-            throw ExcepcionUNQUE(
+            throw ErrorDeNegocio(
                 "Usted posee un codigo que no expiró. " +
                         "Revise su correo y confirme su cuenta con el codigo dado"
             )
@@ -168,7 +168,7 @@ class Alumno(
 
     private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
         if (this.cargaDeCodigo != null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
-            throw ExcepcionUNQUE("Su codigo ha expirado. Cree su cuenta nuevamente")
+            throw ErrorDeNegocio("Su codigo ha expirado. Cree su cuenta nuevamente")
         }
     }
 
