@@ -403,6 +403,22 @@ class AlumnoService {
         return FormularioDirectorDTO.desdeModelo(formularioRepository.save(formulario), dni)
     }
 
+    @Transactional
+    fun modificarCoeficienteAlumno(coeficienteAlumnos: List<CoeficienteAlumnoDTO>): List<ConflictoAlumnoCoeficiente> {
+        val conflictivos = mutableListOf<ConflictoAlumnoCoeficiente>()
+        coeficienteAlumnos.forEach {
+            try{
+                val alumno = alumnoRepository.findById(it.alumnoDni).orElseThrow { ExcepcionUNQUE("No se encontro el alumno con dni ${it.alumnoDni}") }
+                alumno.coeficiente = it.coeficienteAlumno
+                alumnoRepository.save(alumno)
+            } catch (excepcion: ExcepcionUNQUE) {
+                conflictivos.add(ConflictoAlumnoCoeficiente(it.alumnoDni, excepcion.message))
+            }
+        }
+
+        return conflictivos
+    }
+
     fun crearFormulario(
         cuatrimestre: Cuatrimestre,
         alumno: Alumno,
@@ -519,4 +535,16 @@ data class ConflictoHistoriaAcademica(
     val materia: String,
     @ApiModelProperty(example = "Materia no encontrada")
     val mensaje: String
+)
+
+data class CoeficienteAlumnoDTO(
+        val alumnoDni: Int,
+        val coeficienteAlumno: Double
+)
+
+data class ConflictoAlumnoCoeficiente(
+        @ApiModelProperty(example = "12345678")
+        val dni: Int,
+        @ApiModelProperty(example = "hay conflicto con el alumno ... y legajo ...")
+        val mensaje: String?
 )

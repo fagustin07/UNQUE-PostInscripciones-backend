@@ -265,12 +265,30 @@ class DirectivoController {
     )
     @RequestMapping(value = ["/alumnos"], method = [RequestMethod.GET])
     fun alumnos(
-        @ApiParam(value = "patron del dni", example = "1234567", required = false)
+        @ApiParam(value = "Patron del dni", example = "1234567", required = false)
         @RequestParam dni: String?
     ): ResponseEntity<*> {
         return ResponseEntity(
             alumnoService.todos(dni ?: ""),
             HttpStatus.OK
+        )
+    }
+
+    @ApiOperation("Endpoint para actualizar los coeficientes de un listado de alumnos existentes en el sistema")
+    @ApiResponses(
+            value = [
+                ApiResponse(code = 204, message = "Ok", response = ConflictoAlumnoCoeficiente::class, responseContainer = "List"),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/alumnos/coeficiente"], method = [RequestMethod.PATCH])
+    fun coeficientesAlumnos(
+            @RequestBody
+            coeficientesAlumnos: List<CoeficienteAlumnoDTO>
+    ): ResponseEntity<*> {
+        return ResponseEntity(
+                alumnoService.modificarCoeficienteAlumno(coeficientesAlumnos),
+                HttpStatus.OK
         )
     }
 
