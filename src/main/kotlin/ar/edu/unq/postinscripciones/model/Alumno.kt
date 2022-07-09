@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -31,8 +32,10 @@ class Alumno(
 ) {
     var codigo: Int? = null
     var cargaDeCodigo: LocalDateTime? = null
+
     @Enumerated(EnumType.STRING)
     var estadoCuenta: EstadoCuenta = EstadoCuenta.SIN_CONFIRMAR
+
     @Enumerated(EnumType.STRING)
     val rol = Role.ROLE_ALUMNO
 
@@ -40,7 +43,7 @@ class Alumno(
     private val formularios: MutableList<Formulario> = mutableListOf()
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name="alumno_dni")
+    @JoinColumn(name = "alumno_dni")
     var historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
 
     fun guardarFormulario(formulario: Formulario) {
@@ -127,14 +130,16 @@ class Alumno(
     }
 
     fun materiasAprobadas(): List<Materia> {
-        return materiasCursadasPorEstadoDeMateria(EstadoMateria.APROBADO).map { it.materia } + materiasCursadasPorEstadoDeMateria(EstadoMateria.PA).map { it.materia }
+        return materiasCursadasPorEstadoDeMateria(EstadoMateria.APROBADO).map { it.materia } + materiasCursadasPorEstadoDeMateria(
+            EstadoMateria.PA
+        ).map { it.materia }
     }
 
     fun cantidadAprobadas() = historiaAcademica.count { it.estado == EstadoMateria.APROBADO }
 
     fun haAprobado(materia: Materia) = this.materiasAprobadas().any { it.esLaMateria(materia) }
 
-    fun puedeCursar(solicitudes : List<Materia>, materiasDisponibles: List<String>) : Boolean {
+    fun puedeCursar(solicitudes: List<Materia>, materiasDisponibles: List<String>): Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
     }
 
@@ -153,14 +158,16 @@ class Alumno(
     }
 
     private fun checkTiempoDeCodigo(horaDeCarga: LocalDateTime) {
-        if (this.cargaDeCodigo!= null && horaDeCarga.isBefore(this.cargaDeCodigo!!.plusMinutes(30))) {
-            throw ExcepcionUNQUE("Usted posee un codigo que no expiró. " +
-                    "Revise su correo y confirme su cuenta con el codigo dado")
+        if (this.cargaDeCodigo != null && horaDeCarga.isBefore(this.cargaDeCodigo!!.plusMinutes(30))) {
+            throw ExcepcionUNQUE(
+                "Usted posee un codigo que no expiró. " +
+                        "Revise su correo y confirme su cuenta con el codigo dado"
+            )
         }
     }
 
     private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
-        if (this.cargaDeCodigo!= null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
+        if (this.cargaDeCodigo != null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
             throw ExcepcionUNQUE("Su codigo ha expirado. Cree su cuenta nuevamente")
         }
     }
@@ -191,6 +198,17 @@ class Alumno(
             this.materiasAprobadas().filter { it.tpi2010 == cicloTPI }.sumOf { it.creditos }
         } else {
             0
+        }
+    }
+
+    fun agregarMateriaCursada(materia: Materia, fecha: LocalDate, resultado: EstadoMateria) {
+        this.historiaAcademica.removeIf { it.fueSubido(materia, fecha) }
+        val fueCargada = this.historiaAcademica.any { it.esElResultado(materia, fecha, resultado) }
+
+        if (!fueCargada) {
+            if (resultado != EstadoMateria.APROBADO || !this.haAprobado(materia)) {
+                this.historiaAcademica.add(MateriaCursada(materia, resultado, fecha))
+            }
         }
     }
 }

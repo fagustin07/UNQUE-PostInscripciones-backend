@@ -66,6 +66,17 @@ class AlumnoService {
     }
 
     @Transactional
+    fun subirHistoriaAcademica(alumnosMateriaCursada: List<AlumnoMateriaCursada>): List<ConflictoHistoriaAcademica> {
+        alumnosMateriaCursada.forEach { alumnoMateriaCursada ->
+            val alumno = alumnoRepository.findById(alumnoMateriaCursada.dni).get()
+            val materia = materiaRepository.findMateriaByCodigo(alumnoMateriaCursada.codigo).get()
+            alumno.agregarMateriaCursada(materia, alumnoMateriaCursada.fecha, alumnoMateriaCursada.resultado)
+            alumnoRepository.save(alumno)
+        }
+        return emptyList()
+    }
+
+    @Transactional
     fun actualizarHistoriaAcademica(alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>): MutableList<ConflictoHistoriaAcademica> {
         val conflictoHistoriaAcademicaAlumnos: MutableList<ConflictoHistoriaAcademica> = mutableListOf()
         alumnosConHistoriaAcademica.forEach { alumnoConHistoriaAcademica ->

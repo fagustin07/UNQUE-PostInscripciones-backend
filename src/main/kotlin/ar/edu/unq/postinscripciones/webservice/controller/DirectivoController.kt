@@ -94,9 +94,9 @@ class DirectivoController {
     )
     @RequestMapping(value = ["/alumnos/historia-academica"], method = [RequestMethod.PATCH])
     fun actualizarHistoriaAcademica(
-        @RequestBody alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>
+        @RequestBody alumnosMateriaCursada: List<AlumnoMateriaCursada>
     ): ResponseEntity<*> {
-        val conflictoHistoriaAcademicas = alumnoService.actualizarHistoriaAcademica(alumnosConHistoriaAcademica)
+        val conflictoHistoriaAcademicas = alumnoService.subirHistoriaAcademica(alumnosMateriaCursada)
         return if (conflictoHistoriaAcademicas.isEmpty()) {
             ResponseEntity(null, HttpStatus.OK)
         } else {
