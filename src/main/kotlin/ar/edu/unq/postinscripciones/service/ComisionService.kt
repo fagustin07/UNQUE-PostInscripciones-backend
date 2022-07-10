@@ -6,14 +6,15 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ComisionNoEncontrada
 import ar.edu.unq.postinscripciones.model.exception.CuatrimestreNoEncontrado
 import ar.edu.unq.postinscripciones.model.exception.MateriaNoEncontrada
-import ar.edu.unq.postinscripciones.model.exception.RecursoNoEncontrado
 import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
 import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
-import ar.edu.unq.postinscripciones.service.dto.comision.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.ComisionNueva
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
+import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
+import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
-import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -35,12 +36,12 @@ class ComisionService {
     private lateinit var cuatrimestreRepository: CuatrimestreRepository
 
     @Transactional
-    fun actualizarOfertaAcademica(
-        comisionesACrear: List<ComisionACrear>,
+    fun subirOferta(
+        comisionesACrear: List<ComisionNueva>,
         inicioInscripciones: LocalDateTime? = null,
         finInscripciones: LocalDateTime? = null,
         cuatrimestre: Cuatrimestre? = null
-    ): List<ConflictoComision> {
+    ): List<Conflicto> {
         val miCuatrimestre: Cuatrimestre = cuatrimestre ?: Cuatrimestre.actualConFechas(inicioInscripciones, finInscripciones)
         val existeCuatrimestre =
             cuatrimestreRepository.findByAnioAndSemestre(miCuatrimestre.anio, miCuatrimestre.semestre)
@@ -51,7 +52,7 @@ class ComisionService {
             cuatrimestreRepository.save(miCuatrimestre)
         }
 
-        return guardarComisionesBuscandoConflictos(comisionesACrear, cuatrimestreObtenido)
+        return crearComisiones(comisionesACrear, cuatrimestreObtenido)
     }
 
     @Transactional
@@ -100,55 +101,6 @@ class ComisionService {
         return comisiones.map { ComisionDTO.desdeModelo(it) }
     }
 
-    private fun guardarComisionesBuscandoConflictos(
-        comisionesACrear: List<ComisionACrear>,
-        cuatrimestre: Cuatrimestre,
-    ): List<ConflictoComision> {
-        val conflictos: MutableList<ConflictoComision> = mutableListOf()
-        comisionesACrear.forEach { comisionACrear ->
-            val materia = materiaRepository.findByNombreIgnoringCase(comisionACrear.nombreMateria)
-            if(!materia.isPresent) {
-                val mensaje = "No existe la materia ${comisionACrear.nombreMateria}"
-                conflictos.add(ConflictoComision(comisionACrear.nombreMateria, comisionACrear.numeroComision, mensaje))
-            } else {
-                val existeComision = comisionRespository
-                    .findByNumeroAndMateriaAndCuatrimestre(comisionACrear.numeroComision, materia.get(), cuatrimestre)
-                if (existeComision.isPresent) {
-                    val mensaje = "Ya existe esta comision"
-                    conflictos.add(ConflictoComision(comisionACrear.nombreMateria, comisionACrear.numeroComision, mensaje))
-                } else {
-                    guardarComision(comisionACrear, materia.get(), cuatrimestre)
-                }
-            }
-        }
-        return conflictos
-    }
-
-    @Transactional
-    fun modificarHorarios(comisionesConHorarios: List<ComisionConHorarios>, cuatrimestre: Cuatrimestre = Cuatrimestre.actual()): MutableList<ConflictoHorarios> {
-        val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { RecursoNoEncontrado("Cuatrimestre no encontrado") }
-        val conflictoHorarios = mutableListOf<ConflictoHorarios>()
-
-        comisionesConHorarios.forEach { comisionConHorarios ->
-            val materia = materiaRepository.findMateriaByCodigo(comisionConHorarios.materia)
-            if (materia.isPresent) {
-                val comision = comisionRespository
-                    .findByNumeroAndMateriaAndCuatrimestre(comisionConHorarios.comision, materia.get(), cuatrimestreObtenido)
-                if (comision.isPresent) {
-                    val comisionObtenida = comision.get()
-                    comisionObtenida.modificarHorarios(comisionConHorarios.horarios.map { HorarioDTO.aModelo(it) })
-                    comisionRespository.save(comisionObtenida)
-                } else {
-                    conflictoHorarios.add(ConflictoHorarios(comisionConHorarios.comision, comisionConHorarios.materia, "No se encontró la comision"))
-                }
-            } else {
-                conflictoHorarios.add(ConflictoHorarios(comisionConHorarios.comision, comisionConHorarios.materia, "No se encontró la materia"))
-            }
-        }
-
-        return conflictoHorarios
-    }
-
     private fun actualizarCuatrimestre(
         cuatrimestre: Cuatrimestre,
         inicioInscripciones: LocalDateTime?,
@@ -157,19 +109,42 @@ class ComisionService {
         cuatrimestre.actualizarFechas(inicioInscripciones, finInscripciones)
         return cuatrimestreRepository.save(cuatrimestre)
     }
-    private fun guardarComision(
-        comisionACrear: ComisionACrear,
-        materia: Materia,
-        cuatrimestre: Cuatrimestre
-    ): Comision {
+
+    private fun crearComisiones(
+        comisionesNuevas: List<ComisionNueva>,
+        cuatrimestreObtenido: Cuatrimestre
+    ): List<Conflicto> {
+        val conflictos: MutableList<Conflicto> = mutableListOf()
+        comisionesNuevas.forEach { comisionNueva ->
+            val materia = materiaRepository.findByNombreIgnoringCaseOrCodigoIgnoringCase(comisionNueva.actividad, comisionNueva.codigo)
+            if(!materia.isPresent) {
+                val mensaje = "No existe la materia ${comisionNueva.actividad}"
+                conflictos.add(Conflicto(comisionNueva.fila, mensaje))
+            } else {
+                val existeComision = comisionRespository
+                    .findByNumeroAndMateriaAndCuatrimestre(comisionNueva.comision, materia.get(), cuatrimestreObtenido)
+                if (existeComision.isPresent) {
+                    val mensaje = "Ya existe la comision ${comisionNueva.comision}, materia ${comisionNueva.actividad}"
+                    conflictos.add(Conflicto(comisionNueva.fila,  mensaje))
+                } else {
+                    saveComision(comisionNueva, materia.get(), cuatrimestreObtenido)
+                }
+            }
+        }
+        return conflictos
+    }
+
+    private fun saveComision(comisionACrear: ComisionNueva, materia: Materia, cuatrimestre: Cuatrimestre): Comision {
         return comisionRespository.save(
             Comision(
                 materia,
-                comisionACrear.numeroComision,
+                comisionACrear.comision,
                 cuatrimestre,
-                mutableListOf(),
+                comisionACrear.horarios.map { HorarioDTO.aModelo(it) }.toMutableList(),
                 comisionACrear.cuposTotales,
-                comisionACrear.sobrecuposTotales
+                comisionACrear.sobrecuposTotales,
+                comisionACrear.modalidad,
+                comisionACrear.locacion
             )
         )
     }
@@ -192,12 +167,3 @@ class ComisionService {
         )
     }
 }
-
-data class ConflictoHorarios(
-    @ApiModelProperty(example = "1")
-    val comision: Int,
-    @ApiModelProperty(example = "01035")
-    val materia: String,
-    @ApiModelProperty(example = "Comision no encontrada")
-    val mensaje: String
-)

@@ -623,7 +623,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se levanta una excepcion al enviar un formulario pasada la fecha de fin aceptada por el cuatrimestre`() {
-        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
+        comisionService.subirOferta(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
 
         val excepcion = assertThrows<ExcepcionUNQUE> {
             alumnoService.guardarSolicitudPara(
@@ -638,7 +638,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se levanta una excepcion al enviar un formulario antes de la fecha de inicio aceptada por el cuatrimestre`() {
-        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
+        comisionService.subirOferta(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
 
         val excepcion = assertThrows<ExcepcionUNQUE> {
             alumnoService.guardarSolicitudPara(

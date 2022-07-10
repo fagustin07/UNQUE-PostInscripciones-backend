@@ -7,7 +7,8 @@ import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.comision.ComisionACrear
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.ComisionNueva
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
@@ -146,13 +147,16 @@ internal class ComisionServiceTest {
         val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(
-                ComisionACrear(
-                    1,
+                ComisionNueva(
                     bdd.codigo,
-                    30,
-                    8
+                    "Bases de datos",
+                    1,
+                    Modalidad.PRESENCIAL,
+                    Locacion.Bernal,
+                    listOf(),
+                    12
                 ),
             ),
             inicioInscripciones,
@@ -173,7 +177,7 @@ internal class ComisionServiceTest {
         val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(),
             null,
             finInscripciones,
@@ -192,7 +196,7 @@ internal class ComisionServiceTest {
         val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
-        comisionService.actualizarOfertaAcademica(listOf(), inicioInscripciones, finInscripciones)
+        comisionService.subirOferta(listOf(), inicioInscripciones, finInscripciones)
 
         val cuatrimestreActuaActualizado = cuatrimestreService.obtener()
         assertThat(cuatrimestreActuaActualizado.inicioInscripciones).isNotEqualTo(cuatrimestre.inicioInscripciones)

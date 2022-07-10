@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty
 import java.time.LocalTime
 
 data class HorarioDTO(
-    @ApiModelProperty(example = "LUNES", required = true)
+    @ApiModelProperty(example = "Lun", required = true)
     val dia: Dia,
     @ApiModelProperty(example = "18:00", required = true)
     val inicio: String,

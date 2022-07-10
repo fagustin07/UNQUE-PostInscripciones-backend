@@ -5,9 +5,9 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
-import ar.edu.unq.postinscripciones.service.dto.comision.ConflictoComision
 import ar.edu.unq.postinscripciones.service.dto.cuatrimestre.OfertaAcademicaDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDirectorDTO
@@ -284,14 +284,14 @@ class DirectivoController {
             ApiResponse(code = 201, message = "Comisiones creadas"),
             ApiResponse(code = 204, message = "Fechas actualizadas"),
             ApiResponse(code = 400, message = "Algo salio mal"),
-            ApiResponse(code = 409, message = "Hubo conflicto de comisiones", response = ConflictoComision::class, responseContainer = "List")
+            ApiResponse(code = 409, message = "Hubo conflicto de comisiones", response = Conflicto::class, responseContainer = "List")
         ]
     )
     @RequestMapping(value = ["/comisiones/oferta"], method = [RequestMethod.POST])
     fun actualizarOfertaAcademica(
         @RequestBody oferta: OfertaAcademicaDTO,
     ): ResponseEntity<*> {
-        val conflictoComisiones = comisionService.actualizarOfertaAcademica(
+        val conflictoComisiones = comisionService.subirOferta(
             oferta.comisionesACargar ?: listOf(),
             oferta.inicioInscripciones,
             oferta.finInscripciones

@@ -219,7 +219,7 @@ internal class MateriaServiceTest {
         val formulario = alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
 
-        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)
+        comisionService.subirOferta(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)
         alumnoService.cambiarEstadoSolicitud(
             formulario.solicitudes.first().id,
             EstadoSolicitud.APROBADO,

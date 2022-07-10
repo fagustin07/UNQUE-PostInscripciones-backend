@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
@@ -27,7 +28,11 @@ class Comision(
     @Column(nullable = false)
     val sobrecuposTotales: Int = 5,
     @Column(nullable = false)
-    val modalidad: Modalidad = Modalidad.PRESENCIAL
+    @Enumerated(EnumType.STRING)
+    val modalidad: Modalidad = Modalidad.PRESENCIAL,
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    val locacion: Locacion = Locacion.Bernal
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -51,7 +51,7 @@ class DataSeed(
         if (emptyData()) {
             val epyl = Materia("80005", "Elementos de Programación y Lógica", mutableListOf(), tpi2015 = CicloTPI.CI)
             val lea = Materia("80000", "Lectura y Escritura Académica", mutableListOf(), tpi2015 = CicloTPI.CI)
-            val matematica = Materia("80003", "Matemática", mutableListOf(), tpi2015 = CicloTPI.CI)
+            val matematica = Materia("80003", "Matematica", mutableListOf(), tpi2015 = CicloTPI.CI)
             val ingles1 = Materia("90000", "Inglés 1", mutableListOf())
             val ingles2 = Materia("90028", "Inglés 2", mutableListOf())
             val ttu = Materia("752", "Taller de Trabajo Universitario", mutableListOf())
