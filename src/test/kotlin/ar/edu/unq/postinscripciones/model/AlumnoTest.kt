@@ -3,6 +3,7 @@ package ar.edu.unq.postinscripciones.model
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -105,6 +106,22 @@ internal class AlumnoTest {
         alumno = Alumno(carrera = Carrera.P)
 
         assertThat(alumno.carrera).isEqualTo(Carrera.P)
+    }
+
+    @Test
+    fun `un alumno conoce su locacion`() {
+        alumno = Alumno(locacion = Locacion.General_Belgrano)
+
+        assertThat(alumno.locacion).isEqualTo(Locacion.General_Belgrano)
+    }
+
+    @Test
+    fun `un alumno conoce sus estados de inscripcion`() {
+        alumno = Alumno()
+
+        assertThat(alumno.estadoInscripcion).isEqualTo(EstadoInscripcion.Aceptado)
+        assertThat(alumno.regular).isEqualTo(Regular.S)
+        assertThat(alumno.calidad).isEqualTo(Calidad.Activo)
     }
 
     @Test

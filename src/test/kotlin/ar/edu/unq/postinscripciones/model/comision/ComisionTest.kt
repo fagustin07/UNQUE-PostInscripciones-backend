@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +23,7 @@ internal class ComisionTest {
     fun `set up`() {
         val horarios: List<Horario> = horariosBdd()
         bdd = Materia()
-        comisionUnoBdd = Comision(bdd, 1, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales)
+        comisionUnoBdd = Comision(bdd, 1, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, locacion = Locacion.Berazategui)
     }
 
     @Test
@@ -63,6 +64,11 @@ internal class ComisionTest {
     @Test
     fun `una comision conoce sus sobrecupos totales`() {
         assertThat(comisionUnoBdd.sobrecuposTotales).isEqualTo(15)
+    }
+
+    @Test
+    fun `una comision conoce donde se dicta`() {
+        assertThat(comisionUnoBdd.locacion).isEqualTo(Locacion.Berazategui)
     }
 
     @Test

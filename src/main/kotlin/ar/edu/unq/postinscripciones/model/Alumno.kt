@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -28,7 +29,12 @@ class Alumno(
     @Column(nullable = false)
     var coeficiente: Double = 3.0,
     @Column(nullable = false)
-    var cursaTPI2010: Boolean = false
+    var cursaTPI2010: Boolean = false,
+    @Enumerated(EnumType.STRING)
+    var locacion: Locacion = Locacion.Bernal,
+    var estadoInscripcion: EstadoInscripcion = EstadoInscripcion.Aceptado,
+    var calidad: Calidad = Calidad.Activo,
+    var regular: Regular = Regular.S
 ) {
     var codigo: Int? = null
     var cargaDeCodigo: LocalDateTime? = null
