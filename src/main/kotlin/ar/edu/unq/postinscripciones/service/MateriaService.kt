@@ -183,13 +183,19 @@ data class ConflictoCorrelativa(
 
 
 data class MateriaDetalle(
+    @ApiModelProperty(example = "12345")
     val codigo: String,
+    @ApiModelProperty(example = "SARASA")
     val nombre: String,
     var correlativas: List<String>,
+    @ApiModelProperty(example = "8")
     val creditos: Int,
+    @ApiModelProperty(example = "CO")
     var tpi2015: CicloTPI,
+    @ApiModelProperty(example = "NBW")
     var li: CicloLI,
     val requisitosCiclo: List<RequisitoCicloDTO>,
+    @ApiModelProperty(example = "NO_PERTENECE")
     var tpi2010: CicloTPI
 ) {
     companion object {
@@ -209,8 +215,11 @@ data class MateriaDetalle(
 }
 
 data class RequisitoCicloDTO(
+    @ApiModelProperty(example = "CB")
     val ciclo: String,
+    @ApiModelProperty(example = "LI")
     val carrera: Plan,
+    @ApiModelProperty(example = "112")
     val creditos: Int
 ) {
     companion object {

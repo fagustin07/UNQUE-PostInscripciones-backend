@@ -17,7 +17,7 @@ class Materia(
     var tpi2015: CicloTPI = CicloTPI.CO,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var li: CicloLI = CicloLI.CA,
+    var li: CicloLI = CicloLI.NBW,
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name="materia_id")
     val requisitosCiclo: MutableSet<RequisitoCiclo> = mutableSetOf(),

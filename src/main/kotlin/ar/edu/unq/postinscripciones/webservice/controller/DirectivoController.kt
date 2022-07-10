@@ -6,15 +6,12 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
-import ar.edu.unq.postinscripciones.service.dto.comision.ComisionConHorarios
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.ConflictoComision
 import ar.edu.unq.postinscripciones.service.dto.cuatrimestre.OfertaAcademicaDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDirectorDTO
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioMateria
 import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
-import ar.edu.unq.postinscripciones.service.dto.materia.MateriaConCorrelativas
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaPorSolicitudes
 import io.swagger.annotations.ApiOperation
@@ -48,20 +45,7 @@ class DirectivoController {
     @Autowired
     private lateinit var cargaMateriaService: CargaMateriaService
 
-//    CARGA DE DATOS
-    @RequestMapping(value = ["/materias/carga"], method = [RequestMethod.POST])
-    fun cargarMaterias(@RequestBody planillaMaterias: PlanillaMaterias): ResponseEntity<*> {
-        cargaMateriaService.cargarMaterias(planillaMaterias)
-        return ResponseEntity(null, HttpStatus.CREATED)
-    }
 
-    @RequestMapping(value = ["/materias/{codigo}"], method = [RequestMethod.GET])
-    fun buscarMateria(
-        @ApiParam(value = "Codigo de la materia deseada", example = "01035", required = true)
-        @PathVariable
-        codigo: String): ResponseEntity<*> {
-        return ResponseEntity(materiaService.detalle(codigo), HttpStatus.OK)
-    }
 
     //   CONTROLADOR ALUMNOS
 
@@ -362,7 +346,7 @@ class DirectivoController {
     )
     @RequestMapping(value = ["/materias/{codigo}/solicitantes"], method = [RequestMethod.GET])
     fun alumnosQueSolicitaronMateria(
-        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+        @ApiParam(value = "Codigo de la materia", example = "1035", required = true)
         @PathVariable
         codigo: String,
         @ApiParam(value = "Numero de la comision para filtrar", example = "1", required = false)
@@ -378,27 +362,6 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Actualiza los horarios de comisiones existentes")
-    @ApiResponses(
-        value = [
-            ApiResponse(code = 200, message = "OK"),
-            ApiResponse(code = 400, message = "Algo salio mal"),
-            ApiResponse(code = 409, message = "Conflicto al actualizar horarios", response = ConflictoHorarios::class, responseContainer = "List")
-        ]
-    )
-    @RequestMapping(value = ["/comisiones/horarios"], method = [RequestMethod.PATCH])
-    fun modificarHorarios(
-        @RequestBody
-        comisionesConHorarios: List<ComisionConHorarios>
-    ): ResponseEntity<*> {
-        val conflictoHorarios = comisionService.modificarHorarios(comisionesConHorarios)
-        return if(conflictoHorarios.isEmpty()) {
-            ResponseEntity(null, HttpStatus.OK)
-        } else {
-            ResponseEntity(conflictoHorarios, HttpStatus.CONFLICT)
-        }
-    }
-
 //    CONTROLADOR MATERIAS
 
     @ApiOperation("Registra nuevas  materias en el sistema")
@@ -410,14 +373,29 @@ class DirectivoController {
         ]
     )
     @RequestMapping(value = ["/materias"], method = [RequestMethod.POST])
-    fun registrarMaterias(@RequestBody formulariosMaterias: List<FormularioMateria>): ResponseEntity<*> {
-        val conflictoMaterias = materiaService.crear(formulariosMaterias)
+    fun cargarMaterias(@RequestBody planillaMaterias: PlanillaMaterias): ResponseEntity<*> {
+        val conflictoMaterias = cargaMateriaService.cargarMaterias(planillaMaterias)
 
         return if (conflictoMaterias.isEmpty()) {
             ResponseEntity(null, HttpStatus.CREATED)
         } else {
             ResponseEntity(conflictoMaterias, HttpStatus.CONFLICT)
         }
+    }
+
+    @ApiOperation("Obtiene informacion detallada de una materia")
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 200, message = "OK", response = MateriaDetalle::class),
+            ApiResponse(code = 404, message = "Materia no encontrada"),
+        ]
+    )
+    @RequestMapping(value = ["/materias/{codigo}"], method = [RequestMethod.GET])
+    fun buscarMateria(
+        @ApiParam(value = "Codigo de la materia deseada", example = "1035", required = true)
+        @PathVariable
+        codigo: String): ResponseEntity<*> {
+        return ResponseEntity(materiaService.detalle(codigo), HttpStatus.OK)
     }
 
     @ApiOperation(value = "##### Lista todas las materias de que se dictan en el cuatrimestre actual,  ordenadas por cantidad de solicitudes #####")
@@ -459,32 +437,6 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation(value = "Actualiza las materias correlativas de materias registradas")
-    @ApiResponses(
-        value = [
-            ApiResponse(code = 200, message = "OK"),
-            ApiResponse(code = 400, message = "Algo salio mal"),
-            ApiResponse(code = 409, message = "Conflicto al actualizar correlativas", response = ConflictoCorrelativa::class, responseContainer = "List"),
-
-        ]
-    )
-    @RequestMapping(value = ["/materias/correlativas"], method = [RequestMethod.PATCH])
-    fun actualizarCorrelativas(
-        @RequestBody
-        @ApiParam(
-            value = "lista de tuplas de (codigo materia, lista de codigo de sus correlativas)",
-            required = true
-        )
-        materiasConCorrelativas: List<MateriaConCorrelativas>
-    ): ResponseEntity<*> {
-        val conflictoCorrelativas = materiaService.actualizarCorrelativas(materiasConCorrelativas)
-        return if (conflictoCorrelativas.isEmpty()) {
-            ResponseEntity(null, HttpStatus.OK)
-        } else {
-            ResponseEntity(conflictoCorrelativas, HttpStatus.CONFLICT)
-        }
-    }
-
     @ApiOperation(value = "Retorna todas las comisiones del cuatrimestre actual de una materia especifica")
     @ApiResponses(
         value = [
@@ -495,7 +447,7 @@ class DirectivoController {
     @RequestMapping(value = ["/materias/{codigo}/comision"], method = [RequestMethod.GET])
     fun materiasComision(
         @PathVariable
-        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+        @ApiParam(value = "Codigo de la materia", example = "1035", required = true)
         codigo: String
     ): ResponseEntity<*> {
         return ResponseEntity(
@@ -514,7 +466,7 @@ class DirectivoController {
     @RequestMapping(value = ["/materias/{codigo}/solicitudes/rechazar"], method = [RequestMethod.PATCH])
     fun rechazarSolicitudesMateria(
         @PathVariable
-        @ApiParam(value = "Codigo de la materia", example = "01035", required = true)
+        @ApiParam(value = "Codigo de la materia", example = "1035", required = true)
         codigo: String,
         @ApiParam(value = "Numero de comision", example = "1", required = false)
         @RequestParam
@@ -582,7 +534,7 @@ class DirectivoController {
     @ApiOperation("Elimina una materia del sistema y todo lo relacionado al mismo")
     @RequestMapping(value = ["/materias"], method = [RequestMethod.DELETE])
     fun borrarMateria(
-        @ApiParam(value = "codigo de materia", example = "01035", required = true)
+        @ApiParam(value = "codigo de materia", example = "1035", required = true)
         @RequestParam
         codigo: String,
     ): ResponseEntity<*> {

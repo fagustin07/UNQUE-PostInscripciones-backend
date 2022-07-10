@@ -49,170 +49,170 @@ class DataSeed(
     private fun loadData() {
 
         if (emptyData()) {
-            val epyl = Materia("80005", "Elementos de Programación y Lógica", mutableListOf())
-            val lea = Materia("80000", "Lectura y Escritura Académica", mutableListOf())
-            val matematica = Materia("8003N", "Matemática", mutableListOf())
+            val epyl = Materia("80005", "Elementos de Programación y Lógica", mutableListOf(), tpi2015 = CicloTPI.CI)
+            val lea = Materia("80000", "Lectura y Escritura Académica", mutableListOf(), tpi2015 = CicloTPI.CI)
+            val matematica = Materia("80003", "Matemática", mutableListOf(), tpi2015 = CicloTPI.CI)
             val ingles1 = Materia("90000", "Inglés 1", mutableListOf())
             val ingles2 = Materia("90028", "Inglés 2", mutableListOf())
-            val ttu = Materia("00752", "Taller de Trabajo Universitario", mutableListOf())
-            val tti = Materia("751N", "Taller de Trabajo Intelectual", mutableListOf())
+            val ttu = Materia("752", "Taller de Trabajo Universitario", mutableListOf())
+            val tti = Materia("751", "Taller de Trabajo Intelectual", mutableListOf())
 
-            val intro = Materia("00487", "Introducción a la Programación", mutableListOf(epyl))
-            val orga = Materia("01032", "Organización de las Computadoras", mutableListOf(epyl))
-            val mate1 = Materia("01033", "Matemática 1", mutableListOf(matematica))
-            val objetos1 = Materia("01034", "Programación con Objetos 1", mutableListOf(intro))
-            val bdd = Materia("01035", "Bases de Datos", mutableListOf())
-            val estructura = Materia("01036", "Estructura de Datos", mutableListOf(intro))
+            val intro = Materia("487", "Introducción a la Programación", mutableListOf(epyl), tpi2015 = CicloTPI.CO, tpi2010 = CicloTPI.CO, li = CicloLI.NBW)
+            val orga = Materia("1032", "Organización de las Computadoras", mutableListOf(epyl))
+            val mate1 = Materia("1033", "Matemática 1", mutableListOf(matematica))
+            val objetos1 = Materia("1034", "Programación con Objetos 1", mutableListOf(intro))
+            val bdd = Materia("1035", "Bases de Datos", mutableListOf(), tpi2015 = CicloTPI.CO, tpi2010 = CicloTPI.CO, li = CicloLI.NBW)
+            val estructura = Materia("1036", "Estructura de Datos", mutableListOf(intro), tpi2015 = CicloTPI.CO, tpi2010 = CicloTPI.CO, li = CicloLI.NBW)
             val objetos2 =
-                Materia("01037", "Programación con Objetos 2", mutableListOf(objetos1))
-            val redes = Materia("01038", "Redes de Computadoras", mutableListOf(orga))
+                Materia("1037", "Programación con Objetos 2", mutableListOf(objetos1))
+            val redes = Materia("1038", "Redes de Computadoras", mutableListOf(orga))
             val sistemasoperativos =
-                Materia("01039", "Sistemas Operativos", mutableListOf(intro, orga))
+                Materia("1039", "Sistemas Operativos", mutableListOf(intro, orga))
             val concurrente =
-                Materia("01040", "Programación Concurrente", mutableListOf(estructura))
-            val mate2 = Materia("01041", "Matemática 2", mutableListOf(mate1))
+                Materia("1040", "Programación Concurrente", mutableListOf(estructura))
+            val mate2 = Materia("1041", "Matemática 2", mutableListOf(mate1))
             val elementosdeingeneria =
-                Materia("01042", "Elementos de Ingenieria de Software", mutableListOf(objetos2))
+                Materia("1042", "Elementos de Ingenieria de Software", mutableListOf(objetos2))
             val interfaces = Materia(
-                "01043",
+                "1043",
                 "Construcción de Interfaces de Usuario",
                 mutableListOf(objetos2),
             )
             val persistencia =
-                Materia("01044", "Estrategias de Persistencia", mutableListOf(bdd, objetos2))
-            val funcional = Materia("01045", "Programación Funcional", mutableListOf(estructura))
+                Materia("1044", "Estrategias de Persistencia", mutableListOf(bdd, objetos2))
+            val funcional = Materia("1045", "Programación Funcional", mutableListOf(estructura))
             val desarrollo = Materia(
-                "01046",
+                "1046",
                 "Desarrollo de Aplicaciones",
                 mutableListOf(elementosdeingeneria, persistencia, interfaces)
             )
             val labo = Materia(
-                "01047",
+                "1047",
                 "Laboratiorio de Sistemas Operativos y Redes",
                 mutableListOf(redes, sistemasoperativos),
             )
-            val bdd2 = Materia("01048", "Bases de Datos II", mutableListOf())
+            val bdd2 = Materia("1048", "Bases de Datos II", mutableListOf())
             val softwareLibre = Materia(
-                "01049",
+                "1049",
                 "Participación y Gestión en Proyectos de Software Libre",
                 mutableListOf(),
             )
             val introArquitectura =
-                Materia("01050", "Introducción a las Arquitecturas de Software", mutableListOf())
+                Materia("1050", "Introducción a las Arquitecturas de Software", mutableListOf())
             val objetos3 =
-                Materia("01051", "Programación con Objetos 3", mutableListOf(objetos2))
+                Materia("1051", "Programación con Objetos 3", mutableListOf(objetos2))
             val bioinformatica =
-                Materia("01052", "Introducción a la Bioinformática", mutableListOf())
+                Materia("1052", "Introducción a la Bioinformática", mutableListOf())
             val politica = Materia(
-                "01053",
+                "1053",
                 "Politicas Públicas en la Sociedad de la Información y la Era Digital",
                 mutableListOf(),
             )
             val geografica =
-                Materia("01054", "Sistemas de Información Geográfica", mutableListOf())
+                Materia("1054", "Sistemas de Información Geográfica", mutableListOf())
             val declarativas =
-                Materia("01055", "Herramientas declarativas en Programación", mutableListOf())
+                Materia("1055", "Herramientas declarativas en Programación", mutableListOf())
             val videojuegos =
-                Materia("01056", "Introducción al Desarrollo de Videojuegos", mutableListOf())
+                Materia("1056", "Introducción al Desarrollo de Videojuegos", mutableListOf())
             val derechos = Materia(
-                "01057",
+                "1057",
                 "Derechos de Autor y Derecho de Copia en la Era Digita",
                 mutableListOf(),
             )
             val arduino = Materia(
-                "01058",
+                "1058",
                 "Seminarios: Introducción a la Electrónica y Programación de Controladores con Arduino",
                 mutableListOf()
             )
             val tecnicas = Materia(
-                "01059",
+                "1059",
                 "Seminarios sobre Herramientas ó Tecnicas Puntuales: Tecnología y Sociedad",
                 mutableListOf()
             )
-            val tip = Materia("01060", "Trabajo de Inserción Profesional", mutableListOf())
+            val tip = Materia("1060", "Trabajo de Inserción Profesional", mutableListOf())
 
-            val analisis = Materia("00054", "Análisis Matemático 1", mutableListOf(mate2))
-            val mate3 = Materia("00842", "Matemática 3", mutableListOf(analisis))
-            val proba = Materia("00604", "Probabilidad y Estadisticas", mutableListOf(mate3))
-            val logica = Materia("01302", "Lógica y Programación", mutableListOf(intro, mate1))
-            val seguridad = Materia("01303", "Seguridad de la Información", mutableListOf(labo))
+            val analisis = Materia("54", "Análisis Matemático 1", mutableListOf(mate2))
+            val mate3 = Materia("842", "Matemática 3", mutableListOf(analisis))
+            val proba = Materia("604", "Probabilidad y Estadisticas", mutableListOf(mate3))
+            val logica = Materia("1302", "Lógica y Programación", mutableListOf(intro, mate1))
+            val seguridad = Materia("1303", "Seguridad de la Información", mutableListOf(labo))
             val requerimientos = Materia(
-                "01308",
+                "1308",
                 "Ingenieria de Requerimientos",
                 mutableListOf(elementosdeingeneria),
             )
             val gestion = Materia(
-                "01304",
+                "1304",
                 "Gestión de Proyectos de Desarrollo de Software",
                 mutableListOf(requerimientos),
             )
             val practicaDeDesarrollo = Materia(
-                "01305",
+                "1305",
                 "Prácticas de Desarrollo de Software",
                 mutableListOf(elementosdeingeneria, interfaces, persistencia),
             )
-            val lfa = Materia("01306", "Lenguajes Formales y Automatas", mutableListOf(logica))
-            val algoritmos = Materia("01307", "Algoritmos", mutableListOf(funcional))
+            val lfa = Materia("1306", "Lenguajes Formales y Automatas", mutableListOf(logica))
+            val algoritmos = Materia("1307", "Algoritmos", mutableListOf(funcional))
 
-            val teoria = Materia("01309", "Teoría de la Computación", mutableListOf(lfa))
+            val teoria = Materia("1309", "Teoría de la Computación", mutableListOf(lfa))
             val arquitectura1 = Materia(
-                "01310",
+                "1310",
                 "Arquitectura de Software I",
                 mutableListOf(concurrente, seguridad, gestion)
             )
             val distribuidos =
-                Materia("01311", "Sistemas Distribuidos", mutableListOf(concurrente, labo))
+                Materia("1311", "Sistemas Distribuidos", mutableListOf(concurrente, labo))
             val caracteristicas = Materia(
-                "01312",
+                "1312",
                 "Caracteristicas de Lenguajes de Programación",
                 mutableListOf(logica),
             )
             val arquitectura2 = Materia(
-                "01313",
+                "1313",
                 "Arquitectura de Software II",
                 mutableListOf(arquitectura1, distribuidos)
             )
             val arquitecturaDeComputadoras =
-                Materia("01314", "Arquitectura de Computadoras", mutableListOf(labo))
+                Materia("1314", "Arquitectura de Computadoras", mutableListOf(labo))
             val parseo = Materia(
-                "01315",
+                "1315",
                 "Parseo y Generación de Código",
                 mutableListOf(lfa, caracteristicas)
             )
             val aspectosLegales =
-                Materia("01316", "Aspectos Legales y Sociales", mutableListOf())
-            val seminarioFinal = Materia("01317", "Seminario Final", mutableListOf())
+                Materia("1316", "Aspectos Legales y Sociales", mutableListOf())
+            val seminarioFinal = Materia("1317", "Seminario Final", mutableListOf())
             val seminarioCapacitacion = Materia(
-                "01719",
+                "1719",
                 "Seminarios de Capacitación Profesional en Informática (SCPI)",
                 mutableListOf()
             )
 
-            val seguridadTec = Materia("00646", "Seguridad Informática", mutableListOf())
+            val seguridadTec = Materia("646", "Seguridad Informática", mutableListOf())
 
-            val tv = Materia("01328", "Seminario : Televisión Digital", mutableListOf())
+            val tv = Materia("1328", "Seminario : Televisión Digital", mutableListOf())
             val streaming =
-                Materia("01632", "Seminario : Tecnología de Streaming sobre Internet", mutableListOf())
+                Materia("1632", "Seminario : Tecnología de Streaming sobre Internet", mutableListOf())
             val cloud = Materia(
-                "01643",
+                "1643",
                 "Seminario : Taller de Desarrollos de Servicios Web / Cloud Modernos",
                 mutableListOf()
             )
-            val bajo = Materia("01644", "Seminario : Programación a Bajo Nivel", mutableListOf())
-            val semantica = Materia("01319", "Semántica de Lenguajes de Programación", mutableListOf())
-            val seminarios = Materia("01622", "Seminários", mutableListOf())
-            val calidad = Materia("01707", "Calidad del Software", mutableListOf())
+            val bajo = Materia("1644", "Seminario : Programación a Bajo Nivel", mutableListOf())
+            val semantica = Materia("1319", "Semántica de Lenguajes de Programación", mutableListOf())
+            val seminarios = Materia("1622", "Seminarios", mutableListOf())
+            val calidad = Materia("1707", "Calidad del Software", mutableListOf())
             val funcionalAvanzada =
-                Materia("01708", "Programación Funcional Avanzada", mutableListOf())
+                Materia("1708", "Programación Funcional Avanzada", mutableListOf())
             val progCuantica =
-                Materia("01709", "Introducción a la Programación Cuántica", mutableListOf())
+                Materia("1709", "Introducción a la Programación Cuántica", mutableListOf())
             val ciudadana = Materia(
-                "01710",
+                "1710",
                 "Ciencia Ciudadana y Colaboración Abierta y Distribuida",
                 mutableListOf()
             )
-            val ludificacion = Materia("01711", "Ludificación", mutableListOf())
-            val cdDatos = Materia("01745", "Ciencia de Datos", mutableListOf())
+            val ludificacion = Materia("1711", "Ludificación", mutableListOf())
+            val cdDatos = Materia("1745", "Ciencia de Datos", mutableListOf())
 
             val bddhorariosc1 = mutableListOf(
                 Horario(Dia.Mar, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),

@@ -16,7 +16,7 @@ class CargaMateriaService {
     private lateinit var materiaRepository: MateriaRepository
 
     @Transactional
-    fun cargarMaterias(planillaMaterias: PlanillaMaterias) {
+    fun cargarMaterias(planillaMaterias: PlanillaMaterias): List<ConflictoMateria> {
         planillaMaterias.materias.forEach {
             guardarDatosBasicosMateria(it, planillaMaterias.plan)
         }
@@ -24,6 +24,8 @@ class CargaMateriaService {
         planillaMaterias.materias.forEach {
             actualizarRequisitosMateria(it, planillaMaterias.plan)
         }
+
+        return emptyList()
     }
 
     private fun guardarDatosBasicosMateria(nuevaMateria: MateriaParaCargar, plan: Plan) {
