@@ -53,10 +53,9 @@ class AlumnoService {
     fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumno> {
         val conflictos: MutableList<ConflictoAlumno> = mutableListOf()
         planillaAlumnos.forEach { formulario ->
-            val alumnoExistente = alumnoRepository.findByDniOrLegajo(formulario.dni, formulario.legajo)
+            val alumnoExistente = alumnoRepository.findById(formulario.dni)
             if (alumnoExistente.isPresent) {
-                val mensaje = "Conflicto con el alumno con dni ${alumnoExistente.get().dni} " +
-                        "y legajo ${alumnoExistente.get().legajo}"
+                val mensaje = "Conflicto con el alumno con dni ${alumnoExistente.get().dni}"
                 conflictos.add(ConflictoAlumno(formulario.dni, formulario.legajo, mensaje))
             } else {
                 guardarAlumno(formulario)
@@ -273,9 +272,7 @@ class AlumnoService {
         return ResumenAlumno(
             alumno.nombre,
             alumno.dni,
-            alumno.legajo,
             alumno.carrera,
-            alumno.coeficiente,
             FormularioDirectorDTO.desdeModelo(
                 alumno.obtenerFormulario(
                     cuatrimestreObtenido.anio,
@@ -408,22 +405,6 @@ class AlumnoService {
         return FormularioDirectorDTO.desdeModelo(formularioRepository.save(formulario), dni)
     }
 
-    @Transactional
-    fun modificarCoeficienteAlumno(coeficienteAlumnos: List<CoeficienteAlumnoDTO>): List<ConflictoAlumnoCoeficiente> {
-        val conflictivos = mutableListOf<ConflictoAlumnoCoeficiente>()
-        coeficienteAlumnos.forEach {
-            try{
-                val alumno = alumnoRepository.findById(it.alumnoDni).orElseThrow { AlumnoNoEncontrado(it.alumnoDni) }
-                alumno.coeficiente = it.coeficienteAlumno
-                alumnoRepository.save(alumno)
-            } catch (excepcion: ExcepcionUNQUE) {
-                conflictivos.add(ConflictoAlumnoCoeficiente(it.alumnoDni, excepcion.message))
-            }
-        }
-
-        return conflictivos
-    }
-
     fun crearFormulario(
         cuatrimestre: Cuatrimestre,
         alumno: Alumno,
@@ -457,10 +438,8 @@ class AlumnoService {
             formulario.nombre,
             formulario.apellido,
             formulario.correo,
-            formulario.legajo,
             "",
-            formulario.carrera,
-            formulario.coeficiente
+            formulario.carrera
         )
 
         return alumnoRepository.save(alumno)
@@ -540,16 +519,4 @@ data class ConflictoHistoriaAcademica(
     val materia: String,
     @ApiModelProperty(example = "Materia no encontrada")
     val mensaje: String
-)
-
-data class CoeficienteAlumnoDTO(
-        val alumnoDni: Int,
-        val coeficienteAlumno: Double
-)
-
-data class ConflictoAlumnoCoeficiente(
-        @ApiModelProperty(example = "12345678")
-        val dni: Int,
-        @ApiModelProperty(example = "hay conflicto con el alumno ... y legajo ...")
-        val mensaje: String?
 )

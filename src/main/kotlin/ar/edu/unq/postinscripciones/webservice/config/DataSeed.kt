@@ -269,10 +269,8 @@ class DataSeed(
                 "Jorge",
                 "Arenales",
                 "jorge.arenales20@alu.edu.ar",
-                12345,
                 contrasenia,
-                Carrera.PW,
-                8.7
+                Carrera.PW
 
             )
             val bartolo = Alumno(
@@ -280,30 +278,24 @@ class DataSeed(
                 "Bartolo",
                 "Gutierrez",
                 "bartolito@alu.edu.ar",
-                45555,
                 contrasenia,
-                Carrera.PW,
-                7.24
+                Carrera.PW
             )
             val maria = Alumno(
                 12345680,
                 "Maria",
                 "Jimenez",
                 "mjimenez@alu.edu.ar",
-                45557,
                 contrasenia,
-                Carrera.PW,
-                8.21
+                Carrera.PW
             )
             val roberto = Alumno(
                 12345679,
                 "Roberto",
                 "Sanchez",
                 "rsanchez@alu.edu.ar",
-                45556,
                 contrasenia,
-                Carrera.P,
-                6.10
+                Carrera.P
             )
 
             val firulais = Alumno(
@@ -311,10 +303,8 @@ class DataSeed(
                 "Firulais",
                 "Tercero",
                 "ftercero@alu.edu.ar",
-                45559,
                 contrasenia,
-                Carrera.P,
-                5.34
+                Carrera.P
             )
 
             val sofia = Alumno(
@@ -322,10 +312,8 @@ class DataSeed(
                 "sofia",
                 "Sofia",
                 "ssofia@alu.edu.ar",
-                45560,
                 contrasenia,
-                Carrera.P,
-                9.15
+                Carrera.P
             )
             cuatrimestreRepository.save(cuatrimestre)
             materiaRepository.saveAll(listOf(epyl, lea, ttu, tti, matematica, ingles1, ingles2, bdd, intro, orga,mate1, estructura, objetos1, objetos2, redes

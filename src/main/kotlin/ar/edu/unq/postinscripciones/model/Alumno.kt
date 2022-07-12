@@ -19,15 +19,11 @@ class Alumno(
     val apellido: String = "",
     @Column(nullable = false)
     val correo: String = "",
-    @Column(unique = true, nullable = false)
-    val legajo: Int = 4,
     @Column(nullable = false)
     var contrasenia: String = "",
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val carrera: Carrera = Carrera.PW,
-    @Column(nullable = false)
-    var coeficiente: Double = 3.0,
     @Column(nullable = false)
     var cursaTPI2010: Boolean = false,
     @Enumerated(EnumType.STRING)
@@ -147,10 +143,6 @@ class Alumno(
 
     fun puedeCursar(solicitudes: List<Materia>, materiasDisponibles: List<String>): Boolean {
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
-    }
-
-    fun cambiarCoeficiente(coeficiente: Double) {
-        this.coeficiente = coeficiente
     }
 
     private fun chequearSiExiste(formulario: Formulario) {

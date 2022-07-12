@@ -60,7 +60,7 @@ internal class AlumnoTest {
     }
 
     @Test
-    fun `un alumno conoce su legajo`() {
+    fun `un alumno conoce su dni`() {
         alumno = Alumno(dni = 90)
 
         assertThat(alumno.dni).isEqualTo(90)
@@ -92,13 +92,6 @@ internal class AlumnoTest {
         alumno = Alumno(contrasenia = "123")
 
         assertThat(alumno.contrasenia).isEqualTo("123")
-    }
-
-    @Test
-    fun `un alumno conoce su dni`() {
-        alumno = Alumno(legajo = 123)
-
-        assertThat(alumno.legajo).isEqualTo(123)
     }
 
     @Test
@@ -157,24 +150,6 @@ internal class AlumnoTest {
         alumno.cargarHistoriaAcademica(materiaCursada1)
 
         assertThat(alumno.materiasAprobadas()).usingRecursiveComparison().isEqualTo(listOf(materiaCursada1.materia))
-    }
-
-    @Test
-    fun `Un alumno conoce su coeficiente`() {
-        val nuevoCoeficiente = 5.23
-
-        alumno.cambiarCoeficiente(nuevoCoeficiente)
-
-        assertThat(alumno.coeficiente).isEqualTo(nuevoCoeficiente)
-    }
-
-    @Test
-    fun `A un alumno se le puede modificar su coeficiente`() {
-        val coeficienteAntes = alumno.coeficiente
-        alumno.cambiarCoeficiente(7.0)
-
-        assertThat(alumno.coeficiente).isEqualTo(7.0)
-        assertThat(alumno.coeficiente).isNotEqualTo(coeficienteAntes)
     }
 
     @Test

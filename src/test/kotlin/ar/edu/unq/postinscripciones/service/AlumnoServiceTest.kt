@@ -858,7 +858,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     alumno.cantidadAprobadas(),
-                    alumno.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
                 AlumnoSolicitaMateria(
@@ -869,7 +868,6 @@ internal class AlumnoServiceTest {
                     comision2Algoritmos.numero,
                     algo.codigo,
                     fede.cantidadAprobadas(),
-                    fede.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
             )
@@ -910,7 +908,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     alumno.cantidadAprobadas(),
-                    alumno.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
             )
@@ -919,7 +916,7 @@ internal class AlumnoServiceTest {
     }
 
     @Test
-    fun `se pueden obtener los alumnos que pidieron una materia ordenados por mayor coeficiente`() {
+    fun `se pueden obtener los alumnos que pidieron una materia ordenados por materias aprobadas`() {
         val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioNuevoAlumno = FormularioCrearAlumno(
             123456712,
@@ -949,7 +946,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     nacho.cantidadAprobadas(),
-                    nacho.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
                 AlumnoSolicitaMateria(
@@ -960,7 +956,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     fede.cantidadAprobadas(),
-                    fede.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
             )
@@ -1447,33 +1442,6 @@ internal class AlumnoServiceTest {
 
         val alumnos = alumnoService.todos()
         assertThat(alumnos.first().dni).isEqualTo(nacho.dni)
-    }
-
-    @Test
-    fun `Se puede modificar el coeficiente de varios alumnos`() {
-        val coeficienteAlumnoAntesDeActualizar = alumno.coeficiente
-        val coeficientes = listOf(
-                CoeficienteAlumnoDTO(alumno.dni, 7.0)
-        )
-
-        alumnoService.modificarCoeficienteAlumno(coeficientes)
-        val coeficienteAlumnoDespuesDeActualizar = alumnoService.buscarAlumno(alumno.dni).coeficiente
-
-        assertThat(coeficienteAlumnoDespuesDeActualizar).isEqualTo(7.0)
-        assertThat(coeficienteAlumnoDespuesDeActualizar).isNotEqualTo(coeficienteAlumnoAntesDeActualizar)
-    }
-
-    @Test
-    fun `Al intentar modificar el coeficiente de un alumnos que no existe en el sistema se devuelve como conflictivo`() {
-        val dniInexistente = 89034783
-        val coeficientes = listOf(
-                CoeficienteAlumnoDTO(dniInexistente, 7.0)
-        )
-
-        val conflictivos = alumnoService.modificarCoeficienteAlumno(coeficientes)
-
-        assertThat(conflictivos.first().dni).isEqualTo(dniInexistente)
-        assertThat(conflictivos.first().mensaje).isEqualTo("El alumno con dni ${dniInexistente} no existe")
     }
 
 

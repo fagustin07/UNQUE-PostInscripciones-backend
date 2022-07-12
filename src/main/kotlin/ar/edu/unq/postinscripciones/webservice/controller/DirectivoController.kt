@@ -258,24 +258,6 @@ class DirectivoController {
         )
     }
 
-    @ApiOperation("Endpoint para actualizar los coeficientes de un listado de alumnos existentes en el sistema")
-    @ApiResponses(
-            value = [
-                ApiResponse(code = 204, message = "Ok", response = ConflictoAlumnoCoeficiente::class, responseContainer = "List"),
-                ApiResponse(code = 400, message = "Algo salio mal")
-            ]
-    )
-    @RequestMapping(value = ["/alumnos/coeficiente"], method = [RequestMethod.PATCH])
-    fun coeficientesAlumnos(
-            @RequestBody
-            coeficientesAlumnos: List<CoeficienteAlumnoDTO>
-    ): ResponseEntity<*> {
-        return ResponseEntity(
-                alumnoService.modificarCoeficienteAlumno(coeficientesAlumnos),
-                HttpStatus.OK
-        )
-    }
-
 //    CONTROLADOR COMISIONES
 
     @ApiOperation("Registra nuevas comisiones a la oferta academica y actualiza los plazos del periodo de inscripciones.")

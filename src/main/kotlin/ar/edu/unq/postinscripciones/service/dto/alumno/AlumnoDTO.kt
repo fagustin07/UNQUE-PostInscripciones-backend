@@ -12,10 +12,6 @@ data class AlumnoDTO(
     val apellido: String,
     @ApiModelProperty(example = "correo@ejemplo.com.ar")
     val correo: String,
-    @ApiModelProperty(example = "12345")
-    val legajo: Int,
-    @ApiModelProperty(example = "5.33")
-    val coeficiente: Double
 ) {
     companion object {
         fun desdeModelo(alumno: Alumno): AlumnoDTO {
@@ -23,9 +19,7 @@ data class AlumnoDTO(
                 alumno.dni,
                 alumno.nombre,
                 alumno.apellido,
-                alumno.correo,
-                alumno.legajo,
-                alumno.coeficiente
+                alumno.correo
             )
         }
     }

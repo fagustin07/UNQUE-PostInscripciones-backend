@@ -19,8 +19,6 @@ data class AlumnoSolicitaMateria(
     val codigoMateria: String,
     @ApiModelProperty(example = "15")
     val cantidadDeAprobadas: Int,
-    @ApiModelProperty(example = "4.33")
-    val coeficiente: Double,
     @ApiModelProperty(example = "PENDIENTE")
     val estado: EstadoSolicitud,
 ) {
@@ -34,8 +32,7 @@ data class AlumnoSolicitaMateria(
                 tupla.get(5) as Int,
                 tupla.get(6) as String,
                 (tupla.get(7) as Long).toInt(),
-                tupla.get(8) as Double,
-                tupla.get(9) as EstadoSolicitud
+                tupla.get(8) as EstadoSolicitud
                 )
         }
     }
