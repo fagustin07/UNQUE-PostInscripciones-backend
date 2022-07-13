@@ -54,8 +54,8 @@ class Alumno(
         formularios.add(formulario)
     }
 
-    fun obtenerHistorialSolicitudes(cuatrimestre: Cuatrimestre): List<String> {
-        return formularios.filter { !it.cuatrimestre.esElCuatrimestre(cuatrimestre) }.flatMap { it.solicitudes.map { it.comision.materia.nombre } }
+    fun obtenerHistorialSolicitudes(cuatrimestre: Cuatrimestre): List<SolicitudSobrecupo> {
+        return formularios.filter { !it.cuatrimestre.esElCuatrimestre(cuatrimestre) }.flatMap { it.solicitudes }
     }
 
     fun borrarFormulario(anio: Int, semestre: Semestre) {

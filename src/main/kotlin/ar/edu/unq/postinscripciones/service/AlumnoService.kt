@@ -290,7 +290,7 @@ class AlumnoService {
                 ), alumno.dni
             ),
             materiasCursadas,
-            alumno.obtenerHistorialSolicitudes(cuatrimestreObtenido)
+            alumno.obtenerHistorialSolicitudes(cuatrimestreObtenido).map { ResumenSolicitudDTO.desdeModelo(it) }
         )
     }
 

@@ -13,5 +13,5 @@ data class ResumenAlumno(
     val carrera: Carrera,
     val formulario: FormularioDirectorDTO,
     val resumenCursadas: List<MateriaCursadaResumenDTO>,
-    val solicitudesAntiguas: List<String>
+    val solicitudesAntiguas: List<ResumenSolicitudDTO>
 )
