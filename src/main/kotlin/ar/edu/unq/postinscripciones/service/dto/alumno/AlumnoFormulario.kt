@@ -19,6 +19,7 @@ data class AlumnoFormulario(
                     tupla.get(1) as String,
                     tupla.get(2) as String,
                     tupla.get(3) as String,
+                    tupla.get(9) as Long
                 ),
                 tupla.get(4) as Long,
                 tupla.get(5) as EstadoFormulario,

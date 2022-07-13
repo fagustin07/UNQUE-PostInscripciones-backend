@@ -225,14 +225,14 @@ class AlumnoService {
     }
 
     @Transactional
-    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now()) {
-        val cuatrimestre = Cuatrimestre.actual()
+    fun cerrarFormularios(fecha: LocalDateTime = LocalDateTime.now(), cuatrimestre: Cuatrimestre = Cuatrimestre.actual()) {
         val cuatrimestreObtenido = cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre).orElseThrow { CuatrimestreNoEncontrado() }
-        val alumnos = alumnoRepository.findAll()
 
         if (cuatrimestreObtenido.finInscripciones > fecha) {
             throw ErrorDeNegocio("No se puede cerrar los formularios aun, la fecha de inscripciones no ha concluido")
         }
+
+        val alumnos = alumnoRepository.findAll()
 
         alumnos.forEach {
             if(it.yaGuardoUnFormulario(cuatrimestreObtenido)) {

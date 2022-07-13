@@ -12,6 +12,7 @@ data class AlumnoDTO(
     val apellido: String,
     @ApiModelProperty(example = "correo@ejemplo.com.ar")
     val correo: String,
+    val cantidadAprobadas: Long
 ) {
     companion object {
         fun desdeModelo(alumno: Alumno): AlumnoDTO {
@@ -19,7 +20,8 @@ data class AlumnoDTO(
                 alumno.dni,
                 alumno.nombre,
                 alumno.apellido,
-                alumno.correo
+                alumno.correo,
+                alumno.cantidadAprobadas().toLong()
             )
         }
     }

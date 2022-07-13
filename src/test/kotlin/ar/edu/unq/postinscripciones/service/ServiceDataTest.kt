@@ -42,10 +42,10 @@ internal class ServiceDataTest {
 
         val alumnosRegistrados = alumnoService.todos()
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
-        assertThat(alumnosRegistrados)
+        assertThat(planillaAlumnos)
             .usingRecursiveComparison()
-            .ignoringFields("formularios", "contrasenia", "coeficiente")
-            .isEqualTo(planillaAlumnos)
+            .ignoringFields("legajo", "carrera", "coeficiente")
+            .isEqualTo(alumnosRegistrados)
     }
 
     @Test

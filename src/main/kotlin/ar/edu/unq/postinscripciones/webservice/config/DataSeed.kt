@@ -12,6 +12,7 @@ import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
 import ar.edu.unq.postinscripciones.service.AlumnoService
 import ar.edu.unq.postinscripciones.service.AutenticacionService
+import ar.edu.unq.postinscripciones.service.ComisionService
 import ar.edu.unq.postinscripciones.service.dto.CreacionDirectivo
 import ar.edu.unq.postinscripciones.service.dto.alumno.AlumnoConHistoriaAcademica
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Profile("!test")
@@ -33,7 +35,8 @@ class DataSeed(
     @Autowired private val comisionRespository: ComisionRespository,
     @Autowired private val alumnoRepository: AlumnoRepository,
     @Autowired private val alumnoService: AlumnoService,
-    @Autowired private val autenticacionService: AutenticacionService
+    @Autowired private val autenticacionService: AutenticacionService,
+    @Autowired private val comisionService: ComisionService
 ) : CommandLineRunner {
 
     @Value("\${admin.password}")
@@ -406,14 +409,23 @@ class DataSeed(
             )
 
             val comisiones2019S1 = comisionRespository.findByCuatrimestre(cuatrimestre2019S1)
-            val comisiones2019S2 = comisionRespository.findByCuatrimestre(cuatrimestre2019S2)
-            jorge.guardarFormulario(Formulario(cuatrimestre2019S1,
-                comisiones2019S1.map { SolicitudSobrecupo(it) } as MutableList<SolicitudSobrecupo>))
-            sofia.guardarFormulario(Formulario(cuatrimestre2019S1,
-                comisiones2019S2.map { SolicitudSobrecupo(it) } as MutableList<SolicitudSobrecupo>))
+            alumnoService.guardarSolicitudPara(jorge.dni, comisiones2019S1.map { it.id!! }, cuatrimestre2019S1)
+            alumnoService.guardarSolicitudPara(maria.dni, comisiones2019S1.map { it.id!! }, cuatrimestre2019S1)
 
-            alumnoRepository.save(jorge)
-            alumnoRepository.save(sofia)
+            comisionService.subirOferta(
+                finInscripciones = LocalDateTime.of(2019,4,13,10,0),
+                inicioInscripciones = LocalDateTime.of(2019,2,13,10,0),
+                cuatrimestre = cuatrimestre2019S1, comisionesACrear = listOf()
+            )
+
+            comisionService.subirOferta(
+                finInscripciones = LocalDateTime.of(2019,8,13,10,0),
+                inicioInscripciones = LocalDateTime.of(2019,6,13,10,0),
+                cuatrimestre = cuatrimestre2019S2, comisionesACrear = listOf()
+            )
+
+            alumnoService.cerrarFormularios(cuatrimestre = cuatrimestre2019S1)
+            alumnoService.cerrarFormularios(cuatrimestre = cuatrimestre2019S2)
             alumnoService.actualizarHistoriaAcademica(listOf(
                 AlumnoConHistoriaAcademica(45678900, historiaAcademica)
             ))

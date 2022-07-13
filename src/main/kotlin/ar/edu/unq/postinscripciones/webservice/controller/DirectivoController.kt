@@ -10,7 +10,6 @@ import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.cuatrimestre.OfertaAcademicaDTO
-import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDirectorDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
@@ -241,7 +240,7 @@ class DirectivoController {
         }
     }
 
-    @ApiOperation("Listado de alumnos con datos basicos, filtrarlos por comienzo de dni, ordenados por coeficiente")
+    @ApiOperation("Listado de alumnos con datos basicos, filtrarlos por comienzo de dni, ordenados por cantidad de aprobadas")
     @ApiResponses(
         value = [
             ApiResponse(code = 200, message = "Ok", response = AlumnoDTO::class, responseContainer = "List"),
