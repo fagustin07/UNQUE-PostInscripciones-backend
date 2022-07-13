@@ -5,6 +5,7 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.service.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.AlumnoCarga
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
@@ -58,8 +59,8 @@ class DirectivoController {
         ]
     )
     @RequestMapping(value = ["/alumnos"], method = [RequestMethod.POST])
-    fun registrarAlumnos(@RequestBody planillaAlumnos: List<FormularioCrearAlumno>): ResponseEntity<*> {
-        val conflictoAlumnos = alumnoService.registrarAlumnos(planillaAlumnos)
+    fun registrarAlumnos(@RequestBody planillaAlumnos: List<AlumnoCarga>): ResponseEntity<*> {
+        val conflictoAlumnos = alumnoService.subirAlumnos(planillaAlumnos)
 
         return if (conflictoAlumnos.isEmpty()) {
             ResponseEntity(null, HttpStatus.CREATED)

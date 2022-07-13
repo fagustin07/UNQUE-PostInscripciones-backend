@@ -4,6 +4,7 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.AlumnoCarga
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,11 +24,11 @@ class Alumno(
     var contrasenia: String = "",
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val carrera: Carrera = Carrera.PW,
+    var carrera: Carrera = Carrera.PW,
     @Column(nullable = false)
     var cursaTPI2010: Boolean = false,
     @Enumerated(EnumType.STRING)
-    var locacion: Locacion = Locacion.Bernal,
+    val locacion: Locacion = Locacion.Bernal,
     var estadoInscripcion: EstadoInscripcion = EstadoInscripcion.Aceptado,
     var calidad: Calidad = Calidad.Activo,
     var regular: Regular = Regular.S
@@ -42,7 +43,7 @@ class Alumno(
     val rol = Role.ROLE_ALUMNO
 
     @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val formularios: MutableList<Formulario> = mutableListOf()
+    val formularios: MutableList<Formulario> = mutableListOf()
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "alumno_dni")
@@ -149,34 +150,6 @@ class Alumno(
         return solicitudes.all { materiasDisponibles.contains(it.codigo) }
     }
 
-    private fun chequearSiExiste(formulario: Formulario) {
-        if (yaGuardoUnFormulario(formulario.cuatrimestre)) {
-            throw ErrorDeNegocio("Ya has guardado un formulario para este cuatrimestre")
-        }
-    }
-
-    private fun checkEstadoCuenta() {
-        if (this.estadoCuenta == EstadoCuenta.CONFIRMADA) throw ErrorDeNegocio("Ya posees una cuenta")
-    }
-
-    private fun checkTiempoDeCodigo(horaDeCarga: LocalDateTime) {
-        if (this.cargaDeCodigo != null && horaDeCarga.isBefore(this.cargaDeCodigo!!.plusMinutes(30))) {
-            throw ErrorDeNegocio(
-                "Usted posee un codigo que no expiró. " +
-                        "Revise su correo y confirme su cuenta con el codigo dado"
-            )
-        }
-    }
-
-    private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
-        if (this.cargaDeCodigo != null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
-            throw ErrorDeNegocio("Su codigo ha expirado. Cree su cuenta nuevamente")
-        }
-    }
-
-    private fun tieneAprobado(materia: Materia) =
-        this.historiaAcademica.any { it.materia.esLaMateria(materia) && it.estado == EstadoMateria.APROBADO }
-
     fun aproboTodas(correlativas: List<Materia>): Boolean {
         val materiasAprobadas = this.materiasAprobadas()
 
@@ -211,6 +184,55 @@ class Alumno(
             if (resultado != EstadoMateria.APROBADO || !this.haAprobado(materia)) {
                 this.historiaAcademica.add(MateriaCursada(materia, resultado, fecha))
             }
+        }
+    }
+
+    fun actualizarDatos(datosActualizados: AlumnoCarga) {
+        this.calidad = datosActualizados.calidad
+        this.regular = datosActualizados.regular
+        this.estadoInscripcion = datosActualizados.estado
+        actualizarCarrera(datosActualizados)
+    }
+
+    private fun chequearSiExiste(formulario: Formulario) {
+        if (yaGuardoUnFormulario(formulario.cuatrimestre)) {
+            throw ErrorDeNegocio("Ya has guardado un formulario para este cuatrimestre")
+        }
+    }
+
+    private fun checkEstadoCuenta() {
+        if (this.estadoCuenta == EstadoCuenta.CONFIRMADA) throw ErrorDeNegocio("Ya posees una cuenta")
+    }
+
+    private fun checkTiempoDeCodigo(horaDeCarga: LocalDateTime) {
+        if (this.cargaDeCodigo != null && horaDeCarga.isBefore(this.cargaDeCodigo!!.plusMinutes(30))) {
+            throw ErrorDeNegocio(
+                "Usted posee un codigo que no expiró. " +
+                        "Revise su correo y confirme su cuenta con el codigo dado"
+            )
+        }
+    }
+
+    private fun checkTiempoConfirmacionCodigo(horaDeCarga: LocalDateTime) {
+        if (this.cargaDeCodigo != null && horaDeCarga.isAfter(this.cargaDeCodigo!!.plusMinutes(5))) {
+            throw ErrorDeNegocio("Su codigo ha expirado. Cree su cuenta nuevamente")
+        }
+    }
+
+    private fun tieneAprobado(materia: Materia) =
+        this.historiaAcademica.any { it.materia.esLaMateria(materia) && it.estado == EstadoMateria.APROBADO }
+
+    private fun actualizarCarrera(datosActualizados: AlumnoCarga) {
+        if (datosActualizados.propuesta == Carrera.P && this.carrera == Carrera.W) {
+            this.carrera = Carrera.PW
+            this.cursaTPI2010 = datosActualizados.plan == 2010
+        }
+        if (datosActualizados.propuesta == Carrera.W && this.carrera == Carrera.P) {
+            this.carrera = Carrera.PW
+        }
+
+        if (datosActualizados.propuesta == Carrera.P && this.carrera == Carrera.P) {
+            this.cursaTPI2010 = datosActualizados.plan == 2010
         }
     }
 }

@@ -6,6 +6,8 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.*
 import ar.edu.unq.postinscripciones.persistence.*
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.AlumnoCarga
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioAlumnoDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
@@ -16,6 +18,7 @@ import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaResumenDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
 import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -47,20 +50,31 @@ class AlumnoService {
     private lateinit var jwtTokenUtil: JWTTokenUtil
 
     @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
     private lateinit var chequeadorDeMateriaDisponible: ChequeadorDeMateriasDisponibles
 
     @Transactional
-    fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumno> {
-        val conflictos: MutableList<ConflictoAlumno> = mutableListOf()
-        planillaAlumnos.forEach { formulario ->
-            val alumnoExistente = alumnoRepository.findById(formulario.dni)
-            if (alumnoExistente.isPresent) {
-                val mensaje = "Conflicto con el alumno con dni ${alumnoExistente.get().dni}"
-                conflictos.add(ConflictoAlumno(formulario.dni, formulario.legajo, mensaje))
+    fun subirAlumnos(nuevosAlumnos: List<AlumnoCarga>): List<Conflicto> {
+        val conflictos = mutableListOf<Conflicto>()
+
+        nuevosAlumnos.forEach { nuevoAlumno ->
+            val existeAlumno = alumnoRepository.findById(nuevoAlumno.dni)
+
+            if (existeAlumno.isPresent) {
+                conflictos.add(Conflicto(nuevoAlumno.fila, "El alumno con dni ${nuevoAlumno.dni} ya existe y se actualizó su información"))
+                val alumno = existeAlumno.get()
+                alumno.actualizarDatos(nuevoAlumno)
+                alumnoRepository.save(alumno)
             } else {
-                guardarAlumno(formulario)
+                val alumno = nuevoAlumno.aModelo()
+                alumno.contrasenia = passwordEncoder.encode("alumno")
+                alumno.estadoCuenta = EstadoCuenta.CONFIRMADA
+                alumnoRepository.save(alumno)
             }
         }
+
         return conflictos
     }
 
@@ -400,6 +414,21 @@ class AlumnoService {
         formulario.agregarComentarios(descripcion, autor, fechaCarga)
 
         return FormularioDirectorDTO.desdeModelo(formularioRepository.save(formulario), dni)
+    }
+
+    @Transactional
+    fun registrarAlumnos(planillaAlumnos: List<FormularioCrearAlumno>): List<ConflictoAlumno> {
+        val conflictos: MutableList<ConflictoAlumno> = mutableListOf()
+        planillaAlumnos.forEach { formulario ->
+            val alumnoExistente = alumnoRepository.findById(formulario.dni)
+            if (alumnoExistente.isPresent) {
+                val mensaje = "Conflicto con el alumno con dni ${alumnoExistente.get().dni}"
+                conflictos.add(ConflictoAlumno(formulario.dni, formulario.legajo, mensaje))
+            } else {
+                guardarAlumno(formulario)
+            }
+        }
+        return conflictos
     }
 
     fun crearFormulario(
