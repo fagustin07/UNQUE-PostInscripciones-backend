@@ -5,6 +5,7 @@ import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.comision.Horario
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
+import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.persistence.AlumnoRepository
 import ar.edu.unq.postinscripciones.persistence.ComisionRespository
 import ar.edu.unq.postinscripciones.persistence.CuatrimestreRepository
@@ -252,6 +253,8 @@ class DataSeed(
                 Horario(Dia.Mie, LocalTime.of(14, 0, 0), LocalTime.of(18, 0, 0))
             )
             val cuatrimestre = Cuatrimestre.actual()
+            val cuatrimestre2019S1 = Cuatrimestre(anio = 2019, semestre = Semestre.S1)
+            val cuatrimestre2019S2 = Cuatrimestre(anio = 2019, semestre = Semestre.S2)
 
             val bddc1 = Comision(bdd, 1, cuatrimestre, bddhorariosc1)
             val bddc2 = Comision(bdd, 2, cuatrimestre, bddhorariosc2)
@@ -262,6 +265,10 @@ class DataSeed(
             val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
             val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1)
 
+            val bddc12019S1 = Comision(bdd, 1, cuatrimestre2019S1, bddhorariosc1)
+            val matec12019S1 = Comision(mate1, 1, cuatrimestre2019S1, matehorarios)
+            val estrc12019S2 = Comision(estructura, 1, cuatrimestre2019S2, estrhorarios)
+            val introc12019S2 = Comision(intro, 1, cuatrimestre2019S2, introhorariosc1)
             val contrasenia = passwordEncoder.encode("contrasenia")
 
             val jorge = Alumno(
@@ -316,13 +323,15 @@ class DataSeed(
                 Carrera.P
             )
             cuatrimestreRepository.save(cuatrimestre)
+            cuatrimestreRepository.save(cuatrimestre2019S1)
+            cuatrimestreRepository.save(cuatrimestre2019S2)
             materiaRepository.saveAll(listOf(epyl, lea, ttu, tti, matematica, ingles1, ingles2, bdd, intro, orga,mate1, estructura, objetos1, objetos2, redes
                                             , sistemasoperativos, concurrente, mate2, elementosdeingeneria, interfaces, persistencia, funcional, desarrollo, labo, bdd2
                                             , softwareLibre, introArquitectura, objetos3, bioinformatica, politica, geografica, declarativas, videojuegos, derechos, arduino
                                             , tecnicas, tip, analisis, mate3, proba, logica, seguridad, requerimientos, gestion, practicaDeDesarrollo, lfa, algoritmos
                                             , teoria, arquitectura1, distribuidos, caracteristicas, arquitectura2, arquitecturaDeComputadoras, parseo, aspectosLegales, seminarioFinal, seminarioCapacitacion
                                             , seguridadTec, tv, streaming, cloud, bajo, semantica, seminarios, calidad, funcionalAvanzada, progCuantica, ciudadana, ludificacion, cdDatos))
-            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1, inglesc1))
+            comisionRespository.saveAll(listOf(bddc1, bddc2, matec1, estrc1,introc1, introc2, orgac1, inglesc1, bddc12019S1, estrc12019S2, introc12019S2, matec12019S1))
             jorge.actualizarHistoriaAcademica(listOf(
                     MateriaCursada(intro, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
                     MateriaCursada(matematica, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20)),
@@ -396,6 +405,15 @@ class DataSeed(
                 MateriaCursadaDTO(lea.codigo, EstadoMateria.APROBADO, fecha)
             )
 
+            val comisiones2019S1 = comisionRespository.findByCuatrimestre(cuatrimestre2019S1)
+            val comisiones2019S2 = comisionRespository.findByCuatrimestre(cuatrimestre2019S2)
+            jorge.guardarFormulario(Formulario(cuatrimestre2019S1,
+                comisiones2019S1.map { SolicitudSobrecupo(it) } as MutableList<SolicitudSobrecupo>))
+            sofia.guardarFormulario(Formulario(cuatrimestre2019S1,
+                comisiones2019S2.map { SolicitudSobrecupo(it) } as MutableList<SolicitudSobrecupo>))
+
+            alumnoRepository.save(jorge)
+            alumnoRepository.save(sofia)
             alumnoService.actualizarHistoriaAcademica(listOf(
                 AlumnoConHistoriaAcademica(45678900, historiaAcademica)
             ))

@@ -240,12 +240,9 @@ class AlumnoService {
         val comisionesOfertadas = comisionRepository.findByCuatrimestre(cuatrimestreObtenido)
         val codigos: List<String> = comisionesOfertadas.map { it.materia }.groupBy { it.codigo }.map { it.key }
         val materiasOfertadas: List<Materia> = materiaRepository.findAllByCodigoIn(codigos)
-
         val materiasQuePuedeCursar = chequeadorDeMateriaDisponible.materiasQuePuedeCursar(alumno, materiasOfertadas)
-
         return materiasQuePuedeCursar.map { materia ->
             val comisiones = comisionesOfertadas.filter { it.materia.esLaMateria(materia) }
-
             MateriaComision(
                 materia.codigo,
                 materia.nombre,
@@ -268,7 +265,6 @@ class AlumnoService {
 
                 MateriaCursadaResumenDTO(materia.nombre, materia.codigo, estado, fecha, intentos)
             }
-
         return ResumenAlumno(
             alumno.nombre,
             alumno.dni,
@@ -279,7 +275,8 @@ class AlumnoService {
                     cuatrimestreObtenido.semestre
                 ), alumno.dni
             ),
-            materiasCursadas
+            materiasCursadas,
+            alumno.obtenerHistorialSolicitudes(cuatrimestreObtenido)
         )
     }
 
