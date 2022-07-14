@@ -252,7 +252,6 @@ class AlumnoService {
                 .orElseThrow { CuatrimestreNoEncontrado() }
         val alumno =
             alumnoRepository.findById(dni).orElseThrow { AlumnoNoEncontrado(dni) }
-        this.checkEsRegular(alumno)
         val comisionesOfertadas = comisionRepository.findByCuatrimestre(cuatrimestreObtenido).filter { alumno.cumpleLocacion(it) }
         val codigos: List<String> = comisionesOfertadas.map { it.materia }.groupBy { it.codigo }.map { it.key }
         val materiasOfertadas: List<Materia> = materiaRepository.findAllByCodigoIn(codigos)
@@ -446,6 +445,7 @@ class AlumnoService {
         comisionesInscriptoIds: List<Long>,
         fechaCarga: LocalDateTime
     ): Formulario {
+        this.checkEsRegular(alumno)
         val cuatrimestreObtenido =
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { CuatrimestreNoEncontrado() }
