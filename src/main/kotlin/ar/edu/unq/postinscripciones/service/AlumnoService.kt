@@ -57,6 +57,7 @@ class AlumnoService {
     @Transactional
     fun subirAlumnos(nuevosAlumnos: List<AlumnoCarga>): List<Conflicto> {
         val conflictos = mutableListOf<Conflicto>()
+        val password = passwordEncoder.encode("alumno")
 
         nuevosAlumnos.forEach { nuevoAlumno ->
             val existeAlumno = alumnoRepository.findById(nuevoAlumno.dni)
@@ -69,7 +70,7 @@ class AlumnoService {
             } else {
                 val alumno = nuevoAlumno.aModelo()
                 if (nuevoAlumno.correo == null) {
-                    alumno.contrasenia = passwordEncoder.encode("alumno")
+                    alumno.contrasenia = password
                     alumno.estadoCuenta = EstadoCuenta.CONFIRMADA
                 }
                 alumnoRepository.save(alumno)
@@ -82,15 +83,17 @@ class AlumnoService {
     @Transactional
     fun subirHistoriaAcademica(alumnosMateriaCursada: List<AlumnoMateriaCursada>): MutableList<Conflicto> {
         val conflictos = mutableListOf<Conflicto>()
+        val alumnos = alumnoRepository.findAllById(alumnosMateriaCursada.map { it.dni }.toSet())
+        val materias = materiaRepository.findAllById(alumnosMateriaCursada.map { it.codigo }.toSet())
+
         alumnosMateriaCursada.forEach { alumnoMateriaCursada ->
-            val existeAlumno = alumnoRepository.findById(alumnoMateriaCursada.dni)
-            if (existeAlumno.isPresent) {
-                val alumno = existeAlumno.get()
-                val existeMateria = materiaRepository.findMateriaByCodigo(alumnoMateriaCursada.codigo)
-                if (existeMateria.isPresent) {
-                    val materia = existeMateria.get()
+            val existeAlumno = alumnos.firstOrNull { it.dni == alumnoMateriaCursada.dni }
+            if (existeAlumno != null) {
+                val alumno = existeAlumno
+                val existeMateria = materias.firstOrNull{ it.codigo == alumnoMateriaCursada.codigo}
+                if (existeMateria != null) {
+                    val materia = existeMateria
                     alumno.agregarMateriaCursada(materia, alumnoMateriaCursada.fecha, alumnoMateriaCursada.resultado)
-                    alumnoRepository.save(alumno)
                 } else {
                     conflictos.add(Conflicto(alumnoMateriaCursada.fila, "No existe la materia con codigo ${alumnoMateriaCursada.codigo}"))
                 }
@@ -99,43 +102,8 @@ class AlumnoService {
             }
         }
 
+        alumnoRepository.saveAll(alumnos)
         return conflictos
-    }
-
-    @Transactional
-    fun actualizarHistoriaAcademica(alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>): MutableList<ConflictoHistoriaAcademica> {
-        val conflictoHistoriaAcademicaAlumnos: MutableList<ConflictoHistoriaAcademica> = mutableListOf()
-        alumnosConHistoriaAcademica.forEach { alumnoConHistoriaAcademica ->
-            val existeAlumno = alumnoRepository.findById(alumnoConHistoriaAcademica.dni)
-            if (existeAlumno.isPresent) {
-                val alumno = existeAlumno.get()
-                val historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
-                    alumnoConHistoriaAcademica.materiasCursadas.forEach {
-                    val existeMateria = materiaRepository.findMateriaByCodigo(it.codigoMateria)
-                    if (existeMateria.isPresent) {
-                        historiaAcademica.add(MateriaCursada(existeMateria.get(), it.estado, it.fechaDeCarga))
-                    } else {
-                        conflictoHistoriaAcademicaAlumnos.add(ConflictoHistoriaAcademica(alumno.dni, it.codigoMateria, "No existe la materia"))
-                    }
-                }
-                if (historiaAcademica.isEmpty()) {
-                    conflictoHistoriaAcademicaAlumnos
-                        .add(
-                            ConflictoHistoriaAcademica(alumno.dni, "-", "No se modificó " +
-                                "la historia academica ya que se presentó una lista con materias inválidas que " +
-                                "hizo que quede vacía")
-                        )
-                } else {
-                    alumno.actualizarHistoriaAcademica(historiaAcademica)
-                    alumnoRepository.save(alumno)
-                }
-            } else {
-                conflictoHistoriaAcademicaAlumnos.add(ConflictoHistoriaAcademica(alumnoConHistoriaAcademica.dni, "-", "No existe el alumno"))
-            }
-
-        }
-
-        return conflictoHistoriaAcademicaAlumnos
     }
 
     @Transactional
@@ -178,6 +146,42 @@ class AlumnoService {
     @Transactional
     fun todos(patronDni: String = ""): List<AlumnoDTO> {
         return alumnoRepository.findByDniStartsWithOrderByCantAprobadasDesc(patronDni).map { AlumnoDTO.desdeModelo(it) }
+    }
+
+    @Transactional
+    fun actualizarHistoriaAcademica(alumnosConHistoriaAcademica: List<AlumnoConHistoriaAcademica>): MutableList<ConflictoHistoriaAcademica> {
+        val conflictoHistoriaAcademicaAlumnos: MutableList<ConflictoHistoriaAcademica> = mutableListOf()
+        alumnosConHistoriaAcademica.forEach { alumnoConHistoriaAcademica ->
+            val existeAlumno = alumnoRepository.findById(alumnoConHistoriaAcademica.dni)
+            if (existeAlumno.isPresent) {
+                val alumno = existeAlumno.get()
+                val historiaAcademica: MutableList<MateriaCursada> = mutableListOf()
+                alumnoConHistoriaAcademica.materiasCursadas.forEach {
+                    val existeMateria = materiaRepository.findMateriaByCodigo(it.codigoMateria)
+                    if (existeMateria.isPresent) {
+                        historiaAcademica.add(MateriaCursada(existeMateria.get(), it.estado, it.fechaDeCarga))
+                    } else {
+                        conflictoHistoriaAcademicaAlumnos.add(ConflictoHistoriaAcademica(alumno.dni, it.codigoMateria, "No existe la materia"))
+                    }
+                }
+                if (historiaAcademica.isEmpty()) {
+                    conflictoHistoriaAcademicaAlumnos
+                        .add(
+                            ConflictoHistoriaAcademica(alumno.dni, "-", "No se modificó " +
+                                    "la historia academica ya que se presentó una lista con materias inválidas que " +
+                                    "hizo que quede vacía")
+                        )
+                } else {
+                    alumno.actualizarHistoriaAcademica(historiaAcademica)
+                    alumnoRepository.save(alumno)
+                }
+            } else {
+                conflictoHistoriaAcademicaAlumnos.add(ConflictoHistoriaAcademica(alumnoConHistoriaAcademica.dni, "-", "No existe el alumno"))
+            }
+
+        }
+
+        return conflictoHistoriaAcademicaAlumnos
     }
 
     @Transactional
