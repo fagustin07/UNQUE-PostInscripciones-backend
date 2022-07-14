@@ -76,7 +76,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, numero : Int?, semestre: Semestre, anio: Int, pendiente: Boolean?,estado : EstadoMateria = EstadoMateria.APROBADO, estadoSolicitud: EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
 
     @Query(
-        "SELECT a.dni, a.nombre, a.apellido, a.correo, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(solicitudes_pendientes) as total_solicitudes_pendientes, count(solicitudes_aprobadas) as total_solicitudes_aprobadas, count(m) " +
+        "SELECT a.dni, a.nombre, a.apellido, a.correo, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(solicitudes_pendientes) as total_solicitudes_pendientes, count(solicitudes_aprobadas) as total_solicitudes_aprobadas, count(m), a.locacion, a.regular, a.calidad, a.estadoInscripcion " +
         "FROM Alumno as a " +
             "JOIN Formulario as f " +
                 "ON f.id IN (SELECT f2.id FROM a.formularios as f2 WHERE f2.cuatrimestre.semestre = ?2 AND f2.cuatrimestre.anio = ?3) " +
