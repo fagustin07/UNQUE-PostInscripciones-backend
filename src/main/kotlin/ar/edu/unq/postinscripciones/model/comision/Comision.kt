@@ -24,9 +24,9 @@ class Comision(
     @JoinColumn(name ="comision_id")
     var horarios: MutableList<Horario> = mutableListOf(),
     @Column(nullable = false)
-    val cuposTotales: Int = 30,
+    var cuposTotales: Int = 30,
     @Column(nullable = false)
-    val sobrecuposTotales: Int = 5,
+    var sobrecuposTotales: Int = 5,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val modalidad: Modalidad = Modalidad.PRESENCIAL,
@@ -45,6 +45,20 @@ class Comision(
     fun modificarHorarios(nuevosHorarios: List<Horario>) {
         horarios.clear()
         horarios.addAll(nuevosHorarios)
+    }
+
+    fun modificarCuposTotales(cupos: Int) {
+        this.cuposTotales = cupos
+    }
+
+    fun modificarSobreuposTotales(sobrecupos: Int) {
+        if(sobrecuposOcupados > sobrecupos) {
+            throw ErrorDeNegocio(
+                    "No se puede modificar la cantidad de sobrecupos " +
+                            "dado que la cantidad de sobrecupos ocupados es mayor"
+            )
+        }
+        this.sobrecuposTotales = sobrecupos
     }
 
     fun asignarSobrecupo() {

@@ -15,6 +15,7 @@ import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
+import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -101,6 +102,14 @@ class ComisionService {
         return comisiones.map { ComisionDTO.desdeModelo(it) }
     }
 
+    @Transactional
+    fun cambiarCantidadDeCuposYSobreCupos(cambioDeCuposYSobrecupos: CambioDeCuposYSobrecupos): ComisionDTO {
+        val comision = comisionRespository.findById(cambioDeCuposYSobrecupos.idComision).orElseThrow { ComisionNoEncontrada(cambioDeCuposYSobrecupos.idComision) }
+        comision.modificarSobreuposTotales(cambioDeCuposYSobrecupos.cantidadSobrecupos)
+        comision.modificarCuposTotales(cambioDeCuposYSobrecupos.cantidadCupos)
+        return ComisionDTO.desdeModelo(comisionRespository.save(comision))
+    }
+
     private fun actualizarCuatrimestre(
         cuatrimestre: Cuatrimestre,
         inicioInscripciones: LocalDateTime?,
@@ -167,3 +176,13 @@ class ComisionService {
         )
     }
 }
+
+
+data class CambioDeCuposYSobrecupos(
+        @ApiModelProperty(example = "1")
+        val idComision: Long,
+        @ApiModelProperty(example = "30")
+        val cantidadCupos: Int,
+        @ApiModelProperty(example = "5")
+        val cantidadSobrecupos: Int
+)

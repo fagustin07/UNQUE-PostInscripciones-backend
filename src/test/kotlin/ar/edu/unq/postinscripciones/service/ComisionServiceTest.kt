@@ -226,6 +226,15 @@ internal class ComisionServiceTest {
         assertThat(ofertaObtenida).doesNotContain(ComisionDTO.desdeModelo(comisionExcluida))
     }
 
+    @Test
+    fun `Se puede modificar la cantidad de cupos y sobrecupos totales de una comision persisitida`() {
+        val cambioDeCuposYSobrecupos =  CambioDeCuposYSobrecupos(comision.id!!, 40, 2)
+        val comision = comisionService.cambiarCantidadDeCuposYSobreCupos(cambioDeCuposYSobrecupos)
+
+        assertThat(comision.cuposTotales).isEqualTo(40)
+        assertThat(comision.sobreCuposTotales).isEqualTo(2)
+    }
+
     @AfterEach
     fun tearDown() {
         dataService.clearDataSet()

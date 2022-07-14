@@ -3,6 +3,7 @@ package ar.edu.unq.postinscripciones.model.comision
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.assertj.core.api.Assertions.assertThat
@@ -113,6 +114,39 @@ internal class ComisionTest {
         val exception = assertThrows<ExcepcionUNQUE> { comision.quitarSobrecupo() }
 
         assertThat(exception.message).isEqualTo("No hay sobrecupos ocupados")
+    }
+
+    @Test
+    fun `Se puede modificar la cantidad de cupos totales de una comision`() {
+        val comision = Comision(bdd, cuposTotales = 30)
+        val cuposAntes = comision.cuposTotales
+
+        comision.modificarCuposTotales(20)
+
+        assertThat(comision.cuposTotales).isEqualTo(20)
+        assertThat(cuposAntes).isNotEqualTo(comision.cuposTotales)
+    }
+
+    @Test
+    fun `Se puede modificar la cantidad de sobrecupos totales de una comision`() {
+        val comision = Comision(bdd, sobrecuposTotales = 5)
+        val sobrecuposAntes = comision.sobrecuposTotales
+
+        comision.modificarSobreuposTotales(2)
+
+        assertThat(comision.sobrecuposTotales).isEqualTo(2)
+        assertThat(sobrecuposAntes).isNotEqualTo(comision.sobrecuposTotales)
+    }
+
+    @Test
+    fun `No se puede asignar menos sobrecupos totales que los ocupados a una comision`() {
+        val comision = Comision(bdd, sobrecuposTotales = 2)
+        comision.asignarSobrecupo()
+        comision.asignarSobrecupo()
+
+        val exception =  assertThrows<ErrorDeNegocio> { comision.modificarSobreuposTotales(1) }
+
+        assertThat(exception.message).isEqualTo("No se puede modificar la cantidad de sobrecupos dado que la cantidad de sobrecupos ocupados es mayor")
     }
 
 

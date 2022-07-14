@@ -344,6 +344,27 @@ class DirectivoController {
         )
     }
 
+    @ApiOperation("Endpoint para modificar la cantidad de cupos y sobrecupos totales")
+    @ApiResponses(
+            value = [
+                ApiResponse(
+                        code = 200,
+                        message = "OK",
+                        response = ComisionDTO::class
+                ),
+                ApiResponse(code = 400, message = "Algo salio mal")
+            ]
+    )
+    @RequestMapping(value = ["/comisiones/cupos"], method = [RequestMethod.PATCH])
+    fun cambiarCuposYSobrecupos(@RequestBody cambioDeCuposYSobrecupos: CambioDeCuposYSobrecupos): ResponseEntity<*> {
+        return ResponseEntity(
+                comisionService.cambiarCantidadDeCuposYSobreCupos(cambioDeCuposYSobrecupos),
+                HttpStatus.OK
+        )
+    }
+
+
+
 //    CONTROLADOR MATERIAS
 
     @ApiOperation("Registra nuevas  materias en el sistema")
