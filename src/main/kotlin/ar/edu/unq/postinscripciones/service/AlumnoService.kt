@@ -282,7 +282,7 @@ class AlumnoService {
 
     private fun checkEsRegular(alumno: Alumno) {
         if(!alumno.esRegular()){
-            throw ErrorDeNegocio("El alumno no puede cursar las materias disponibles")
+            throw ErrorDeNegocio("No podes registar tu formulario porque no sos alumno regular")
         }
     }
 

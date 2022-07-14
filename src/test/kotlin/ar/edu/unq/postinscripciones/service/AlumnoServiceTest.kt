@@ -6,10 +6,13 @@ import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.SolicitudSobrecupoRepository
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.AlumnoCarga
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
@@ -1444,6 +1447,22 @@ internal class AlumnoServiceTest {
         assertThat(alumnos.first().dni).isEqualTo(nacho.dni)
     }
 
+    @Test
+    fun `Un alumno no puede registrar un formulario si no es regular`() {
+        alumnoService.subirAlumnos(
+            listOf( AlumnoCarga(alumno.dni, alumno.nombre, alumno.apellido, Carrera.P, 2015, EstadoInscripcion.Pendiente, Calidad.Pasivo, Regular.N, Locacion.Bernal, null, 123))
+        )
+
+        val excepcion = assertThrows<ErrorDeNegocio> {
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        }
+
+        assertThat(excepcion.message).isEqualTo("No podes registar tu formulario porque no sos alumno regular")
+    }
 
     @AfterEach
     fun tearDown() {
