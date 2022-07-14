@@ -2,6 +2,7 @@ package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.*
 import ar.edu.unq.postinscripciones.persistence.MateriaRepository
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.MateriaParaCargar
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.Plan
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
@@ -16,21 +17,27 @@ class CargaMateriaService {
     private lateinit var materiaRepository: MateriaRepository
 
     @Transactional
-    fun cargarMaterias(planillaMaterias: PlanillaMaterias): List<ConflictoMateria> {
+    fun cargarMaterias(planillaMaterias: PlanillaMaterias): List<Conflicto> {
+        val conflictos = mutableListOf<Conflicto>()
+
         planillaMaterias.materias.forEach {
-            guardarDatosBasicosMateria(it, planillaMaterias.plan)
+            val nuevosConflictos = guardarDatosBasicosMateria(it, planillaMaterias.plan)
+            conflictos.addAll(nuevosConflictos)
         }
 
         planillaMaterias.materias.forEach {
-            actualizarRequisitosMateria(it, planillaMaterias.plan)
+            val nuevosConflictos = actualizarRequisitosMateria(it, planillaMaterias.plan)
+            conflictos.addAll(nuevosConflictos)
         }
 
-        return emptyList()
+        return conflictos
     }
 
-    private fun guardarDatosBasicosMateria(nuevaMateria: MateriaParaCargar, plan: Plan) {
+    private fun guardarDatosBasicosMateria(nuevaMateria: MateriaParaCargar, plan: Plan): List<Conflicto> {
+        val conflictos = mutableListOf<Conflicto>()
         val existeMateria = materiaRepository.findMateriaByCodigo(nuevaMateria.codigo)
         val materia = if (existeMateria.isPresent) {
+            conflictos.add(Conflicto(nuevaMateria.fila, "La materia ${nuevaMateria.codigo} existe y se actualizarán sus datos"))
             existeMateria.get()
         } else {
             Materia(
@@ -44,17 +51,23 @@ class CargaMateriaService {
         }
         setearCiclo(plan, materia, nuevaMateria.cicloTPI, nuevaMateria.cicloLI)
         materiaRepository.save(materia)
+        return conflictos
     }
 
-    private fun actualizarRequisitosMateria(nuevaMateria: MateriaParaCargar, plan: Plan) {
+    private fun actualizarRequisitosMateria(nuevaMateria: MateriaParaCargar, plan: Plan): List<Conflicto> {
+        val conflictos = mutableListOf<Conflicto>()
         val materia = materiaRepository.findMateriaByCodigo(nuevaMateria.codigo).get()
         val correlativas = materiaRepository.findAllByCodigoIn(nuevaMateria.correlativas).toMutableList()
-
+        if (correlativas.size != nuevaMateria.correlativas.size) {
+            conflictos.add(Conflicto(nuevaMateria.fila, "Hay materias correlativas que se quisieron cargar y no existen"))
+        }
         val  requisitosCiclo = crearRequisitos(nuevaMateria, plan)
 
         materia.actualizarRequisitos(correlativas, requisitosCiclo)
 
         materiaRepository.save(materia)
+
+        return conflictos
     }
 
     private fun crearRequisitos(nuevaMateria: MateriaParaCargar, plan: Plan): MutableList<RequisitoCiclo> {

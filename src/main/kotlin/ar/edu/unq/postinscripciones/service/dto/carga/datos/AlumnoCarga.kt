@@ -12,6 +12,7 @@ data class AlumnoCarga(
     val calidad: Calidad,
     val regular: Regular,
     val locacion: Locacion,
+    val correo: String? = null,
     val fila: Int
 ) {
     fun aModelo(): Alumno {
@@ -19,7 +20,7 @@ data class AlumnoCarga(
             dni,
             nombre,
             apellido,
-            "${dni}_${apellido}@alu.unque.edu.ar",
+            correo ?: "${dni}_${apellido}@alu.unque.edu.ar",
             "",
             propuesta,
             propuesta == Carrera.P && plan == 2010,

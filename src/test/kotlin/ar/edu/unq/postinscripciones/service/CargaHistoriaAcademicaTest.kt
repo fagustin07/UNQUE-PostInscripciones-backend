@@ -253,6 +253,48 @@ class CargaHistoriaAcademicaTest {
         assertThat(cursadasAlumno.first().estado).isEqualTo(EstadoMateria.APROBADO)
     }
 
+    @Test
+    fun `se pueden generar conflictos al cargar las historias academicas`() {
+        val alumno = alumnoService.crear(
+            FormularioCrearAlumno(
+                12345678,
+                "fede",
+                "sanchez",
+                "fede@test.com",
+                12345,
+                Carrera.P,
+                3.22
+            )
+        )
+        val materia = materiaService.crear("Funcional", "FUN-205", mutableListOf(), Carrera.PW)
+
+        val dniInexistente = 9999999
+        val codigoInexistente = "NO_EXISTE"
+        val conflictos = alumnoService.subirHistoriaAcademica(
+            listOf(
+                AlumnoMateriaCursada(
+                    alumno.dni,
+                    codigoInexistente,
+                    LocalDate.of(2021, 10, 12),
+                    EstadoMateria.APROBADO,
+                    2132
+                ),
+                AlumnoMateriaCursada(
+                    dniInexistente,
+                    materia.codigo,
+                    LocalDate.of(2021, 10, 12),
+                    EstadoMateria.APROBADO,
+                    2133
+                )
+            )
+        )
+
+        assertThat(conflictos).hasSize(2)
+        assertThat(conflictos.first().fila).isEqualTo(2132)
+        assertThat(conflictos.first().mensaje).isEqualTo("No existe la materia con codigo $codigoInexistente")
+        assertThat(conflictos.last().fila).isEqualTo(2133)
+        assertThat(conflictos.last().mensaje).isEqualTo("No existe el alumno con dni $dniInexistente")
+    }
     @AfterEach
     fun tearDown() {
         materiaService.borrarTodos()

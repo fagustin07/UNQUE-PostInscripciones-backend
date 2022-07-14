@@ -69,8 +69,10 @@ class AlumnoService {
                 alumnoRepository.save(alumno)
             } else {
                 val alumno = nuevoAlumno.aModelo()
-                alumno.contrasenia = passwordEncoder.encode("alumno")
-                alumno.estadoCuenta = EstadoCuenta.CONFIRMADA
+                if (nuevoAlumno.correo == null) {
+                    alumno.contrasenia = passwordEncoder.encode("alumno")
+                    alumno.estadoCuenta = EstadoCuenta.CONFIRMADA
+                }
                 alumnoRepository.save(alumno)
             }
         }
@@ -79,14 +81,26 @@ class AlumnoService {
     }
 
     @Transactional
-    fun subirHistoriaAcademica(alumnosMateriaCursada: List<AlumnoMateriaCursada>): List<ConflictoHistoriaAcademica> {
+    fun subirHistoriaAcademica(alumnosMateriaCursada: List<AlumnoMateriaCursada>): MutableList<Conflicto> {
+        val conflictos = mutableListOf<Conflicto>()
         alumnosMateriaCursada.forEach { alumnoMateriaCursada ->
-            val alumno = alumnoRepository.findById(alumnoMateriaCursada.dni).get()
-            val materia = materiaRepository.findMateriaByCodigo(alumnoMateriaCursada.codigo).get()
-            alumno.agregarMateriaCursada(materia, alumnoMateriaCursada.fecha, alumnoMateriaCursada.resultado)
-            alumnoRepository.save(alumno)
+            val existeAlumno = alumnoRepository.findById(alumnoMateriaCursada.dni)
+            if (existeAlumno.isPresent) {
+                val alumno = existeAlumno.get()
+                val existeMateria = materiaRepository.findMateriaByCodigo(alumnoMateriaCursada.codigo)
+                if (existeMateria.isPresent) {
+                    val materia = existeMateria.get()
+                    alumno.agregarMateriaCursada(materia, alumnoMateriaCursada.fecha, alumnoMateriaCursada.resultado)
+                    alumnoRepository.save(alumno)
+                } else {
+                    conflictos.add(Conflicto(alumnoMateriaCursada.fila, "No existe la materia con codigo ${alumnoMateriaCursada.codigo}"))
+                }
+            } else {
+                conflictos.add(Conflicto(alumnoMateriaCursada.fila, "No existe el alumno con dni ${alumnoMateriaCursada.dni}"))
+            }
         }
-        return emptyList()
+
+        return conflictos
     }
 
     @Transactional

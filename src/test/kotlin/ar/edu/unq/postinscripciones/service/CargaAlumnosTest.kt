@@ -1,21 +1,24 @@
 package ar.edu.unq.postinscripciones.service
 
-import ar.edu.unq.postinscripciones.model.Calidad
-import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.EstadoInscripcion
-import ar.edu.unq.postinscripciones.model.Regular
+import ar.edu.unq.postinscripciones.model.*
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.AlumnoCarga
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.Conflicto
 import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 
 @IntegrationTest
 class CargaAlumnosTest {
+
     @Autowired
     private lateinit var alumnoService: AlumnoService
+
+    @Autowired
+    private lateinit var autenticacionService: AutenticacionService
 
     @Test
     fun `se puede cargar nuevos alumnos`() {
@@ -32,6 +35,7 @@ class CargaAlumnosTest {
                     Calidad.Activo,
                     Regular.S,
                     Locacion.General_Belgrano,
+                    null,
                     123
                 )
             )
@@ -61,6 +65,7 @@ class CargaAlumnosTest {
                     Calidad.Activo,
                     Regular.S,
                     Locacion.General_Belgrano,
+                    null,
                     123
                 )
             )
@@ -78,6 +83,7 @@ class CargaAlumnosTest {
                     Calidad.Pasivo,
                     Regular.N,
                     Locacion.General_Belgrano,
+                    null,
                     125
                 )
             )
@@ -110,6 +116,7 @@ class CargaAlumnosTest {
                     Calidad.Activo,
                     Regular.S,
                     Locacion.General_Belgrano,
+                    null,
                     123
                 )
             )
@@ -127,6 +134,7 @@ class CargaAlumnosTest {
                     Calidad.Pasivo,
                     Regular.N,
                     Locacion.General_Belgrano,
+                    null,
                     125
                 )
             )
@@ -155,6 +163,7 @@ class CargaAlumnosTest {
                     Calidad.Activo,
                     Regular.S,
                     Locacion.General_Belgrano,
+                    null,
                     123
                 )
             )
@@ -172,6 +181,7 @@ class CargaAlumnosTest {
                     Calidad.Pasivo,
                     Regular.N,
                     Locacion.General_Belgrano,
+                    null,
                     125
                 )
             )
@@ -200,6 +210,7 @@ class CargaAlumnosTest {
                     Calidad.Activo,
                     Regular.S,
                     Locacion.General_Belgrano,
+                    null,
                     123
                 )
             )
@@ -217,6 +228,7 @@ class CargaAlumnosTest {
                     Calidad.Pasivo,
                     Regular.N,
                     Locacion.General_Belgrano,
+                    null,
                     125
                 )
             )
@@ -245,6 +257,7 @@ class CargaAlumnosTest {
                     Calidad.Activo,
                     Regular.S,
                     Locacion.General_Belgrano,
+                    null,
                     123
                 )
             )
@@ -264,6 +277,7 @@ class CargaAlumnosTest {
                     Calidad.Pasivo,
                     Regular.N,
                     Locacion.General_Belgrano,
+                    null,
                     125
                 )
             )
@@ -275,6 +289,66 @@ class CargaAlumnosTest {
         assertThat(alumnoAntesDeSegundaCarga.carrera).isEqualTo(Carrera.P)
         assertThat(alumnoAntesDeSegundaCarga.cursaTPI2010).isTrue
         assertThat(alumnoCargado.cursaTPI2010).isFalse
+    }
+
+    @Test
+    fun `si no se recibe un correo se autogenera uno y se le confirma la cuenta con contrasenia alumno`() {
+        val dni = 123456
+        alumnoService.subirAlumnos(
+            listOf(
+                AlumnoCarga(
+                    dni,
+                    "Flavio",
+                    "Estigarribia",
+                    Carrera.P,
+                    2010,
+                    EstadoInscripcion.Aceptado,
+                    Calidad.Activo,
+                    Regular.S,
+                    Locacion.General_Belgrano,
+                    null,
+                    123
+                )
+            )
+        )
+
+        val alumnoCargado = alumnoService.buscarAlumno(dni)
+        assertThat(alumnoCargado.estadoCuenta).isEqualTo(EstadoCuenta.CONFIRMADA)
+        assertThat(alumnoCargado.correo).isEqualTo("${alumnoCargado.dni}_${alumnoCargado.apellido}@alu.unque.edu.ar")
+        assertThat(autenticacionService.loguearse(alumnoCargado.dni,"alumno")).isNotBlank
+    }
+
+    @Test
+    fun `si se recibe un correo no se guarda una cuenta confirmada`() {
+        val dni = 123456
+        val correo = "micorreo@unq.edu.ar"
+        alumnoService.subirAlumnos(
+            listOf(
+                AlumnoCarga(
+                    dni,
+                    "Flavio",
+                    "Estigarribia",
+                    Carrera.P,
+                    2010,
+                    EstadoInscripcion.Aceptado,
+                    Calidad.Activo,
+                    Regular.S,
+                    Locacion.General_Belgrano,
+                    correo,
+                    123
+                )
+            )
+        )
+
+        val alumnoCargado = alumnoService.buscarAlumno(dni)
+
+        val excepcion = assertThrows<ErrorDeNegocio> {
+            autenticacionService.loguearse(alumnoCargado.dni,"alumno")
+        }
+
+        assertThat(alumnoCargado.estadoCuenta).isEqualTo(EstadoCuenta.SIN_CONFIRMAR)
+        assertThat(alumnoCargado.correo).isEqualTo(correo)
+        assertThat(excepcion.message).isEqualTo("Cree o confirme su cuenta")
     }
 
     @AfterEach
