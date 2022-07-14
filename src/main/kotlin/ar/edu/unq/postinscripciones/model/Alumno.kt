@@ -142,6 +142,7 @@ class Alumno(
         ).map { it.materia }
     }
 
+    fun esRegular() = calidad == Calidad.Activo && regular == Regular.S && estadoInscripcion == EstadoInscripcion.Aceptado
     fun cantidadAprobadas() = historiaAcademica.count { it.estado == EstadoMateria.APROBADO }
 
     fun haAprobado(materia: Materia) = this.materiasAprobadas().any { it.esLaMateria(materia) }

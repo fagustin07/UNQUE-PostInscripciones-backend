@@ -250,7 +250,7 @@ class AlumnoService {
                 .orElseThrow { CuatrimestreNoEncontrado() }
         val alumno =
             alumnoRepository.findById(dni).orElseThrow { AlumnoNoEncontrado(dni) }
-
+        this.checkEsRegular(alumno)
         val comisionesOfertadas = comisionRepository.findByCuatrimestre(cuatrimestreObtenido).filter { alumno.cumpleLocacion(it) }
         val codigos: List<String> = comisionesOfertadas.map { it.materia }.groupBy { it.codigo }.map { it.key }
         val materiasOfertadas: List<Materia> = materiaRepository.findAllByCodigoIn(codigos)
@@ -262,6 +262,12 @@ class AlumnoService {
                 materia.nombre,
                 comisiones.map { ComisionParaAlumno.desdeModelo(it) }.toMutableList()
             )
+        }
+    }
+
+    private fun checkEsRegular(alumno: Alumno) {
+        if(!alumno.esRegular()){
+            throw ErrorDeNegocio("El alumno no puede cursar las materias disponibles")
         }
     }
 
@@ -442,7 +448,6 @@ class AlumnoService {
             cuatrimestreRepository.findByAnioAndSemestre(cuatrimestre.anio, cuatrimestre.semestre)
                 .orElseThrow { CuatrimestreNoEncontrado() }
         this.checkFecha(cuatrimestreObtenido.inicioInscripciones, cuatrimestreObtenido.finInscripciones, fechaCarga)
-
         val solicitudes = chequearSiPuedeCursarYObtenerSolicitudes(alumno, cuatrimestre, idComisiones)
         val comisionesInscripto = comisionesInscriptoIds.map {
             val comision = comisionRepository.findById(it).orElseThrow {

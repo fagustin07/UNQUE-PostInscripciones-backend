@@ -281,8 +281,10 @@ class DataSeed(
                 "Arenales",
                 "jorge.arenales20@alu.edu.ar",
                 contrasenia,
-                Carrera.PW
-
+                Carrera.PW,
+                calidad = Calidad.Activo,
+                regular = Regular.S,
+                estadoInscripcion = EstadoInscripcion.Aceptado
             )
             val bartolo = Alumno(
                 12345677,
@@ -290,7 +292,10 @@ class DataSeed(
                 "Gutierrez",
                 "bartolito@alu.edu.ar",
                 contrasenia,
-                Carrera.PW
+                Carrera.PW,
+                calidad = Calidad.Activo,
+                regular = Regular.S,
+                estadoInscripcion = EstadoInscripcion.Aceptado
             )
             val maria = Alumno(
                 12345680,
@@ -298,7 +303,10 @@ class DataSeed(
                 "Jimenez",
                 "mjimenez@alu.edu.ar",
                 contrasenia,
-                Carrera.PW
+                Carrera.PW,
+                calidad = Calidad.Activo,
+                regular = Regular.S,
+                estadoInscripcion = EstadoInscripcion.Aceptado
             )
             val roberto = Alumno(
                 12345679,
@@ -306,7 +314,10 @@ class DataSeed(
                 "Sanchez",
                 "rsanchez@alu.edu.ar",
                 contrasenia,
-                Carrera.P
+                Carrera.P,
+                calidad = Calidad.Activo,
+                regular = Regular.S,
+                estadoInscripcion = EstadoInscripcion.Aceptado
             )
 
             val firulais = Alumno(
@@ -316,7 +327,10 @@ class DataSeed(
                 "ftercero@alu.edu.ar",
                 contrasenia,
                 Carrera.P,
-                locacion = Locacion.General_Belgrano
+                locacion = Locacion.General_Belgrano,
+                calidad = Calidad.Activo,
+                regular = Regular.S,
+                estadoInscripcion = EstadoInscripcion.Aceptado
             )
 
             val sofia = Alumno(
@@ -325,7 +339,10 @@ class DataSeed(
                 "Sofia",
                 "ssofia@alu.edu.ar",
                 contrasenia,
-                Carrera.P
+                Carrera.P,
+                calidad = Calidad.Activo,
+                regular = Regular.N,
+                estadoInscripcion = EstadoInscripcion.Aceptado
             )
             cuatrimestreRepository.save(cuatrimestre)
             cuatrimestreRepository.save(cuatrimestre2019S1)
