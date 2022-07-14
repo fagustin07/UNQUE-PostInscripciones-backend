@@ -16,7 +16,6 @@ import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaComision
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaResumenDTO
 import ar.edu.unq.postinscripciones.webservice.config.security.JWTTokenUtil
-import io.swagger.annotations.ApiModelProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -121,9 +120,11 @@ class AlumnoService {
                 }
                 if (historiaAcademica.isEmpty()) {
                     conflictoHistoriaAcademicaAlumnos
-                        .add(ConflictoHistoriaAcademica(alumno.dni, "-", "No se modificó " +
+                        .add(
+                            ConflictoHistoriaAcademica(alumno.dni, "-", "No se modificó " +
                                 "la historia academica ya que se presentó una lista con materias inválidas que " +
-                                "hizo que quede vacía"))
+                                "hizo que quede vacía")
+                        )
                 } else {
                     alumno.actualizarHistoriaAcademica(historiaAcademica)
                     alumnoRepository.save(alumno)
@@ -552,21 +553,3 @@ class AlumnoService {
         alumnoRepository.findAll().forEach { alumnoRepository.deleteById(it.dni) }
     }
 }
-
-data class ConflictoAlumno(
-    @ApiModelProperty(example = "12345678")
-    val dni: Int,
-    @ApiModelProperty(example = "45965")
-    val legajo: Int,
-    @ApiModelProperty(example = "hay conflicto con el alumno ... y legajo ...")
-    val mensaje: String
-)
-
-data class ConflictoHistoriaAcademica(
-    @ApiModelProperty(example = "12345678")
-    val dni: Int,
-    @ApiModelProperty(example = "231321")
-    val materia: String,
-    @ApiModelProperty(example = "Materia no encontrada")
-    val mensaje: String
-)

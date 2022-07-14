@@ -12,7 +12,9 @@ import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.cuatrimestre.OfertaAcademicaDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioDirectorDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.SolicitudSobrecupoDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.ConflictoMateria
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDTO
+import ar.edu.unq.postinscripciones.service.dto.materia.MateriaDetalle
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaPorSolicitudes
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
