@@ -235,6 +235,16 @@ class Alumno(
             this.cursaTPI2010 = datosActualizados.plan == 2010
         }
     }
+
+    fun cumpleLocacion(comision: Comision): Boolean {
+        return if(this.locacion == Locacion.General_Belgrano){
+            comision.locacion == Locacion.General_Belgrano
+        } else if(comision.locacion == Locacion.General_Belgrano){
+            this.locacion == Locacion.General_Belgrano
+        } else {
+            true
+        }
+    }
 }
 
 enum class EstadoCuenta {

@@ -251,7 +251,7 @@ class AlumnoService {
         val alumno =
             alumnoRepository.findById(dni).orElseThrow { AlumnoNoEncontrado(dni) }
 
-        val comisionesOfertadas = comisionRepository.findByCuatrimestre(cuatrimestreObtenido)
+        val comisionesOfertadas = comisionRepository.findByCuatrimestre(cuatrimestreObtenido).filter { alumno.cumpleLocacion(it) }
         val codigos: List<String> = comisionesOfertadas.map { it.materia }.groupBy { it.codigo }.map { it.key }
         val materiasOfertadas: List<Materia> = materiaRepository.findAllByCodigoIn(codigos)
         val materiasQuePuedeCursar = chequeadorDeMateriaDisponible.materiasQuePuedeCursar(alumno, materiasOfertadas)

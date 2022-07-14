@@ -15,6 +15,7 @@ import ar.edu.unq.postinscripciones.service.AutenticacionService
 import ar.edu.unq.postinscripciones.service.ComisionService
 import ar.edu.unq.postinscripciones.service.dto.CreacionDirectivo
 import ar.edu.unq.postinscripciones.service.dto.alumno.AlumnoConHistoriaAcademica
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import ar.edu.unq.postinscripciones.service.dto.materia.MateriaCursadaDTO
 import org.springframework.beans.factory.annotation.Autowired
@@ -266,7 +267,7 @@ class DataSeed(
             val introc1 = Comision(intro, 1, cuatrimestre, introhorariosc1)
             val introc2 = Comision(intro, 2, cuatrimestre, introhorariosc2)
             val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
-            val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1)
+            val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1, locacion = Locacion.General_Belgrano)
 
             val bddc12019S1 = Comision(bdd, 1, cuatrimestre2019S1, bddhorariosc1)
             val matec12019S1 = Comision(mate1, 1, cuatrimestre2019S1, matehorarios)
@@ -314,7 +315,8 @@ class DataSeed(
                 "Tercero",
                 "ftercero@alu.edu.ar",
                 contrasenia,
-                Carrera.P
+                Carrera.P,
+                locacion = Locacion.General_Belgrano
             )
 
             val sofia = Alumno(
