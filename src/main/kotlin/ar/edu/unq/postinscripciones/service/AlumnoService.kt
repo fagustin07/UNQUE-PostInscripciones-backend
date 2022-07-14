@@ -206,7 +206,9 @@ class AlumnoService {
             solicitudSobrecupoRepository.findById(solicitudId).orElseThrow { RecursoNoEncontrado("No existe la solicitud") }
         val formulario = formularioRepository.findById(formularioId).orElseThrow { FormularioNoEncontrado(formularioId) }
 
-        chequearEstado(formulario, fecha)
+        chequearEstadoFormulario(formulario)
+        chequearFechaDeInscripcion(formulario, fecha)
+
         val materia = solicitud.comision.materia
         if(estado == EstadoSolicitud.APROBADO && formulario.tieneAprobadaAlgunaDe(materia)) {
             throw ErrorDeNegocio("El alumno ya tiene una comision aprobada de la materia ${materia.nombre}")
@@ -237,7 +239,7 @@ class AlumnoService {
         alumnos.forEach {
             if(it.yaGuardoUnFormulario(cuatrimestreObtenido)) {
                 val formulario = it.obtenerFormulario(cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
-                chequearEstado(formulario, fecha)
+                chequearFechaDeInscripcion(formulario, fecha)
                 formulario.cerrarFormulario()
             }
         }
@@ -486,16 +488,19 @@ class AlumnoService {
         return solicitudes
     }
 
-    private fun chequearEstado(formulario: Formulario, fecha: LocalDateTime) {
+    private fun chequearEstadoFormulario(formulario: Formulario) {
+        if (formulario.estado == EstadoFormulario.CERRADO) {
+            throw ErrorDeNegocio("No se puede cambiar el estado de esta solicitud, el formulario al que pertenece se encuentra cerrado")
+        }
+    }
+
+    private fun chequearFechaDeInscripcion(formulario: Formulario, fecha: LocalDateTime) {
         val cuatrimestreObtenido = cuatrimestreRepository
-            .findByAnioAndSemestre(formulario.cuatrimestre.anio, formulario.cuatrimestre.semestre)
-            .get()
+                .findByAnioAndSemestre(formulario.cuatrimestre.anio, formulario.cuatrimestre.semestre)
+                .get()
 
         if (cuatrimestreObtenido.finInscripciones > fecha && formulario.estado != EstadoFormulario.CERRADO) {
             throw ErrorDeNegocio("No se puede cambiar el estado de esta solicitud, la fecha de inscripciones no ha concluido")
-        }
-        if (formulario.estado == EstadoFormulario.CERRADO) {
-            throw ErrorDeNegocio("No se puede cambiar el estado de esta solicitud, el formulario al que pertenece se encuentra cerrado")
         }
     }
 
