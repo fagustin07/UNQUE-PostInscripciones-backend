@@ -7,19 +7,23 @@ import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import java.util.*
 import javax.persistence.Tuple
 
 @Repository
 interface AlumnoRepository : CrudRepository<Alumno, Int> {
-    fun findByDniOrLegajo(dni: Int, legajo: Int): Optional<Alumno>
 
     @Query(
-        "FROM Alumno " +
-        "WHERE CAST(dni as string) LIKE concat(:dniString, '%') " +
-        "ORDER BY coeficiente DESC"
+        "SELECT a " +
+        "FROM Alumno as a " +
+        "LEFT JOIN MateriaCursada as m " +
+            "ON m.id IN ( " +
+            "SELECT m2.id FROM a.historiaAcademica as m2 WHERE m2.estado = ?2 " +
+        ") " +
+        "WHERE CAST(dni as string) LIKE concat(?1, '%') " +
+        "GROUP BY a.dni " +
+        "ORDER BY count(m) DESC"
     )
-    fun findByDniStartsWithOrderByCoeficienteDesc(dniString: String): List<Alumno>
+    fun findByDniStartsWithOrderByCantAprobadasDesc(dniString: String, estadoMateria: EstadoMateria = EstadoMateria.APROBADO ): List<Alumno>
 
     @Query(
         "SELECT alu.dni, afs.formulario_id, afs.solicitud_id, count(mc.id) AS aprobadas\n" +
@@ -53,7 +57,7 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
     )
     fun findResumenHistoriaAcademica(dni: Int): List<Tuple>
     @Query(
-        "SELECT a.dni, a.nombre, a.apellido, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas, a.coeficiente, s.estado " +
+        "SELECT a.dni, a.nombre, a.apellido, f.id, s.id, s.comision.numero, s.comision.materia.codigo, count(m) as materias_aprobadas, s.estado " +
         "FROM Alumno as a " +
         "JOIN Formulario as f " +
             "ON f.id IN (SELECT f2.id FROM a.formularios as f2) " +
@@ -67,12 +71,12 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
             ") " +
         "WHERE f.cuatrimestre.semestre = ?3 AND f.cuatrimestre.anio = ?4 AND (?5 IS NULL OR (?5 IS TRUE AND s.estado = ?7) OR (?5 IS FALSE AND NOT s.estado = ?7)) " +
         "GROUP BY a.dni, f.id, s.id, s.comision.numero, s.comision.materia.codigo " +
-        "ORDER BY a.coeficiente DESC"
+        "ORDER BY count(m) DESC"
     )
     fun findBySolicitaMateriaAndComisionMOrderByCantidadAprobadas(codigo: String, numero : Int?, semestre: Semestre, anio: Int, pendiente: Boolean?,estado : EstadoMateria = EstadoMateria.APROBADO, estadoSolicitud: EstadoSolicitud = EstadoSolicitud.PENDIENTE): List<Tuple>
 
     @Query(
-        "SELECT a.dni, a.nombre, a.apellido, a.correo, a.legajo, a.coeficiente, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(solicitudes_pendientes) as total_solicitudes_pendientes, count(solicitudes_aprobadas) as total_solicitudes_aprobadas " +
+        "SELECT a.dni, a.nombre, a.apellido, a.correo, f.id, f.estado, f.comisionesInscripto.size as total_materias_inscripto, count(solicitudes_pendientes) as total_solicitudes_pendientes, count(solicitudes_aprobadas) as total_solicitudes_aprobadas, count(m), a.locacion, a.regular, a.calidad, a.estadoInscripcion " +
         "FROM Alumno as a " +
             "JOIN Formulario as f " +
                 "ON f.id IN (SELECT f2.id FROM a.formularios as f2 WHERE f2.cuatrimestre.semestre = ?2 AND f2.cuatrimestre.anio = ?3) " +
@@ -84,11 +88,15 @@ interface AlumnoRepository : CrudRepository<Alumno, Int> {
                 "ON solicitudes_aprobadas.id IN ( " +
                     "SELECT solicitudes.id FROM f.solicitudes as solicitudes WHERE solicitudes.estado = ?7 " +
                 ") " +
+            "LEFT JOIN MateriaCursada as m " +
+                "ON m.id IN ( " +
+                    "SELECT m2.id FROM a.historiaAcademica as m2 WHERE m2.estado = ?7 " +
+                ") " +
         "WHERE (?1 IS NULL OR concat(a.dni, '') LIKE %?1% ) " +
-        "GROUP BY a.dni, a.nombre, a.apellido, a.correo, a.legajo, f.id " +
+        "GROUP BY a.dni, a.nombre, a.apellido, a.correo, f.id " +
         "HAVING (?4 IS NULL OR (?4 IS TRUE AND f.solicitudes.size = count(solicitudes_pendientes)) OR (?4 IS FALSE AND NOT f.solicitudes.size = count(solicitudes_pendientes))) " +
-            "AND (?5 IS NULL OR (?5 IS TRUE AND count(solicitudes_pendientes) > 0)) " +
-        "ORDER BY a.coeficiente DESC"
+            "AND (?5 IS NULL OR (?5 IS TRUE AND count(solicitudes_pendientes) > 0) OR (?5 IS FALSE AND count(solicitudes_pendientes) = 0)) " +
+        "ORDER BY count(m) DESC"
     )
     fun findAllByDni(dni: String?, semestre: Semestre, anio: Int, sinProcesar: Boolean? = null, pendiente: Boolean? = null, estado : EstadoSolicitud = EstadoSolicitud.PENDIENTE, estadoAprobado : EstadoSolicitud = EstadoSolicitud.APROBADO): List<Tuple>
 }

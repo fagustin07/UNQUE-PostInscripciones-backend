@@ -26,4 +26,12 @@ class MateriaCursada(
         estado = nuevoEstado
         fechaDeCarga = LocalDate.now()
     }
+
+    fun esElResultado(materia: Materia, fecha: LocalDate, resultado: EstadoMateria): Boolean {
+        return this.materia.codigo == materia.codigo && this.fechaDeCarga == fecha && resultado == this.estado
+    }
+
+    fun fueSubido(materia: Materia, fecha: LocalDate): Boolean {
+        return this.materia.codigo == materia.codigo && this.fechaDeCarga == fecha
+    }
 }

@@ -1,5 +1,17 @@
 package ar.edu.unq.postinscripciones.model
 
 enum class Carrera {
-    TPI, LI, SIMULTANEIDAD
+    P, W, PW
+}
+
+enum class EstadoInscripcion {
+    Aceptado, Pendiente
+}
+
+enum class Calidad {
+    Activo, Pasivo
+}
+
+enum class Regular {
+    S, N
 }

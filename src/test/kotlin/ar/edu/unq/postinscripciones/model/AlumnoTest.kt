@@ -3,6 +3,7 @@ package ar.edu.unq.postinscripciones.model
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,7 +19,7 @@ internal class AlumnoTest {
     fun `set up`() {
         comisionBdd = Comision()
         otraComision = Comision(numero = 5)
-        alumno = Alumno(carrera = Carrera.TPI)
+        alumno = Alumno(carrera = Carrera.P)
     }
 
     @Test
@@ -59,7 +60,7 @@ internal class AlumnoTest {
     }
 
     @Test
-    fun `un alumno conoce su legajo`() {
+    fun `un alumno conoce su dni`() {
         alumno = Alumno(dni = 90)
 
         assertThat(alumno.dni).isEqualTo(90)
@@ -94,17 +95,26 @@ internal class AlumnoTest {
     }
 
     @Test
-    fun `un alumno conoce su dni`() {
-        alumno = Alumno(legajo = 123)
+    fun `Un alumno conoce la carrera en la que se encuentra inscripto`() {
+        alumno = Alumno(carrera = Carrera.P)
 
-        assertThat(alumno.legajo).isEqualTo(123)
+        assertThat(alumno.carrera).isEqualTo(Carrera.P)
     }
 
     @Test
-    fun `Un alumno conoce la carrera en la que se encuentra inscripto`() {
-        alumno = Alumno(carrera = Carrera.TPI)
+    fun `un alumno conoce su locacion`() {
+        alumno = Alumno(locacion = Locacion.General_Belgrano)
 
-        assertThat(alumno.carrera).isEqualTo(Carrera.TPI)
+        assertThat(alumno.locacion).isEqualTo(Locacion.General_Belgrano)
+    }
+
+    @Test
+    fun `un alumno conoce sus estados de inscripcion`() {
+        alumno = Alumno()
+
+        assertThat(alumno.estadoInscripcion).isEqualTo(EstadoInscripcion.Aceptado)
+        assertThat(alumno.regular).isEqualTo(Regular.S)
+        assertThat(alumno.calidad).isEqualTo(Calidad.Activo)
     }
 
     @Test
@@ -140,24 +150,6 @@ internal class AlumnoTest {
         alumno.cargarHistoriaAcademica(materiaCursada1)
 
         assertThat(alumno.materiasAprobadas()).usingRecursiveComparison().isEqualTo(listOf(materiaCursada1.materia))
-    }
-
-    @Test
-    fun `Un alumno conoce su coeficiente`() {
-        val nuevoCoeficiente = 5.23
-
-        alumno.cambiarCoeficiente(nuevoCoeficiente)
-
-        assertThat(alumno.coeficiente).isEqualTo(nuevoCoeficiente)
-    }
-
-    @Test
-    fun `A un alumno se le puede modificar su coeficiente`() {
-        val coeficienteAntes = alumno.coeficiente
-        alumno.cambiarCoeficiente(7.0)
-
-        assertThat(alumno.coeficiente).isEqualTo(7.0)
-        assertThat(alumno.coeficiente).isNotEqualTo(coeficienteAntes)
     }
 
     @Test

@@ -2,7 +2,8 @@ package ar.edu.unq.postinscripciones.webservice.config.security
 
 import ar.edu.unq.postinscripciones.model.Alumno
 import ar.edu.unq.postinscripciones.model.Directivo
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.AlumnoNoEncontrado
+import ar.edu.unq.postinscripciones.model.exception.RecursoNoEncontrado
 import ar.edu.unq.postinscripciones.persistence.AlumnoRepository
 import ar.edu.unq.postinscripciones.persistence.DirectivoRepository
 import io.jsonwebtoken.ExpiredJwtException
@@ -92,7 +93,7 @@ class JwtUserDetailsService {
 
     @Transactional
     fun cargarAlumno(dni: Int): UserDetails {
-        val alumno: Alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("Alumno no encontrado") }
+        val alumno: Alumno = alumnoRepository.findById(dni).orElseThrow { AlumnoNoEncontrado(dni) }
 
         return SpringUserDetails(
             alumno.dni.toString(), alumno.contrasenia,
@@ -103,7 +104,7 @@ class JwtUserDetailsService {
     @Transactional
     fun cargarDirectivo(correo: String): UserDetails {
         val directivo: Directivo =
-            directivoRepository.findById(correo).orElseThrow { ExcepcionUNQUE("Directivo no encontrado") }
+            directivoRepository.findById(correo).orElseThrow { RecursoNoEncontrado("Directivo no encontrado") }
 
         return SpringUserDetails(
             directivo.correo, directivo.contrasenia,

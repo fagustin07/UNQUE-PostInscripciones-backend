@@ -7,7 +7,8 @@ import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.comision.ComisionACrear
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.ComisionNueva
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioComision
@@ -50,17 +51,17 @@ internal class ComisionServiceTest {
     @BeforeEach
     fun setUp() {
         val alumno =
-            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.LI, 5.0))
+            alumnoService.crear(FormularioCrearAlumno(123312, "", "", "", 1234, Carrera.W, 5.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.LI, 5.0))
+            alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.W, 5.0))
 
-        bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.SIMULTANEIDAD)
+        bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.PW)
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
 
         horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
 
         val formulario = FormularioComision(
@@ -75,8 +76,8 @@ internal class ComisionServiceTest {
         )
         comision = comisionService.crear(formulario)
         horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formulario2 = FormularioComision(
             2,
@@ -125,32 +126,37 @@ internal class ComisionServiceTest {
 
     @Test
     fun `No se puede obtener una comision que no existe`() {
-        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtener(99999) }
+        val idInexistente: Long = 99999
+        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtener(idInexistente) }
 
-        assertThat(exception.message).isEqualTo("No se encuentra la comision")
+        assertThat(exception.message).isEqualTo("La comision con id $idInexistente no existe")
     }
 
     @Test
     fun `No se pueden obtener las comisiones de una materia que no existe`() {
-        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtenerComisionesMateria("AA-209") }
+        val codigoInexistente = "AA-209"
+        val exception = assertThrows<ExcepcionUNQUE> { comisionService.obtenerComisionesMateria(codigoInexistente) }
 
-        assertThat(exception.message).isEqualTo("No se encuentra la materia")
+        assertThat(exception.message).isEqualTo("La materia con codigo $codigoInexistente no se encuentra registrada en el sistema")
     }
 
     @Test
     fun `se puede guardar una oferta academica con un inicio y un fin para registrar formularios`() {
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
         val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
         val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(
-                ComisionACrear(
-                    1,
+                ComisionNueva(
                     bdd.codigo,
-                    30,
-                    8
+                    "Bases de datos",
+                    1,
+                    Modalidad.PRESENCIAL,
+                    Locacion.Bernal,
+                    listOf(),
+                    12
                 ),
             ),
             inicioInscripciones,
@@ -171,7 +177,7 @@ internal class ComisionServiceTest {
         val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(),
             null,
             finInscripciones,
@@ -190,7 +196,7 @@ internal class ComisionServiceTest {
         val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
-        comisionService.actualizarOfertaAcademica(listOf(), inicioInscripciones, finInscripciones)
+        comisionService.subirOferta(listOf(), inicioInscripciones, finInscripciones)
 
         val cuatrimestreActuaActualizado = cuatrimestreService.obtener()
         assertThat(cuatrimestreActuaActualizado.inicioInscripciones).isNotEqualTo(cuatrimestre.inicioInscripciones)
@@ -201,7 +207,7 @@ internal class ComisionServiceTest {
 
     @Test
     fun `obtener la oferta del cuatrimestre actual segun un patron de nombre de materia`() {
-        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.LI)
+        val algoritmos = materiaService.crear("Algoritmos", "ALG-200", mutableListOf(), Carrera.W)
         val formulario = FormularioComision(
             1,
             algoritmos.codigo,
@@ -216,8 +222,52 @@ internal class ComisionServiceTest {
 
         val ofertaObtenida = comisionService.ofertaDelCuatrimestre("DAT")
 
-        assertThat(ofertaObtenida).contains(ComisionDTO.desdeModelo(comision), ComisionDTO.desdeModelo(comision3), ComisionDTO.desdeModelo(comision2))
+        assertThat(ofertaObtenida).contains(
+            ComisionDTO.desdeModelo(comision),
+            ComisionDTO.desdeModelo(comision3),
+            ComisionDTO.desdeModelo(comision2)
+        )
         assertThat(ofertaObtenida).doesNotContain(ComisionDTO.desdeModelo(comisionExcluida))
+    }
+
+    @Test
+    fun `Se puede modificar la cantidad de cupos y sobrecupos totales de una comision persisitida`() {
+        val cambioDeCuposYSobrecupos = CambioDeCuposYSobrecupos(comision.id!!, 40, 2)
+        val comision = comisionService.cambiarCantidadDeCuposYSobreCupos(cambioDeCuposYSobrecupos)
+
+        assertThat(comision.cuposTotales).isEqualTo(40)
+        assertThat(comision.sobreCuposTotales).isEqualTo(2)
+    }
+
+    @Test
+    fun `se puede crear la misma comision para diferentes locaciones`() {
+        val conflictos = comisionService.subirOferta(
+            listOf(
+                ComisionNueva(
+                    bdd.codigo,
+                    bdd.nombre,
+                    5,
+                    Modalidad.VIRTUAL_ASINCRONICA,
+                    Locacion.Bernal,
+                    listOf(),
+                    123
+                ),
+                ComisionNueva(
+                    bdd.codigo,
+                    bdd.nombre,
+                    5,
+                    Modalidad.VIRTUAL_ASINCRONICA,
+                    Locacion.General_Belgrano,
+                    listOf(),
+                    124
+                )
+            )
+        )
+
+        val comisionesBdd = comisionService.obtenerComisionesMateria(bdd.codigo)
+        assertThat(conflictos).isEmpty()
+        assertThat(comisionesBdd.any { it.numero == 5 && it.locacion == Locacion.Bernal }).isTrue
+        assertThat(comisionesBdd.any { it.numero == 5 && it.locacion == Locacion.General_Belgrano }).isTrue
     }
 
     @AfterEach

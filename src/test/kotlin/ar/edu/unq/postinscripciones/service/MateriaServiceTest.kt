@@ -1,6 +1,8 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
+import ar.edu.unq.postinscripciones.model.CicloLI
+import ar.edu.unq.postinscripciones.model.CicloTPI
 import ar.edu.unq.postinscripciones.model.EstadoSolicitud
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.comision.Dia
@@ -8,6 +10,9 @@ import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.MateriaParaCargar
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Plan
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.PlanillaMaterias
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
 import ar.edu.unq.postinscripciones.service.dto.formulario.*
 import ar.edu.unq.postinscripciones.service.dto.materia.Correlativa
@@ -29,11 +34,15 @@ internal class MateriaServiceTest {
 
     @Autowired
     private lateinit var dataService: DataService
+
     @Autowired
     private lateinit var comisionService: ComisionService
 
     @Autowired
     private lateinit var cuatrimestreService: CuatrimestreService
+
+    @Autowired
+    private lateinit var cargaMateriaService: CargaMateriaService
 
     @Autowired
     private lateinit var alumnoService: AlumnoService
@@ -45,15 +54,15 @@ internal class MateriaServiceTest {
 
     @BeforeEach
     fun setUp() {
-        bdd = materiaService.crear("Base de datos", "BD-096", mutableListOf(), Carrera.SIMULTANEIDAD)
-        algo = materiaService.crear("Algoritmos", "AA-208", mutableListOf(), Carrera.SIMULTANEIDAD)
+        bdd = materiaService.crear("Base de datos", "BD-096", mutableListOf(), Carrera.PW)
+        algo = materiaService.crear("Algoritmos", "AA-208", mutableListOf(), Carrera.PW)
 
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
 
         var horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formulario = FormularioComision(
             1,
@@ -67,8 +76,8 @@ internal class MateriaServiceTest {
         )
         comision = comisionService.crear(formulario)
         horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formulario2 = FormularioComision(
             2,
@@ -85,19 +94,19 @@ internal class MateriaServiceTest {
 
     @Test
     fun `Se puede crear una materia`() {
-        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.PW)
         assertThat(materia).isNotNull
     }
 
     @Test
     fun `no se puede crear una materia con un nombre existente`() {
-        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.PW)
         assertThat(materia).isNotNull
     }
 
     @Test
     fun `no se puede crear una materia con un codigo o nombre existente`() {
-        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Intro", "IP-102", mutableListOf(), Carrera.PW)
         val nombreConflictivo = materia.nombre.lowercase()
         val codigoConflictivo = materia.codigo.lowercase()
         val excepcion = assertThrows<ExcepcionUNQUE> {
@@ -105,7 +114,7 @@ internal class MateriaServiceTest {
                 nombreConflictivo,
                 codigoConflictivo,
                 mutableListOf(),
-                Carrera.SIMULTANEIDAD
+                Carrera.PW
             )
         }
 
@@ -118,7 +127,7 @@ internal class MateriaServiceTest {
 
     @Test
     fun `se puede crear una materia con una correlativa`() {
-        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.PW)
         assertThat(materia.correlativas.first()).isEqualTo(bdd.nombre)
     }
 
@@ -129,7 +138,7 @@ internal class MateriaServiceTest {
                 "Orga",
                 "ORGA-101",
                 mutableListOf("EPYL-103"),
-                Carrera.SIMULTANEIDAD
+                Carrera.PW
             )
         }
 
@@ -138,8 +147,8 @@ internal class MateriaServiceTest {
 
     @Test
     fun `Se puede crear una lista de materias`() {
-        val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.SIMULTANEIDAD)
-        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        val intro = FormularioMateria("00487", "Introducción a la Programación", Carrera.PW)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.PW)
         materiaService.crear(listOf(intro, orga))
 
         assertThat(materiaService.todas().map { it.nombre }).containsAll(listOf(intro.nombre, orga.nombre))
@@ -147,14 +156,14 @@ internal class MateriaServiceTest {
 
     @Test
     fun `no se puede crear una lista de materias que ya existen`() {
-        val listaConflictiva = materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096",  Carrera.SIMULTANEIDAD)))
+        val listaConflictiva = materiaService.crear(listOf(FormularioMateria("Base de datos", "BD-096", Carrera.PW)))
 
         assertThat(listaConflictiva.first().mensaje).isEqualTo("Conflicto con la materia ${bdd.nombre} y codigo ${bdd.codigo}")
     }
 
     @Test
     fun `se puede crear una lista de materias con una correlativa`() {
-        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.PW)
         materiaService.crear(listOf(orga))
         val materiasParaActualizar = listOf(MateriaConCorrelativas(orga.codigo, listOf(Correlativa(bdd.codigo))))
         materiaService.actualizarCorrelativas(materiasParaActualizar)
@@ -165,12 +174,15 @@ internal class MateriaServiceTest {
 
     @Test
     fun `no se puede las correlativas de una materia con un codigo inexistente`() {
-        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.SIMULTANEIDAD)
+        val orga = FormularioMateria("01032", "Organización de las Computadoras", Carrera.PW)
         materiaService.crear(listOf(orga))
 
         val resultado = materiaService
-            .actualizarCorrelativas(listOf(
-                MateriaConCorrelativas(orga.codigo, listOf(Correlativa("NO EXISTE")))))
+            .actualizarCorrelativas(
+                listOf(
+                    MateriaConCorrelativas(orga.codigo, listOf(Correlativa("NO EXISTE")))
+                )
+            )
 
         assertThat(resultado.first().mensaje).isEqualTo("No se encontró la correlativa")
     }
@@ -185,20 +197,21 @@ internal class MateriaServiceTest {
     @Test
     fun `Se puede obtener una materia especifica`() {
         val materiaEncontrada = materiaService.obtener(bdd.codigo)
-        bdd.correlativas.size
-        assertThat(materiaEncontrada).usingRecursiveComparison().isEqualTo(bdd)
+
+        assertThat(materiaEncontrada.nombre).isEqualTo(bdd.nombre)
     }
 
     @Test
     fun `No se puede obtener una materia que no existe`() {
-        val exception = assertThrows<ExcepcionUNQUE> { materiaService.obtener("AA-207") }
+        val codigoInexistente = "AA-207"
+        val exception = assertThrows<ExcepcionUNQUE> { materiaService.obtener(codigoInexistente) }
 
-        assertThat(exception.message).isEqualTo("No se encuentra la materia")
+        assertThat(exception.message).isEqualTo("La materia con codigo $codigoInexistente no se encuentra registrada en el sistema")
     }
 
     @Test
     fun `Se puede actualizar las materias correlativas de una materia`() {
-        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.SIMULTANEIDAD)
+        val materia = materiaService.crear("Orga", "ORGA-101", mutableListOf("BD-096"), Carrera.PW)
         val materiasParaActualizar = listOf(MateriaConCorrelativas(materia.codigo, listOf(Correlativa(algo.codigo))))
         materiaService.actualizarCorrelativas(materiasParaActualizar)
 
@@ -211,14 +224,20 @@ internal class MateriaServiceTest {
     @Test
     fun `Obtener comisiones ordenadas por cantidad de solicitudes pendientes`() {
         val alumno1 =
-            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.LI, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(4235, "", "", "", 12341, Carrera.W, 0.0))
         val alumno2 =
-            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.LI, 0.0))
+            alumnoService.crear(FormularioCrearAlumno(42355, "", "", "", 12331, Carrera.W, 0.0))
 
-        val formulario = alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
+        val formulario =
+            alumnoService.guardarSolicitudPara(alumno1.dni, listOf(comision.id!!, comision2.id!!), cuatrimestre)
         alumnoService.guardarSolicitudPara(alumno2.dni, listOf(comision.id!!), cuatrimestre)
 
-        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now().minusDays(1), LocalDateTime.now().minusDays(1), cuatrimestre)
+        comisionService.subirOferta(
+            listOf(),
+            LocalDateTime.now().minusDays(1),
+            LocalDateTime.now().minusDays(1),
+            cuatrimestre
+        )
         alumnoService.cambiarEstadoSolicitud(
             formulario.solicitudes.first().id,
             EstadoSolicitud.APROBADO,
@@ -240,14 +259,196 @@ internal class MateriaServiceTest {
 
     @Test
     fun `se puede modificar una materia ya creada`() {
-        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.LI)
+        val formulario = FormularioModificarMateria("Algoritmoss", algo.codigo, Carrera.W)
         val nuevaMateria = materiaService.modificar(formulario)
 
         val materiaPersistida = materiaService.obtener(algo.codigo)
 
         assertThat(nuevaMateria).usingRecursiveComparison().isNotEqualTo(algo)
         assertThat(nuevaMateria.nombre).isEqualTo(materiaPersistida.nombre)
-        assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera)
+        assertThat(nuevaMateria.carrera).isEqualTo(materiaPersistida.carrera())
+    }
+
+    @Test
+    fun `se carga una materia para el plan de licenciatura y con requisitos de ciclo`() {
+        val codigo = "111"
+        cargaMateriaService.cargarMaterias(
+            PlanillaMaterias(
+                Plan.LI,
+                listOf(
+                    MateriaParaCargar(
+                        CicloTPI.NO_PERTENECE,
+                        CicloLI.NBW,
+                        codigo,
+                        8,
+                        "Objetos I",
+                        listOf(bdd.codigo),
+                        ci = 30,
+                        nbw = 70,
+                        cb = 101,
+                        fila = 123
+                    )
+                )
+            )
+        )
+
+        val materia = materiaService.obtener(codigo)
+        val correlativas = materia.correlativas
+        val requisitos = materia.requisitosCiclo
+
+        assertThat(correlativas).hasSize(1)
+        assertThat(correlativas.all { it.codigo == bdd.codigo }).isTrue
+        assertThat(requisitos).hasSize(3)
+        assertThat(requisitos.any { it.cicloLI == CicloLI.CI && it.creditos == 30 }).isTrue
+        assertThat(requisitos.any { it.cicloLI == CicloLI.NBW && it.creditos == 70 }).isTrue
+        assertThat(requisitos.any { it.cicloLI == CicloLI.CB && it.creditos == 101 }).isTrue
+    }
+
+    @Test
+    fun `se carga una materia para el plan de tpi 2010 y con requisitos de ciclo`() {
+        val codigo = "111"
+        cargaMateriaService.cargarMaterias(
+            PlanillaMaterias(
+                Plan.TPI2010,
+                listOf(
+                    MateriaParaCargar(
+                        CicloTPI.OR,
+                        CicloLI.NO_PERTENECE,
+                        codigo,
+                        8,
+                        "TIP",
+                        listOf(),
+                        co = 30,
+                        ca = 70,
+                        fila = 123
+                    )
+                )
+            )
+        )
+
+        val materia = materiaService.obtener(codigo)
+        val correlativas = materia.correlativas
+        val requisitos = materia.requisitosCiclo
+
+        assertThat(correlativas).hasSize(0)
+        assertThat(requisitos).hasSize(2)
+        assertThat(requisitos.all { it.esTPI2010 }).isTrue
+        assertThat(requisitos.any { it.cicloTPI == CicloTPI.CO && it.creditos == 30 }).isTrue
+        assertThat(requisitos.any { it.cicloTPI == CicloTPI.CA && it.creditos == 70 }).isTrue
+    }
+
+    @Test
+    fun `se carga una materia para el plan de tpi 2015 y con requisitos de ciclo`() {
+        val codigo = "111"
+        cargaMateriaService.cargarMaterias(
+            PlanillaMaterias(
+                Plan.TPI2015,
+                listOf(
+                    MateriaParaCargar(
+                        CicloTPI.OR,
+                        CicloLI.NO_PERTENECE,
+                        codigo,
+                        8,
+                        "TIP",
+                        listOf(),
+                        ci = 30,
+                        cc = 21,
+                        co = 101,
+                        ca = 70,
+                        fila = 123
+                    )
+                )
+            )
+        )
+
+        val materia = materiaService.obtener(codigo)
+        val requisitos = materia.requisitosCiclo
+
+        assertThat(requisitos).hasSize(4)
+        assertThat(requisitos.all { it.esTPI2010 }).isFalse
+        assertThat(requisitos.any { it.cicloTPI == CicloTPI.CI && it.creditos == 30 }).isTrue
+        assertThat(requisitos.any { it.cicloTPI == CicloTPI.CO && it.creditos == 101 }).isTrue
+        assertThat(requisitos.any { it.cicloTPI == CicloTPI.CA && it.creditos == 70 }).isTrue
+        assertThat(requisitos.any { it.cicloTPI == CicloTPI.CC && it.creditos == 21 }).isTrue
+    }
+
+
+    @Test
+    fun `se carga una materia y si existe se notifica que se actualizaran sus datos`() {
+        val codigo = "111"
+        cargaMateriaService.cargarMaterias(
+            PlanillaMaterias(
+                Plan.LI,
+                listOf(
+                    MateriaParaCargar(
+                        CicloTPI.NO_PERTENECE,
+                        CicloLI.NBW,
+                        codigo,
+                        8,
+                        "Objetos I",
+                        listOf(bdd.codigo),
+                        ci = 30,
+                        nbw = 70,
+                        cb = 101,
+                        fila = 123
+                    )
+                )
+            )
+        )
+
+        val conflictos = cargaMateriaService.cargarMaterias(
+            PlanillaMaterias(
+                Plan.TPI2015,
+                listOf(
+                    MateriaParaCargar(
+                        CicloTPI.CO,
+                        CicloLI.NO_PERTENECE,
+                        codigo,
+                        8,
+                        "Objetos I",
+                        listOf(bdd.codigo),
+                        ci = 30,
+                        fila = 98
+                    )
+                )
+            )
+        )
+
+        val materia = materiaService.obtener(codigo)
+
+        assertThat(materia.carrera()).isEqualTo(Carrera.PW)
+        assertThat(conflictos).hasSize(1)
+        assertThat(conflictos.first().fila).isEqualTo(98)
+        assertThat(conflictos.first().mensaje).isEqualTo("La materia $codigo existe y se actualizarán sus datos")
+    }
+
+    @Test
+    fun `se carga una materia y alguna de sus correlativas no existe se notifica`() {
+        val codigo = "111"
+        val conflictos = cargaMateriaService.cargarMaterias(
+            PlanillaMaterias(
+                Plan.TPI2015,
+                listOf(
+                    MateriaParaCargar(
+                        CicloTPI.CO,
+                        CicloLI.NO_PERTENECE,
+                        codigo,
+                        8,
+                        "Objetos I",
+                        listOf("NOEXISTE"),
+                        ci = 30,
+                        fila = 103
+                    )
+                )
+            )
+        )
+
+        val materia = materiaService.obtener(codigo)
+
+        assertThat(materia.correlativas).hasSize(0)
+        assertThat(conflictos).hasSize(1)
+        assertThat(conflictos.first().fila).isEqualTo(103)
+        assertThat(conflictos.first().mensaje).isEqualTo("Hay materias correlativas que se quisieron cargar y no existen")
     }
 
     @AfterEach

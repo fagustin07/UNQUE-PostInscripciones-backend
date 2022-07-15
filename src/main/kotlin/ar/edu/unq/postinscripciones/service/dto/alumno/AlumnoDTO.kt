@@ -1,6 +1,10 @@
 package ar.edu.unq.postinscripciones.service.dto.alumno
 
 import ar.edu.unq.postinscripciones.model.Alumno
+import ar.edu.unq.postinscripciones.model.Calidad
+import ar.edu.unq.postinscripciones.model.EstadoInscripcion
+import ar.edu.unq.postinscripciones.model.Regular
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import io.swagger.annotations.ApiModelProperty
 
 data class AlumnoDTO(
@@ -12,10 +16,16 @@ data class AlumnoDTO(
     val apellido: String,
     @ApiModelProperty(example = "correo@ejemplo.com.ar")
     val correo: String,
-    @ApiModelProperty(example = "12345")
-    val legajo: Int,
-    @ApiModelProperty(example = "5.33")
-    val coeficiente: Double
+    @ApiModelProperty(example = "5")
+    val cantidadAprobadas: Long,
+    @ApiModelProperty(example = "Bernal")
+    val locacion: Locacion,
+    @ApiModelProperty(example = "S")
+    val regular: Regular,
+    @ApiModelProperty(example = "Activo")
+    val calidad: Calidad,
+    @ApiModelProperty(example = "Aceptado")
+    val estado: EstadoInscripcion
 ) {
     companion object {
         fun desdeModelo(alumno: Alumno): AlumnoDTO {
@@ -24,8 +34,11 @@ data class AlumnoDTO(
                 alumno.nombre,
                 alumno.apellido,
                 alumno.correo,
-                alumno.legajo,
-                alumno.coeficiente
+                alumno.cantidadAprobadas().toLong(),
+                alumno.locacion,
+                alumno.regular,
+                alumno.calidad,
+                alumno.estadoInscripcion
             )
         }
     }

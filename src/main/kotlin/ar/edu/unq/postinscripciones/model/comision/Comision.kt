@@ -3,7 +3,8 @@ package ar.edu.unq.postinscripciones.model.comision
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import javax.persistence.*
@@ -23,11 +24,15 @@ class Comision(
     @JoinColumn(name ="comision_id")
     var horarios: MutableList<Horario> = mutableListOf(),
     @Column(nullable = false)
-    val cuposTotales: Int = 30,
+    var cuposTotales: Int = 30,
     @Column(nullable = false)
-    val sobrecuposTotales: Int = 5,
+    var sobrecuposTotales: Int = 5,
     @Column(nullable = false)
-    val modalidad: Modalidad = Modalidad.PRESENCIAL
+    @Enumerated(EnumType.STRING)
+    val modalidad: Modalidad = Modalidad.PRESENCIAL,
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    val locacion: Locacion = Locacion.Bernal
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,11 +47,25 @@ class Comision(
         horarios.addAll(nuevosHorarios)
     }
 
+    fun modificarCuposTotales(cupos: Int) {
+        this.cuposTotales = cupos
+    }
+
+    fun modificarSobreuposTotales(sobrecupos: Int) {
+        if(sobrecuposOcupados > sobrecupos) {
+            throw ErrorDeNegocio(
+                    "No se puede modificar la cantidad de sobrecupos " +
+                            "dado que la cantidad de sobrecupos ocupados es mayor"
+            )
+        }
+        this.sobrecuposTotales = sobrecupos
+    }
+
     fun asignarSobrecupo() {
         if(sobrecuposDisponibles() > 0) {
             sobrecuposOcupados ++
         } else {
-            throw ExcepcionUNQUE("No hay sobrecupos disponibles")
+            throw ErrorDeNegocio("No hay sobrecupos disponibles")
         }
 
     }
@@ -55,7 +74,7 @@ class Comision(
         if(sobrecuposOcupados > 0) {
             sobrecuposOcupados --
         } else {
-            throw ExcepcionUNQUE("No hay sobrecupos ocupados")
+            throw ErrorDeNegocio("No hay sobrecupos ocupados")
         }
 
     }

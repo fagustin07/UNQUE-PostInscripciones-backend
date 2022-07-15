@@ -1,16 +1,15 @@
 package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Carrera
-import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
+import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
-import ar.edu.unq.postinscripciones.service.dto.comision.ComisionACrear
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.ComisionNueva
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCrearAlumno
 import ar.edu.unq.postinscripciones.service.dto.formulario.FormularioCuatrimestre
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 
 @IntegrationTest
@@ -43,10 +42,10 @@ internal class ServiceDataTest {
 
         val alumnosRegistrados = alumnoService.todos()
         assertThat(alumnosRegistrados.size).isEqualTo(planillaAlumnos.size)
-        assertThat(alumnosRegistrados)
+        assertThat(planillaAlumnos)
             .usingRecursiveComparison()
-            .ignoringFields("formularios", "contrasenia", "coeficiente")
-            .isEqualTo(planillaAlumnos)
+            .ignoringFields("legajo", "carrera", "coeficiente")
+            .isEqualTo(alumnosRegistrados)
     }
 
     @Test
@@ -90,21 +89,27 @@ internal class ServiceDataTest {
     fun `se puede guardar una planilla de oferta de comisiones para un cuatrimestre`() {
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         val cuatri = cuatrimestreService.crear(formularioCuatrimestre)
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
 
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(
-                ComisionACrear(
+                ComisionNueva(
+                    bdd.codigo,
+                    "Bases de datos",
                     1,
-                    bdd.nombre,
-                    30,
-                    8
+                    Modalidad.PRESENCIAL,
+                    Locacion.Bernal,
+                    listOf(),
+                    12
                 ),
-                ComisionACrear(
+                ComisionNueva(
+                    bdd.codigo,
+                    "Bases de datos",
                     2,
-                    bdd.nombre,
-                    30,
-                    8
+                    Modalidad.PRESENCIAL,
+                    Locacion.Bernal,
+                    listOf(),
+                    14
                 )
             ),
             cuatrimestre = cuatri
@@ -117,47 +122,57 @@ internal class ServiceDataTest {
     }
 
     @Test
-    fun `se puede guardar una planilla y se obtienen las comisiones conflictivas por cuatrimestre, materia y numero`() {
+    fun `se puede guardar una planilla y se obtienen las comisiones conflictivas por fila y mensaje`() {
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         val cuatri = cuatrimestreService.crear(formularioCuatrimestre)
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
-        val crearBdd = ComisionACrear(
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
+        val crearBdd = ComisionNueva(
+            bdd.codigo,
+            "Bases de datos",
             1,
-            bdd.nombre,
-            30,
-            8
+            Modalidad.PRESENCIAL,
+            Locacion.Bernal,
+            listOf(),
+            12
         )
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(
                 crearBdd,
-                ComisionACrear(
+                ComisionNueva(
+                    bdd.codigo,
+                    "Bases de datos",
                     2,
-                    bdd.nombre,
-                    30,
-                    8
+                    Modalidad.PRESENCIAL,
+                    Locacion.Bernal,
+                    listOf(),
+                    14
                 )
             ),
             cuatrimestre = cuatri
         )
 
         val comisionesGuardadasConConflicto = comisionService
-            .actualizarOfertaAcademica(listOf(crearBdd), cuatrimestre = cuatri)
+            .subirOferta(listOf(crearBdd), cuatrimestre = cuatri)
 
         assertThat(comisionesGuardadasConConflicto).hasSize(1)
-        assertThat(comisionesGuardadasConConflicto.first().mensaje).isEqualTo("Ya existe esta comision")
+        assertThat(comisionesGuardadasConConflicto.first().fila).isEqualTo(12)
+        assertThat(comisionesGuardadasConConflicto.first().mensaje).isEqualTo("Ya existe la comision ${crearBdd.comision}, materia ${crearBdd.actividad}")
     }
 
     @Test
     fun `si no se aclara un cuatrimestre al subir la oferta academica, se crearan en el cuatrimestre actual`() {
-        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
 
-        comisionService.actualizarOfertaAcademica(
+        comisionService.subirOferta(
             listOf(
-                ComisionACrear(
+                ComisionNueva(
+                    bdd.codigo,
+                    "Bases de datos",
                     1,
-                    bdd.nombre,
-                    30,
-                    8
+                    Modalidad.PRESENCIAL,
+                    Locacion.Bernal,
+                    listOf(),
+                    12
                 ),
             )
         )
@@ -168,21 +183,13 @@ internal class ServiceDataTest {
         assertThat(ofertaDelCuatrimestre).allMatch { it.materia == bdd.nombre }
     }
 
-    @Test
-    fun `si al pedir la oferta de un cuatrimestre no tiene al menos una oferta se levanta una excepcion`() {
-        val excepcion = assertThrows<ExcepcionUNQUE> { comisionService.ofertaDelCuatrimestre() }
-        val cuatrimestre = Cuatrimestre.actual()
-        assertThat(excepcion.message)
-            .isEqualTo("No hay oferta registrada para el cuatrimestre ${cuatrimestre.anio}, ${cuatrimestre.semestre}")
-    }
-
     private fun generarAlumnos(prefijo: Int = 1): List<FormularioCrearAlumno> {
         val planilla = mutableListOf<FormularioCrearAlumno>()
         repeat(10) {
             planilla.add(
                 FormularioCrearAlumno(
                         prefijo + planilla.size, "pepe", "soria", "correo" + planilla.size + "@ejemplo.com",
-                        prefijo + planilla.size, Carrera.TPI, 0.0
+                        prefijo + planilla.size, Carrera.P, 0.0
                 )
             )
         }

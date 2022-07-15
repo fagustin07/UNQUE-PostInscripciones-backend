@@ -6,10 +6,13 @@ import ar.edu.unq.postinscripciones.model.comision.Dia
 import ar.edu.unq.postinscripciones.model.comision.Modalidad
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
 import ar.edu.unq.postinscripciones.persistence.FormularioRepository
 import ar.edu.unq.postinscripciones.persistence.SolicitudSobrecupoRepository
 import ar.edu.unq.postinscripciones.service.dto.alumno.*
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.AlumnoCarga
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionDTO
 import ar.edu.unq.postinscripciones.service.dto.comision.ComisionParaAlumno
 import ar.edu.unq.postinscripciones.service.dto.comision.HorarioDTO
@@ -61,7 +64,7 @@ internal class AlumnoServiceTest {
             "Martinez",
             "nicolas.martinez@unq.edu.ar",
             42256394,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
 
@@ -71,19 +74,19 @@ internal class AlumnoServiceTest {
             "Sandoval",
             "fede.sando@unq.edu.ar",
             11223344,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
 
         alumno = alumnoService.crear(nicoFormularioCrear)
         fede = alumnoService.crear(fedeFormularioCrear)
-        algo = materiaService.crear("Algoritmos", "ALG-208", mutableListOf(), Carrera.SIMULTANEIDAD)
-        funcional = materiaService.crear("Funcional", "FUN-205", mutableListOf(), Carrera.SIMULTANEIDAD)
+        algo = materiaService.crear("Algoritmos", "ALG-208", mutableListOf(), Carrera.PW)
+        funcional = materiaService.crear("Funcional", "FUN-205", mutableListOf(), Carrera.PW)
         val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
         val horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
 
         val formularioComision1 = FormularioComision(
@@ -155,7 +158,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `Un alumno no puede registrar un formulario para una materia que no tiene disponible`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.P)
         val formularioComision = FormularioComision(
             1,
             logica.codigo,
@@ -164,8 +167,8 @@ internal class AlumnoServiceTest {
             35,
             5,
             listOf(
-                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
-                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+                HorarioDTO(Dia.Lun, "18:00", "20:00"),
+                HorarioDTO(Dia.Jue, "09:00", "11:00")
             ),
             Modalidad.PRESENCIAL
         )
@@ -449,7 +452,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
@@ -477,7 +480,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val otroAlumno = alumnoService.crear(formularioAlumno)
@@ -505,7 +508,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno tiene disponible materias solo de su carrera`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(), Carrera.LI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(), Carrera.W)
         val materiasdisponibles =
             alumnoService.materiasDisponibles(alumno.dni, cuatrimestre)
         assertThat(materiasdisponibles.map { it.codigo }).doesNotContain(logica.codigo)
@@ -513,7 +516,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `un alumno no tiene disponible materias de las cuales no cumple los requisitos`() {
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf("ALG-208"), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf("ALG-208"), Carrera.P)
         val materiasdisponibles =
             alumnoService.materiasDisponibles(alumno.dni, cuatrimestre)
         assertThat(materiasdisponibles).hasSize(1)
@@ -529,13 +532,13 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
         alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.P)
         val formularioComision = FormularioComision(
             1,
             logica.codigo,
@@ -544,8 +547,8 @@ internal class AlumnoServiceTest {
             35,
             5,
             listOf(
-                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
-                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+                HorarioDTO(Dia.Lun, "18:00", "20:00"),
+                HorarioDTO(Dia.Jue, "09:00", "11:00")
             ),
             Modalidad.PRESENCIAL
         )
@@ -569,13 +572,13 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
         val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
         alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
-        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.TPI)
+        val logica = materiaService.crear("Lógica y Programacion", "LOG-209", mutableListOf(algo.codigo), Carrera.P)
         val formularioComision = FormularioComision(
             1,
             logica.codigo,
@@ -584,8 +587,8 @@ internal class AlumnoServiceTest {
             35,
             5,
             listOf(
-                HorarioDTO(Dia.LUNES, "18:00", "20:00"),
-                HorarioDTO(Dia.JUEVES, "09:00", "11:00")
+                HorarioDTO(Dia.Lun, "18:00", "20:00"),
+                HorarioDTO(Dia.Jue, "09:00", "11:00")
             ),
             Modalidad.PRESENCIAL
         )
@@ -609,7 +612,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
@@ -623,7 +626,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se levanta una excepcion al enviar un formulario pasada la fecha de fin aceptada por el cuatrimestre`() {
-        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
+        comisionService.subirOferta(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
 
         val excepcion = assertThrows<ExcepcionUNQUE> {
             alumnoService.guardarSolicitudPara(
@@ -638,7 +641,7 @@ internal class AlumnoServiceTest {
 
     @Test
     fun `se levanta una excepcion al enviar un formulario antes de la fecha de inicio aceptada por el cuatrimestre`() {
-        comisionService.actualizarOfertaAcademica(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
+        comisionService.subirOferta(listOf(), LocalDateTime.now(), LocalDateTime.now().plusDays(3))
 
         val excepcion = assertThrows<ExcepcionUNQUE> {
             alumnoService.guardarSolicitudPara(
@@ -656,7 +659,7 @@ internal class AlumnoServiceTest {
         val materiaCursada = MateriaCursadaDTO(algo.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val materiaCursada2 = MateriaCursadaDTO(funcional.codigo, EstadoMateria.DESAPROBADO, LocalDate.of(2020, 12, 20))
         val materiaCursada3 = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 7, 20))
-        val intro = materiaService.crear("Intro", "INT-205", mutableListOf(), Carrera.SIMULTANEIDAD)
+        val intro = materiaService.crear("Intro", "INT-205", mutableListOf(), Carrera.PW)
 
         val formularioComision2 = FormularioComision(
             1,
@@ -675,7 +678,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             44556,
-            Carrera.SIMULTANEIDAD,
+            Carrera.PW,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
@@ -743,7 +746,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             5.0
         )
         val nacho = alumnoService.crear(formularioAlumno)
@@ -858,7 +861,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     alumno.cantidadAprobadas(),
-                    alumno.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
                 AlumnoSolicitaMateria(
@@ -869,7 +871,6 @@ internal class AlumnoServiceTest {
                     comision2Algoritmos.numero,
                     algo.codigo,
                     fede.cantidadAprobadas(),
-                    fede.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
             )
@@ -881,8 +882,8 @@ internal class AlumnoServiceTest {
     fun `se pueden obtener los alumnos que pidieron una materia con una comision especifica`() {
         val formularioAlumno = alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!))
         val horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
 
         val formularioComision = FormularioComision(
@@ -910,7 +911,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     alumno.cantidadAprobadas(),
-                    alumno.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
             )
@@ -919,7 +919,7 @@ internal class AlumnoServiceTest {
     }
 
     @Test
-    fun `se pueden obtener los alumnos que pidieron una materia ordenados por mayor coeficiente`() {
+    fun `se pueden obtener los alumnos que pidieron una materia ordenados por materias aprobadas`() {
         val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
         val formularioNuevoAlumno = FormularioCrearAlumno(
             123456712,
@@ -927,7 +927,7 @@ internal class AlumnoServiceTest {
             "Sanchez",
             "pepe.sanchez@unq.edu.ar",
             4455611,
-            Carrera.TPI,
+            Carrera.P,
             8.21
         )
         var nacho = alumnoService.crear(formularioNuevoAlumno)
@@ -949,7 +949,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     nacho.cantidadAprobadas(),
-                    nacho.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
                 AlumnoSolicitaMateria(
@@ -960,7 +959,6 @@ internal class AlumnoServiceTest {
                     comision1Algoritmos.numero,
                     algo.codigo,
                     fede.cantidadAprobadas(),
-                    fede.coeficiente,
                     EstadoSolicitud.PENDIENTE
                 ),
             )
@@ -1142,6 +1140,27 @@ internal class AlumnoServiceTest {
     }
 
     @Test
+    fun `obtener listado de alumnos ordenado por cantidad de aprobadas`() {
+        val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val formularioAlumno = FormularioCrearAlumno(
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.P,
+                5.0
+        )
+
+        val nacho = alumnoService.crear(formularioAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
+        alumnoService.guardarSolicitudPara(alumno.dni, listOf(comision1Algoritmos.id!!, comision2Algoritmos.id!!), cuatrimestre)
+        alumnoService.guardarSolicitudPara(nacho.dni, listOf(comision1Algoritmos.id!!), cuatrimestre)
+        val alumnos = alumnoService.alumnosPorDni()
+        assertThat(alumnos.first().alumno.dni).isEqualTo(nacho.dni)
+    }
+    @Test
     fun `no se pueden pedir materias en las que declara ya estar inscripto por guarani`() {
         val excepcion = assertThrows<ExcepcionUNQUE> {
             alumnoService.guardarSolicitudPara(
@@ -1161,8 +1180,8 @@ internal class AlumnoServiceTest {
     @Test
     fun `no se pueden pedir comisiones que se superpongan en horarios con las que declara estar inscripto en guarani`() {
         val horarios = listOf(
-            HorarioDTO(Dia.LUNES, "18:30", "21:30"),
-            HorarioDTO(Dia.JUEVES, "18:30", "21:30")
+            HorarioDTO(Dia.Lun, "18:30", "21:30"),
+            HorarioDTO(Dia.Jue, "18:30", "21:30")
         )
         val formularioComision = FormularioComision(
             1,
@@ -1193,7 +1212,7 @@ internal class AlumnoServiceTest {
     @Test
     fun `se pueden pedir comisiones superpuestas en horarios pero de distintos dias`() {
         val horarios = listOf(
-            HorarioDTO(Dia.MARTES, "18:30", "21:30"),
+            HorarioDTO(Dia.Mar, "18:30", "21:30"),
         )
         val formularioComision = FormularioComision(
             1,
@@ -1407,6 +1426,42 @@ internal class AlumnoServiceTest {
         assertThat(formularioDirectivoDespuesDeComentar.comentarios.first().descripcion).isEqualTo("Todo bien")
         assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].autor).isEqualTo("Gabi")
         assertThat(formularioDirectivoDespuesDeComentar.comentarios[1].descripcion).isEqualTo("Aprobado por este lado")
+    }
+    @Test
+    fun `EL listado de alumnos esta ordenado por cantidad de materias aprobadas`() {
+        val materiaCursada = MateriaCursadaDTO(funcional.codigo, EstadoMateria.APROBADO, LocalDate.of(2021, 12, 20))
+        val formularioAlumno = FormularioCrearAlumno(
+                123456712,
+                "Pepe",
+                "Sanchez",
+                "pepe.sanchez@unq.edu.ar",
+                4455611,
+                Carrera.P,
+                5.0
+        )
+        val nacho = alumnoService.crear(formularioAlumno)
+        val actualizarHistoria = listOf(AlumnoConHistoriaAcademica(nacho.dni, listOf(materiaCursada)))
+        alumnoService.actualizarHistoriaAcademica(actualizarHistoria)
+
+        val alumnos = alumnoService.todos()
+        assertThat(alumnos.first().dni).isEqualTo(nacho.dni)
+    }
+
+    @Test
+    fun `Un alumno no puede registrar un formulario si no es regular`() {
+        alumnoService.subirAlumnos(
+            listOf( AlumnoCarga(alumno.dni, alumno.nombre, alumno.apellido, Carrera.P, 2015, EstadoInscripcion.Pendiente, Calidad.Pasivo, Regular.N, Locacion.Bernal, null, 123))
+        )
+
+        val excepcion = assertThrows<ErrorDeNegocio> {
+            alumnoService.guardarSolicitudPara(
+                alumno.dni,
+                listOf(comision1Algoritmos.id!!),
+                cuatrimestre
+            )
+        }
+
+        assertThat(excepcion.message).isEqualTo("No podes registar tu formulario porque no sos alumno regular")
     }
 
     @AfterEach

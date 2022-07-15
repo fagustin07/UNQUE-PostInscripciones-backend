@@ -2,7 +2,8 @@ package ar.edu.unq.postinscripciones.service
 
 import ar.edu.unq.postinscripciones.model.Directivo
 import ar.edu.unq.postinscripciones.model.EstadoCuenta
-import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.model.exception.AlumnoNoEncontrado
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import ar.edu.unq.postinscripciones.persistence.AlumnoRepository
 import ar.edu.unq.postinscripciones.persistence.DirectivoRepository
 import ar.edu.unq.postinscripciones.service.dto.CreacionDirectivo
@@ -38,25 +39,25 @@ class AutenticacionService {
         carga: LocalDateTime = LocalDateTime.now()
     ): AlumnoCodigo {
         val alumno = alumnoRepository.findById(dni)
-            .orElseThrow { ExcepcionUNQUE("No puedes registrarte. Comunicate con el equipo directivo") }
+            .orElseThrow { ErrorDeNegocio("No puedes registrarte. Comunicate con el equipo directivo") }
         val codigo = (1000000 + Math.random() * 9000000).toInt()
         alumno.actualizarCodigoYContrasenia(codigo, passwordEncoder.encode(contrasenia), carga)
-        if (contrasenia != confirmarContrasenia) throw ExcepcionUNQUE("Las contrasenias no coinciden")
+        if (contrasenia != confirmarContrasenia) throw ErrorDeNegocio("Las contrasenias no coinciden")
         alumnoRepository.save(alumno)
         return AlumnoCodigo(AlumnoDTO.desdeModelo(alumno), codigo)
     }
 
     @Transactional
     fun confirmarCuenta(dni: Int, codigo: Int, carga: LocalDateTime = LocalDateTime.now()) {
-        val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("No existe el alumno") }
+        val alumno = alumnoRepository.findById(dni).orElseThrow { AlumnoNoEncontrado(dni) }
         alumno.confirmarCuenta(codigo, carga)
         alumnoRepository.save(alumno)
     }
 
     @Transactional
     fun loguearse(dni: Int, contrasenia: String): String {
-        val alumno = alumnoRepository.findById(dni).orElseThrow { ExcepcionUNQUE("Cree o confirme su cuenta") }
-        if (alumno.estadoCuenta == EstadoCuenta.SIN_CONFIRMAR) throw ExcepcionUNQUE("Cree o confirme su cuenta")
+        val alumno = alumnoRepository.findById(dni).orElseThrow { ErrorDeNegocio("Cree o confirme su cuenta") }
+        if (alumno.estadoCuenta == EstadoCuenta.SIN_CONFIRMAR) throw ErrorDeNegocio("Cree o confirme su cuenta")
 
         return if (passwordEncoder.matches(contrasenia, alumno.contrasenia)) {
             jwtTokenUtil.generarTokenAlumno(alumno)
@@ -89,7 +90,7 @@ class AutenticacionService {
         throw credencialesInvalidas()
     }
 
-    private fun credencialesInvalidas() = ExcepcionUNQUE("Credenciales invalidas")
+    private fun credencialesInvalidas() = ErrorDeNegocio("Credenciales invalidas")
 
     @Transactional
     fun borrarTodos() {

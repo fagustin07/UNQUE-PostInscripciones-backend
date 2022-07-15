@@ -3,7 +3,9 @@ package ar.edu.unq.postinscripciones.model.comision
 import ar.edu.unq.postinscripciones.model.Materia
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Cuatrimestre
 import ar.edu.unq.postinscripciones.model.cuatrimestre.Semestre
+import ar.edu.unq.postinscripciones.model.exception.ErrorDeNegocio
 import ar.edu.unq.postinscripciones.model.exception.ExcepcionUNQUE
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +24,7 @@ internal class ComisionTest {
     fun `set up`() {
         val horarios: List<Horario> = horariosBdd()
         bdd = Materia()
-        comisionUnoBdd = Comision(bdd, 1, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales)
+        comisionUnoBdd = Comision(bdd, 1, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, locacion = Locacion.Berazategui)
     }
 
     @Test
@@ -53,8 +55,8 @@ internal class ComisionTest {
     @Test
     fun `una comision sabe modificar sus horarios`() {
         val nuevosHorarios = listOf(
-                Horario(Dia.MARTES, LocalTime.of(10, 0), LocalTime.of(12, 0)),
-                Horario(Dia.JUEVES, LocalTime.of(10, 0), LocalTime.of(12, 0)))
+                Horario(Dia.Mar, LocalTime.of(10, 0), LocalTime.of(12, 0)),
+                Horario(Dia.Jue, LocalTime.of(10, 0), LocalTime.of(12, 0)))
         comisionUnoBdd.modificarHorarios(nuevosHorarios)
 
         assertThat(comisionUnoBdd.horarios).usingRecursiveComparison().isEqualTo(nuevosHorarios)
@@ -66,14 +68,19 @@ internal class ComisionTest {
     }
 
     @Test
+    fun `una comision conoce donde se dicta`() {
+        assertThat(comisionUnoBdd.locacion).isEqualTo(Locacion.Berazategui)
+    }
+
+    @Test
     fun `una comision conoce sus cupos disponibles`() {
         assertThat(comisionUnoBdd.sobrecuposDisponibles()).isEqualTo(sobrecuposTotales)
     }
     @Test
     fun `Una comision sabe su modalidad`() {
         val horarios: List<Horario> = horariosBdd()
-        val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL)
-        assertThat(comisionDosBdd.modalidad).isEqualTo(Modalidad.VIRTUAL)
+        val comisionDosBdd = Comision(bdd, 2, cuatrimestre, horarios.toMutableList(), cuposTotales, sobrecuposTotales, Modalidad.VIRTUAL_SINCRONICA)
+        assertThat(comisionDosBdd.modalidad).isEqualTo(Modalidad.VIRTUAL_SINCRONICA)
     }
 
     @Test
@@ -109,11 +116,44 @@ internal class ComisionTest {
         assertThat(exception.message).isEqualTo("No hay sobrecupos ocupados")
     }
 
+    @Test
+    fun `Se puede modificar la cantidad de cupos totales de una comision`() {
+        val comision = Comision(bdd, cuposTotales = 30)
+        val cuposAntes = comision.cuposTotales
+
+        comision.modificarCuposTotales(20)
+
+        assertThat(comision.cuposTotales).isEqualTo(20)
+        assertThat(cuposAntes).isNotEqualTo(comision.cuposTotales)
+    }
+
+    @Test
+    fun `Se puede modificar la cantidad de sobrecupos totales de una comision`() {
+        val comision = Comision(bdd, sobrecuposTotales = 5)
+        val sobrecuposAntes = comision.sobrecuposTotales
+
+        comision.modificarSobreuposTotales(2)
+
+        assertThat(comision.sobrecuposTotales).isEqualTo(2)
+        assertThat(sobrecuposAntes).isNotEqualTo(comision.sobrecuposTotales)
+    }
+
+    @Test
+    fun `No se puede asignar menos sobrecupos totales que los ocupados a una comision`() {
+        val comision = Comision(bdd, sobrecuposTotales = 2)
+        comision.asignarSobrecupo()
+        comision.asignarSobrecupo()
+
+        val exception =  assertThrows<ErrorDeNegocio> { comision.modificarSobreuposTotales(1) }
+
+        assertThat(exception.message).isEqualTo("No se puede modificar la cantidad de sobrecupos dado que la cantidad de sobrecupos ocupados es mayor")
+    }
+
 
     fun horariosBdd(): List<Horario> {
         return listOf(
-            Horario(Dia.LUNES, LocalTime.of(18, 0), LocalTime.of(21, 0)),
-            Horario(Dia.MIERCOLES, LocalTime.of(12, 0), LocalTime.of(15, 0))
+            Horario(Dia.Lun, LocalTime.of(18, 0), LocalTime.of(21, 0)),
+            Horario(Dia.Mie, LocalTime.of(12, 0), LocalTime.of(15, 0))
         )
     }
 }

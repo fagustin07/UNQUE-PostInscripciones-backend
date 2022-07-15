@@ -12,12 +12,12 @@ internal class HorarioTest {
 
     @BeforeEach
     fun `set up`() {
-        horario = Horario(Dia.LUNES, horaDieciocho, horaVeintiuno)
+        horario = Horario(Dia.Lun, horaDieciocho, horaVeintiuno)
     }
 
     @Test
     fun `un horario conoce su dia`() {
-        assertThat(horario.dia).isEqualTo(Dia.LUNES)
+        assertThat(horario.dia).isEqualTo(Dia.Lun)
     }
 
     @Test
