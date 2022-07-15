@@ -222,17 +222,52 @@ internal class ComisionServiceTest {
 
         val ofertaObtenida = comisionService.ofertaDelCuatrimestre("DAT")
 
-        assertThat(ofertaObtenida).contains(ComisionDTO.desdeModelo(comision), ComisionDTO.desdeModelo(comision3), ComisionDTO.desdeModelo(comision2))
+        assertThat(ofertaObtenida).contains(
+            ComisionDTO.desdeModelo(comision),
+            ComisionDTO.desdeModelo(comision3),
+            ComisionDTO.desdeModelo(comision2)
+        )
         assertThat(ofertaObtenida).doesNotContain(ComisionDTO.desdeModelo(comisionExcluida))
     }
 
     @Test
     fun `Se puede modificar la cantidad de cupos y sobrecupos totales de una comision persisitida`() {
-        val cambioDeCuposYSobrecupos =  CambioDeCuposYSobrecupos(comision.id!!, 40, 2)
+        val cambioDeCuposYSobrecupos = CambioDeCuposYSobrecupos(comision.id!!, 40, 2)
         val comision = comisionService.cambiarCantidadDeCuposYSobreCupos(cambioDeCuposYSobrecupos)
 
         assertThat(comision.cuposTotales).isEqualTo(40)
         assertThat(comision.sobreCuposTotales).isEqualTo(2)
+    }
+
+    @Test
+    fun `se puede crear la misma comision para diferentes locaciones`() {
+        val conflictos = comisionService.subirOferta(
+            listOf(
+                ComisionNueva(
+                    bdd.codigo,
+                    bdd.nombre,
+                    5,
+                    Modalidad.VIRTUAL_ASINCRONICA,
+                    Locacion.Bernal,
+                    listOf(),
+                    123
+                ),
+                ComisionNueva(
+                    bdd.codigo,
+                    bdd.nombre,
+                    5,
+                    Modalidad.VIRTUAL_ASINCRONICA,
+                    Locacion.General_Belgrano,
+                    listOf(),
+                    124
+                )
+            )
+        )
+
+        val comisionesBdd = comisionService.obtenerComisionesMateria(bdd.codigo)
+        assertThat(conflictos).isEmpty()
+        assertThat(comisionesBdd.any { it.numero == 5 && it.locacion == Locacion.Bernal }).isTrue
+        assertThat(comisionesBdd.any { it.numero == 5 && it.locacion == Locacion.General_Belgrano }).isTrue
     }
 
     @AfterEach

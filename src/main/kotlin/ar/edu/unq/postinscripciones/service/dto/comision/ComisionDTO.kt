@@ -2,6 +2,7 @@ package ar.edu.unq.postinscripciones.service.dto.comision
 
 import ar.edu.unq.postinscripciones.model.comision.Comision
 import ar.edu.unq.postinscripciones.model.comision.Modalidad
+import ar.edu.unq.postinscripciones.service.dto.carga.datos.Locacion
 import io.swagger.annotations.ApiModelProperty
 
 data class ComisionDTO(
@@ -17,7 +18,9 @@ data class ComisionDTO(
     val sobreCuposTotales: Int,
     @ApiModelProperty(example = "12")
     val cuposDisponibles: Int,
-    val horarios: List<HorarioDTO>
+    val horarios: List<HorarioDTO>,
+    @ApiModelProperty(example = "Bernal")
+    val locacion: Locacion
 ) {
 
     companion object {
@@ -29,7 +32,8 @@ data class ComisionDTO(
                 comision.cuposTotales,
                 comision.sobrecuposTotales,
                 comision.sobrecuposDisponibles(),
-                comision.horarios.map { HorarioDTO.desdeModelo(it) }
+                comision.horarios.map { HorarioDTO.desdeModelo(it) },
+                comision.locacion
             )
         }
     }

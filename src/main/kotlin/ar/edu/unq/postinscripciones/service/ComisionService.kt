@@ -97,7 +97,7 @@ class ComisionService {
             .orElseThrow { CuatrimestreNoEncontrado() }
         val materia = materiaRepository.findById(codigoMateria)
             .orElseThrow { MateriaNoEncontrada(codigoMateria) }
-        val comisiones = comisionRespository.findAllByMateriaAndCuatrimestreAnioAndCuatrimestreSemestre(materia, cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
+        val comisiones = comisionRespository.findAllByMateriaAndCuatrimestreAnioAndCuatrimestreSemestreOrderByNumero(materia, cuatrimestreObtenido.anio, cuatrimestreObtenido.semestre)
 
         return comisiones.map { ComisionDTO.desdeModelo(it) }
     }
@@ -131,7 +131,7 @@ class ComisionService {
                 conflictos.add(Conflicto(comisionNueva.fila, mensaje))
             } else {
                 val existeComision = comisionRespository
-                    .findByNumeroAndMateriaAndCuatrimestre(comisionNueva.comision, materia.get(), cuatrimestreObtenido)
+                    .findByNumeroAndMateriaAndCuatrimestreAndLocacion(comisionNueva.comision, materia.get(), cuatrimestreObtenido, comisionNueva.locacion)
                 if (existeComision.isPresent) {
                     val mensaje = "Ya existe la comision ${comisionNueva.comision}, materia ${comisionNueva.actividad}"
                     conflictos.add(Conflicto(comisionNueva.fila,  mensaje))

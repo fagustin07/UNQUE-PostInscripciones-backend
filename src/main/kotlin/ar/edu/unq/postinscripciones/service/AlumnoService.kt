@@ -196,6 +196,7 @@ class AlumnoService {
             cuatrimestreObtenido.anio,
             cuatrimestreObtenido.semestre
         )
+        formulario.solicitudes.sortBy { it.comision.numero }
 
         return if (formulario.estado === EstadoFormulario.CERRADO) {
             FormularioAlumnoDTO.desdeModelo(formulario, dni)

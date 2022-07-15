@@ -224,6 +224,11 @@ class DataSeed(
                 Horario(Dia.Jue, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
             )
 
+            val bddhorariosc12019 = mutableListOf(
+                Horario(Dia.Mar, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),
+                Horario(Dia.Jue, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
+            )
+
             val bddhorariosc2 = mutableListOf(
                 Horario(Dia.Lun, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0)),
                 Horario(Dia.Mie, LocalTime.of(10, 0, 0), LocalTime.of(12, 0, 0))
@@ -241,6 +246,22 @@ class DataSeed(
             )
 
             val introhorariosc1 = mutableListOf(
+                Horario(Dia.Mar, LocalTime.of(18, 0, 0), LocalTime.of(20, 0, 0)),
+                Horario(Dia.Jue, LocalTime.of(18, 0, 0), LocalTime.of(22, 0, 0))
+            )
+
+            val matehorarios2019 = mutableListOf(
+                Horario(Dia.Lun, LocalTime.of(10, 30, 0), LocalTime.of(12, 30, 0)),
+                Horario(Dia.Jue, LocalTime.of(10, 30, 0), LocalTime.of(12, 30, 0))
+            )
+
+            val estrhorarios2019 = mutableListOf(
+                Horario(Dia.Lun, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0)),
+                Horario(Dia.Mie, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0)),
+                Horario(Dia.Vie, LocalTime.of(9, 0, 0), LocalTime.of(12, 0, 0))
+            )
+
+            val introhorariosc12019 = mutableListOf(
                 Horario(Dia.Mar, LocalTime.of(18, 0, 0), LocalTime.of(20, 0, 0)),
                 Horario(Dia.Jue, LocalTime.of(18, 0, 0), LocalTime.of(22, 0, 0))
             )
@@ -269,10 +290,10 @@ class DataSeed(
             val orgac1 = Comision(orga, 1, cuatrimestre, orgahorariosc1)
             val inglesc1 = Comision(ingles1, 1, cuatrimestre, ingles1horariosc1, locacion = Locacion.General_Belgrano)
 
-            val bddc12019S1 = Comision(bdd, 1, cuatrimestre2019S1, bddhorariosc1)
-            val matec12019S1 = Comision(mate1, 1, cuatrimestre2019S1, matehorarios)
-            val estrc12019S2 = Comision(estructura, 1, cuatrimestre2019S2, estrhorarios)
-            val introc12019S2 = Comision(intro, 1, cuatrimestre2019S2, introhorariosc1)
+            val bddc12019S1 = Comision(bdd, 1, cuatrimestre2019S1, bddhorariosc12019)
+            val matec12019S1 = Comision(mate1, 1, cuatrimestre2019S1, matehorarios2019)
+            val estrc12019S2 = Comision(estructura, 1, cuatrimestre2019S2, estrhorarios2019)
+            val introc12019S2 = Comision(intro, 1, cuatrimestre2019S2, introhorariosc12019)
             val contrasenia = passwordEncoder.encode("contrasenia")
 
             val jorge = Alumno(
