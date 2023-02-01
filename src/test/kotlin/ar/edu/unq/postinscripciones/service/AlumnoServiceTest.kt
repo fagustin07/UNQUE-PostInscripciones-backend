@@ -29,6 +29,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Year
 
 @IntegrationTest
 internal class AlumnoServiceTest {
@@ -56,6 +57,9 @@ internal class AlumnoServiceTest {
     private lateinit var algo: MateriaDTO
     private lateinit var funcional: MateriaDTO
 
+    private val semestre = Semestre.actual()
+    private val anio = Year.now().value
+
     @BeforeEach
     fun setUp() {
         val nicoFormularioCrear = FormularioCrearAlumno(
@@ -82,7 +86,7 @@ internal class AlumnoServiceTest {
         fede = alumnoService.crear(fedeFormularioCrear)
         algo = materiaService.crear("Algoritmos", "ALG-208", mutableListOf(), Carrera.PW)
         funcional = materiaService.crear("Funcional", "FUN-205", mutableListOf(), Carrera.PW)
-        val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
+        val formularioCuatrimestre = FormularioCuatrimestre(anio, semestre)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
         val horarios = listOf(
             HorarioDTO(Dia.Lun, "18:30", "21:30"),
@@ -92,8 +96,8 @@ internal class AlumnoServiceTest {
         val formularioComision1 = FormularioComision(
             1,
             algo.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,
@@ -103,8 +107,8 @@ internal class AlumnoServiceTest {
         val formularioComision2 = FormularioComision(
                 2,
                 algo.codigo,
-                2022,
-                Semestre.S1,
+                anio,
+                semestre,
                 35,
                 5,
                 horarios,
@@ -239,8 +243,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             comision1Algoritmos.horarios.map { HorarioDTO.desdeModelo(it) },
@@ -664,8 +668,8 @@ internal class AlumnoServiceTest {
         val formularioComision2 = FormularioComision(
             1,
             intro.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             listOf(),
@@ -768,8 +772,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             listOf(),
@@ -791,8 +795,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             listOf(),
@@ -827,8 +831,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             listOf(),
@@ -889,8 +893,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             2,
             algo.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,
@@ -1186,8 +1190,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             1,
             funcional.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,
@@ -1217,8 +1221,8 @@ internal class AlumnoServiceTest {
         val formularioComision = FormularioComision(
             1,
             funcional.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,

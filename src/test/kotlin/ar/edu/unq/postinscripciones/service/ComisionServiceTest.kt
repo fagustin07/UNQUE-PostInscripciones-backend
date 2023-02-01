@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
+import java.time.Year
 
 @IntegrationTest
 internal class ComisionServiceTest {
@@ -48,6 +49,9 @@ internal class ComisionServiceTest {
     private lateinit var comision2: Comision
     private lateinit var comision3: Comision
 
+    private val semestre = Semestre.actual()
+    private val anio = Year.now().value
+
     @BeforeEach
     fun setUp() {
         val alumno =
@@ -56,7 +60,7 @@ internal class ComisionServiceTest {
             alumnoService.crear(FormularioCrearAlumno(1233123, "", "", "", 12345, Carrera.W, 5.0))
 
         bdd = materiaService.crear("Base de datos", "BBD-208", mutableListOf(), Carrera.PW)
-        val formularioCuatrimestre = FormularioCuatrimestre(2022, Semestre.S1)
+        val formularioCuatrimestre = FormularioCuatrimestre(anio, semestre)
         cuatrimestre = cuatrimestreService.crear(formularioCuatrimestre)
 
         horarios = listOf(
@@ -67,8 +71,8 @@ internal class ComisionServiceTest {
         val formulario = FormularioComision(
             1,
             bdd.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,
@@ -82,8 +86,8 @@ internal class ComisionServiceTest {
         val formulario2 = FormularioComision(
             2,
             bdd.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,
@@ -92,8 +96,8 @@ internal class ComisionServiceTest {
         val formulario3 = FormularioComision(
             3,
             bdd.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             35,
             5,
             horarios,
@@ -143,7 +147,7 @@ internal class ComisionServiceTest {
     @Test
     fun `se puede guardar una oferta academica con un inicio y un fin para registrar formularios`() {
         val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
-        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
+        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, semestre))
         val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
@@ -174,7 +178,7 @@ internal class ComisionServiceTest {
 
     @Test
     fun `se puede actualizar solo una fecha para aceptar formularios del cuatrimestre `() {
-        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, Semestre.S1))
+        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, semestre))
         val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
 
         comisionService.subirOferta(
@@ -211,8 +215,8 @@ internal class ComisionServiceTest {
         val formulario = FormularioComision(
             1,
             algoritmos.codigo,
-            2022,
-            Semestre.S1,
+            anio,
+            semestre,
             30,
             8,
             horarios,
