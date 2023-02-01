@@ -51,6 +51,7 @@ internal class ComisionServiceTest {
 
     private val semestre = Semestre.actual()
     private val anio = Year.now().value
+    private val anioFuturo =  Year.now().value + 2
 
     @BeforeEach
     fun setUp() {
@@ -147,9 +148,9 @@ internal class ComisionServiceTest {
     @Test
     fun `se puede guardar una oferta academica con un inicio y un fin para registrar formularios`() {
         val bdd = materiaService.crear("Bases de Datos", "BD", mutableListOf(), Carrera.PW)
-        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, semestre))
-        val inicioInscripciones = LocalDateTime.of(2023, 3, 1, 12, 30)
-        val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
+        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(anioFuturo, semestre))
+        val inicioInscripciones = LocalDateTime.of(anioFuturo, 3, 1, 12, 30)
+        val finInscripciones = LocalDateTime.of(anioFuturo, 3, 16, 12, 30)
 
         comisionService.subirOferta(
             listOf(
@@ -178,8 +179,8 @@ internal class ComisionServiceTest {
 
     @Test
     fun `se puede actualizar solo una fecha para aceptar formularios del cuatrimestre `() {
-        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(2023, semestre))
-        val finInscripciones = LocalDateTime.of(2023, 3, 16, 12, 30)
+        val miCuatrimestre = cuatrimestreService.crear(FormularioCuatrimestre(anioFuturo, semestre))
+        val finInscripciones = LocalDateTime.of(anioFuturo, 3, 16, 12, 30)
 
         comisionService.subirOferta(
             listOf(),
