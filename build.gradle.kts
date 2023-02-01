@@ -38,6 +38,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	implementation ("org.slf4j:slf4j-api:1.7.30")
+	implementation ("me.paulschwarz:spring-dotenv:3.0.0")
 }
 
 tasks.withType<KotlinCompile> {
