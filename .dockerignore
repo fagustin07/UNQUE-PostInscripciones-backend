@@ -1,1 +1,4 @@
 mysql-volume
+.gradle/
+build/
+logs/
