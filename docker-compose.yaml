@@ -2,10 +2,10 @@ version: '3.9'
 
 services:
   app:
-    container_name: postinscripciones
-    build: .
+    container_name: postinscripciones_app
+    build:
+      context: .
     restart: always
-    env_file: .env
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
@@ -19,11 +19,9 @@ services:
     ports:
       - ${DB_PORT}:${DB_PORT}
     volumes:
-      - mysql-volume:/var/lib/mysql
+      - db-data-volume:/var/lib/mysql-data
     environment:
       - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
 volumes:
-  mysql-volume :
+  db-data-volume:
