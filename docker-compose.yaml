@@ -2,46 +2,26 @@ version: '3.9'
 
 services:
   app:
-    container_name: UNQUE
-    build: .
+    container_name: postinscripciones_app
+    build:
+      context: .
     restart: always
-    env_file: .env
     ports:
-      - ${SPRING_LOCAL_PORT-8080}:${SPRING_DOCKER_PORT-8080}
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
-      - mysql
-    environment:
-      SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url": "${SPRING_DATABASE_URL-jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL}",
-        "spring.datasource.username": "${MYSQLDB_USER-root}",
-        "spring.datasource.password": "${MYSQLDB_ROOT_PASSWORD-root}",
-        "spring.datasource.driver-class-name": "${SPRING_DATABASE_DRIVER-org.h2.Driver}",
-        "spring.jpa.hibernate.ddl-auto": "update",
-        "spring.jpa.database-platform": "${SPRING_DATABASE_PLATFORM-org.hibernate.dialect.H2Dialect}",
-        "spring.jpa.properties.hibernate.show_sql": true,
-        "spring.jpa.generate-ddl": true,
-        "server.port": "${SPRING_DOCKER_PORT-8080}",
-        "spring.security.user.password": "${SPRING_SECURITY_PASSWORD-root}",
-        "spring.security.user.name":"${SPRING_SECURITY_USER-root}",
-        "spring.security.user.roles": "admin", 
-        "spring.liquibase.enabled":false,
-        "spring.flyway.enabled":true,
-        "spring.flyway.baselineOnMigrate":true,
-        "spring.flyway.url":"${SPRING_DATABASE_URL-jdbc:h2:mem:testdb}",
-        "spring.flyway.user":"${MYSQLDB_USER-root}",
-        "spring.flyway.password":"${MYSQLDB_ROOT_PASSWORD-root}",
-        "spring.flyway.schemas[0]":"${MYSQLDB_DATABASE-unque}",
-        "spring.flyway.create-schemas":true,
-        "spring.flyway.locations":"classpath:/db/migrations" }'
-  mysql:
+      - db
+    links:
+      - db
+  db:
     image: "mysql:8.0"
     restart: always
+    container_name: postinscripciones_db
     ports:
-      - ${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}
+      - ${DB_PORT}:${DB_PORT}
     volumes:
-      - mysql-volume:/var/lib/mysql
+      - db-data-volume:/var/lib/mysql-data
     environment:
-      MYSQL_DATABASE: ${MYSQLDB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQLDB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
 volumes:
-  mysql-volume :
+  db-data-volume:

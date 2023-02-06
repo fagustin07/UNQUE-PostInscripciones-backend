@@ -43,6 +43,9 @@ class DataSeed(
     @Value("\${admin.password}")
     private lateinit var adminPassword: String
 
+    @Value("\${admin.user}")
+    private lateinit var adminUser: String
+
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
 
@@ -470,7 +473,7 @@ class DataSeed(
                 AlumnoConHistoriaAcademica(45678900, historiaAcademica)
             ))
 
-            autenticacionService.crearDirectivo(CreacionDirectivo("gabi@unque.edu.ar", "Gabi A", adminPassword))
+            autenticacionService.crearDirectivo(CreacionDirectivo(adminUser, "Gabi A", adminPassword))
             val cantMaterias = materiaRepository.count()
             val cantComisiones = comisionRespository.count()
             val cantAlumnos = alumnoRepository.count()

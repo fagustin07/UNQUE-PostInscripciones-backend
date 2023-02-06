@@ -1,5 +1,7 @@
 FROM openjdk:8-alpine
 
-COPY ./build/libs/postinscripciones-0.0.1-SNAPSHOT.jar app.jar
+WORKDIR /usr/app
+COPY . .
+RUN ./gradlew build -x test
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","./build/libs/postinscripciones-0.0.1-SNAPSHOT.jar"]
